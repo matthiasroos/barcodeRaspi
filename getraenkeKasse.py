@@ -36,17 +36,6 @@ class UserFrame(wx.Frame):
 
 
         self.SetBackgroundColour("Gray")
-
-        #btnBack = wx.Button(panel, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (width-2*btnWidth, height-btnHeight))
-        #self.btnBack = wx.Button(panel, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (0, 0))
-        #self.btnBack.SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD))
-        #self.btnBack.Bind(wx.EVT_BUTTON,self.OnClickedBackButton)
-        #self.btnBack.Disable()
-        #btnConfirm = wx.Button(panel, id = wx.ID_ANY, label = "confirm", name = "confirm", size = wx.Size(btnWidth, btnHeight), pos = (width-1*btnWidth, height-btnHeight))
-        #self.btnConfirm = wx.Button(panel, id = wx.ID_ANY, label = "confirm", name = "confirm", size = wx.Size(btnWidth, btnHeight), pos = ( 100, 100))
-        #self.btnConfirm.SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD))
-        #self.btnConfirm.Bind(wx.EVT_BUTTON,self.OnClickedConfirmButton)
-        #self.btnConfirm.Disable()
         self.ShowFullScreen(True)        
     
     def readUsers(self):
@@ -76,23 +65,11 @@ class UserFrame(wx.Frame):
         #        btn.Disable()
         #lbl = wx.StaticText(self, -1, style=wx.ALIGN_CENTER, label=button_by_id.GetName())
         #self.update()
-        #time.sleep(60)
         self.user = button_by_id.GetLabel()
         #self.btnBack.Enable()
         frameScan = ScanFrame()
         #while True:
         #    print(basc.barcode_reader())
-
-    #def OnClickedBackButton(self, event): 
-    #    btn = event.GetEventObject().GetLabel() 
-    #    print "Label of pressed button = ",btn
-    #    for btn in self.button:
-    #        btn.Enable()
-    #    self.btnBack.Disable()
-
-    #def OnClickedConfirmButton(self, event):
-    #    btn = event.GetEventObject().GetLabel()
-   #    print "Label of pressed button = ", btn
 
 class ScanFrame(wx.Frame):
     
