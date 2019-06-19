@@ -26,7 +26,7 @@ class UserFrame(wx.Frame):
         for i in range(0, nrUsers):
             self.button.append(wx.Button(panel, id = wx.ID_ANY, label = users[i], name = users[i], size = wx.Size(btnWidth, btnHeight), pos = (posX, posY)))
             self.button[i].SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD))
-            self.button[i].Bind(wx.EVT_BUTTON, self.onClickNameButton)
+            self.button[i].Bind(wx.EVT_LEFT_UP, self.onClickNameButton)
             #self.buildButtons(button[i])
             if ((posY + 2*btnHeight + offset) < height):
                 posY = posY + btnHeight + offset
@@ -112,19 +112,19 @@ class ScanFrame(wx.Frame):
         self.btnBack = wx.Button(panel, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (width-2*btnWidth, height-btnHeight))
         #self.btnBack = wx.Button(panel, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (0, 0))
         self.btnBack.SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD))
-        self.btnBack.Bind(wx.EVT_BUTTON,self.OnClickedBackButton)
+        self.btnBack.Bind(wx.EVT_LEFT_UP,self.OnClickedBackButton)
         #self.btnBack.Disable()
         self.btnConfirm = wx.Button(panel, id = wx.ID_ANY, label = "confirm", name = "confirm", size = wx.Size(btnWidth, btnHeight), pos = (width-1*btnWidth, height-btnHeight))
         #self.btnConfirm = wx.Button(panel, id = wx.ID_ANY, label = "confirm", name = "confirm", size = wx.Size(btnWidth, btnHeight), pos = ( 100, 100))
         self.btnConfirm.SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD))
-        self.btnConfirm.Bind(wx.EVT_BUTTON,self.OnClickedConfirmButton)
+        self.btnConfirm.Bind(wx.EVT_LEFT_UP,self.OnClickedConfirmButton)
         self.btnConfirm.Disable()
         
         self.Text = wx.StaticText(panel, label = (frame.user+", was darf es sein?"), pos = (width/3, height/3), size = (150, 50))
         self.Text.SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.Code = wx.TextCtrl(panel, pos = (width/3, height/2), size = (300, 120))
         self.Code.SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD))
-
+        self.Code.SetFocus()
 
         self.ShowFullScreen(True)
 
