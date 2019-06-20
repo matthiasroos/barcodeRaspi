@@ -12,6 +12,7 @@ class UserFrame(wx.Frame):
 
     width = []
     height = []
+    user = []
 
     def __init__(self):
         """Constructor"""
@@ -53,7 +54,7 @@ class UserFrame(wx.Frame):
 
     def onClickNameButton(self, event):
         """
-        This method is fired when its corresponding button is pressed
+        This method is fired when a User button is pressed
         """
         #button = event.GetEventObject()
         #print "The button you pressed was labeled: " + button.GetLabel()
@@ -69,7 +70,7 @@ class UserFrame(wx.Frame):
         #        btn.Disable()
         #lbl = wx.StaticText(self, -1, style=wx.ALIGN_CENTER, label=button_by_id.GetName())
         #self.update()
-        self.user = button_by_id.GetLabel()
+        type(self).user = button_by_id.GetLabel()
         #self.btnBack.Enable()
         frameScan = ScanFrame()
         #while True:
@@ -79,7 +80,7 @@ class ScanFrame(wx.Frame):
     
     def __init__(self):
         """Constructor"""
-        wx.Frame.__init__(self, None, title = "ScanFame", style = wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP)
+        wx.Frame.__init__(self, None, title = "ScanFrame", style = wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP)
         panel = wx.Panel(self)
 
 
@@ -88,15 +89,15 @@ class ScanFrame(wx.Frame):
         self.btnBack = wx.Button(panel, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (UserFrame.width-2*btnWidth, UserFrame.height-btnHeight))
         #self.btnBack = wx.Button(panel, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (0, 0))
         self.btnBack.SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD))
-        self.btnBack.Bind(wx.EVT_LEFT_UP,self.OnClickedBackButton)
+        self.btnBack.Bind(wx.EVT_LEFT_UP,self.onClickBackButton)
         #self.btnBack.Disable()
         self.btnConfirm = wx.Button(panel, id = wx.ID_ANY, label = "confirm", name = "confirm", size = wx.Size(btnWidth, btnHeight), pos = (UserFrame.width-1*btnWidth, UserFrame.height-btnHeight))
         #self.btnConfirm = wx.Button(panel, id = wx.ID_ANY, label = "confirm", name = "confirm", size = wx.Size(btnWidth, btnHeight), pos = ( 100, 100))
         self.btnConfirm.SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD))
-        self.btnConfirm.Bind(wx.EVT_LEFT_UP,self.OnClickedConfirmButton)
+        self.btnConfirm.Bind(wx.EVT_LEFT_UP,self.onClickConfirmButton)
         self.btnConfirm.Disable()
         
-        self.Text = wx.StaticText(panel, label = (frame.user+", was darf es sein?"), pos = (UserFrame.width/3, UserFrame.height/3), size = (150, 50))
+        self.Text = wx.StaticText(panel, label = (UserFrame.user+", was darf es sein?"), pos = (UserFrame.width/3, UserFrame.height/3), size = (150, 50))
         self.Text.SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.Code = wx.TextCtrl(panel, pos = (UserFrame.width/3, UserFrame.height/2), size = (300, 120))
         self.Code.SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD))
@@ -104,7 +105,7 @@ class ScanFrame(wx.Frame):
 
         self.ShowFullScreen(True)
 
-    def OnClickedBackButton(self, event):
+    def onClickBackButton(self, event):
         """"""
         btn = event.GetEventObject().GetLabel()
         print "Label of pressed button = ",btn
@@ -113,7 +114,7 @@ class ScanFrame(wx.Frame):
         #self.btnBack.Disable()
         self.Close()
 
-    def OnClickedConfirmButton(self, event):
+    def onClickConfirmButton(self, event):
         """"""
         btn = event.GetEventObject().GetLabel()
         print "Label of pressed button = ", btn
