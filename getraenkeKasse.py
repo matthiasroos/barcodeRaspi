@@ -4,21 +4,25 @@ import time
 import barcodescanner as basc
 
 usersFile = "user.txt"
+btnHeight = 50
+btnWidth = 150
+
 
 class UserFrame(wx.Frame):
+
+    width = []
+    height = []
 
     def __init__(self):
         """Constructor"""
         wx.Frame.__init__(self, None, title = "Test Fullscreen")
         panel = wx.Panel(self)
 
-        width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)
-        height = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y)
+        type(self).width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)
+        type(self).height = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y)
 
         users = self.readUsers()
         nrUsers = len(users)
-        btnHeight = 50
-        btnWidth = 150
         offset = 5
         posX = offset
         posY = offset
@@ -28,7 +32,7 @@ class UserFrame(wx.Frame):
             self.button[i].SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD))
             self.button[i].Bind(wx.EVT_LEFT_UP, self.onClickNameButton)
             #self.buildButtons(button[i])
-            if ((posY + 2*btnHeight + offset) < height):
+            if ((posY + 2*btnHeight + offset) < type(self).height):
                 posY = posY + btnHeight + offset
             else:
                 posY = offset
@@ -78,28 +82,23 @@ class ScanFrame(wx.Frame):
         wx.Frame.__init__(self, None, title = "ScanFame", style = wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP)
         panel = wx.Panel(self)
 
-        width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)
-        height = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y)
-
-        btnHeight = 50
-        btnWidth = 150
 
         #self.SetBackgroundColour("Gray")
 
-        self.btnBack = wx.Button(panel, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (width-2*btnWidth, height-btnHeight))
+        self.btnBack = wx.Button(panel, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (UserFrame.width-2*btnWidth, UserFrame.height-btnHeight))
         #self.btnBack = wx.Button(panel, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (0, 0))
         self.btnBack.SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.btnBack.Bind(wx.EVT_LEFT_UP,self.OnClickedBackButton)
         #self.btnBack.Disable()
-        self.btnConfirm = wx.Button(panel, id = wx.ID_ANY, label = "confirm", name = "confirm", size = wx.Size(btnWidth, btnHeight), pos = (width-1*btnWidth, height-btnHeight))
+        self.btnConfirm = wx.Button(panel, id = wx.ID_ANY, label = "confirm", name = "confirm", size = wx.Size(btnWidth, btnHeight), pos = (UserFrame.width-1*btnWidth, UserFrame.height-btnHeight))
         #self.btnConfirm = wx.Button(panel, id = wx.ID_ANY, label = "confirm", name = "confirm", size = wx.Size(btnWidth, btnHeight), pos = ( 100, 100))
         self.btnConfirm.SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.btnConfirm.Bind(wx.EVT_LEFT_UP,self.OnClickedConfirmButton)
         self.btnConfirm.Disable()
         
-        self.Text = wx.StaticText(panel, label = (frame.user+", was darf es sein?"), pos = (width/3, height/3), size = (150, 50))
+        self.Text = wx.StaticText(panel, label = (frame.user+", was darf es sein?"), pos = (UserFrame.width/3, UserFrame.height/3), size = (150, 50))
         self.Text.SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD))
-        self.Code = wx.TextCtrl(panel, pos = (width/3, height/2), size = (300, 120))
+        self.Code = wx.TextCtrl(panel, pos = (UserFrame.width/3, UserFrame.height/2), size = (300, 120))
         self.Code.SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.Code.SetFocus()
 
