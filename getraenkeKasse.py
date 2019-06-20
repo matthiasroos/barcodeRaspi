@@ -124,11 +124,6 @@ class ScanFrame(wx.Frame):
 
     def onClickBackButton(self, event):
         """"""
-        btn = event.GetEventObject().GetLabel()
-        print "Label of pressed button = ",btn
-        #for btn in self.button:
-        #    btn.Enable()
-        #self.btnBack.Disable()
         self.Close()
 
     def onClickConfirmButton(self, event):
