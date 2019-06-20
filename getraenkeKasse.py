@@ -22,11 +22,16 @@ class UserFrame(wx.Frame):
         type(self).width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)
         type(self).height = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y)
 
+        # read User list
         users = self.readUsers()
         nrUsers = len(users)
+
+
         offset = 5
         posX = offset
         posY = offset
+
+        # User buttons
         self.button = []
         for i in range(0, nrUsers):
             self.button.append(wx.Button(panel, id = wx.ID_ANY, label = users[i], name = users[i], size = wx.Size(btnWidth, btnHeight), pos = (posX, posY)))
@@ -38,6 +43,11 @@ class UserFrame(wx.Frame):
             else:
                 posY = offset
                 posX = posX + btnWidth + offset
+
+        # List button
+        self.btnList = wx.Button(panel, id = wx.ID_ANY, label = "List", name = "list", size = wx.Size(btnWidth, btnHeight), pos = (type(self).width-1*btnWidth, type(self).height-btnHeight))
+        self.btnList.SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD))
+        self.btnList.Bind(wx.EVT_LEFT_UP, self.onClickListButton)
 
 
         self.SetBackgroundColour("Gray")
@@ -75,6 +85,13 @@ class UserFrame(wx.Frame):
         frameScan = ScanFrame()
         #while True:
         #    print(basc.barcode_reader())
+
+    def onClickListButton(self, event):
+        """
+        This method is fired when the List button is pressed
+        """
+        frameList = ListFrame()
+
 
 class ScanFrame(wx.Frame):
     
@@ -120,7 +137,30 @@ class ScanFrame(wx.Frame):
         print "Label of pressed button = ", btn
 
 
+class ListFrame(wx.Frame):
 
+    def __init__(self):
+        """Constructor"""
+        wx.Frame.__init__(self, None, title = "ListFrame", style = wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP)
+        panel = wx.Panel(self)
+
+        self.btnClose = wx.Button(panel, id = wx.ID_ANY, label = "close", name = "close", size = wx.Size(btnWidth, btnHeight), pos = (UserFrame.width-btnWidth, 0))
+        self.btnClose.SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD))
+        self.btnClose.Bind(wx.EVT_LEFT_UP,self.onClickCloseButton)
+        self.btnBack = wx.Button(panel, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (UserFrame.width-2*btnWidth, UserFrame.height-btnHeight))
+        self.btnBack.SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD))
+        self.btnBack.Bind(wx.EVT_LEFT_UP,self.onClickBackButton)
+
+
+        self.ShowFullScreen(True)
+
+    def onClickCloseButton(self, event):
+        """"""
+        exit()
+
+    def onClickBackButton(self, event):
+        """"""
+        self.Close()
 
 
 if __name__ == "__main__":
