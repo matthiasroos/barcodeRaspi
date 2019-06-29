@@ -69,6 +69,15 @@ class ListFrame(wx.Frame):
             edit = EditFrame()
             edit.initValuesEdit(self.prodList.GetItemText(fi,0), self.prodList.GetItemText(fi,1), self.prodList.GetItemText(fi,2), self.prodList.GetItemText(fi,3))
 
+    def onClickDelButton(self, event):
+        """"""
+        fi = self.prodList.GetFirstSelected()
+        if fi != -1:
+            self.prodList.DeleteItem(fi)
+            for i in range(fi, self.prodList.GetItemCount()):
+                self.prodList.SetStringItem(i, 0, str(i+1))
+
+
 class EditFrame(wx.Frame):
 
     def __init__(self):
