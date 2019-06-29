@@ -35,9 +35,11 @@ class ListFrame(wx.Frame):
 
         btnEdit = wx.Button(panel, id = wx.ID_ANY, label = "edit", name = "edit", size = wx.Size(btnWidth, btnHeight), pos = (type(self).width-btnWidth, 3*btnHeight))
         btnEdit.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
+        btnEdit.Bind(wx.EVT_LEFT_UP, self.onClickEditButton)
 
         btnDel = wx.Button(panel, id = wx.ID_ANY, label = "delete", name = "delete", size = wx.Size(btnWidth, btnHeight), pos = (type(self).width-btnWidth, 4*btnHeight))
         btnDel.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
+        btnDel.Bind(wx.EVT_LEFT_UP, self.onClickDelButton)
 
         btnSave = wx.Button(panel, id = wx.ID_ANY, label = "save", name = "save", size = wx.Size(btnWidth, btnHeight), pos = (type(self).width-btnWidth, 5*btnHeight))
         btnSave.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
@@ -58,9 +60,14 @@ class ListFrame(wx.Frame):
 
     def onClickAddButton(self, event):
         """"""
-        # do something
         edit = EditFrame()
 
+    def onClickEditButton(self, event):
+        """"""
+        fi = self.prodList.GetFirstSelected()
+        if fi != -1:
+            edit = EditFrame()
+            edit.initValuesEdit(self.prodList.GetItemText(fi,0), self.prodList.GetItemText(fi,1), self.prodList.GetItemText(fi,2), self.prodList.GetItemText(fi,3))
 
 class EditFrame(wx.Frame):
 
