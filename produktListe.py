@@ -131,6 +131,19 @@ class EditFrame(wx.Frame):
         self.PriceInp.SetValue(price)
 
 
+    def onClickConfirmButton(self, event):
+        """"""
+        nr = frame.prodList.GetItemCount()
+        if nr == self.number:
+            frame.prodList.Append([str(nr+1), self.CodeInp.GetValue(), self.DescInp.GetValue(), self.PriceInp.GetValue()])
+        else:
+            ind = int(self.number)-1
+            frame.prodList.SetStringItem(ind, 0, str(self.number))
+            frame.prodList.SetStringItem(ind, 1, self.CodeInp.GetValue())
+            frame.prodList.SetStringItem(ind, 2, self.DescInp.GetValue())
+            frame.prodList.SetStringItem(ind, 3, self.PriceInp.GetValue())
+        self.Close()
+
 if __name__ == "__main__":
     app = wx.App(False)  # Create a new app, don't redirect stdout/stderr to a window.
     frame = ListFrame()
