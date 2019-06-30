@@ -122,6 +122,14 @@ class EditFrame(wx.Frame):
 
         self.Show()
 
+    def initValuesEdit(self, number, code, desc, price):
+        """"""
+        self.number = number
+        self.NummerTxt.SetLabel("#"+number)
+        self.CodeInp.SetValue(code)
+        self.DescInp.SetValue(desc)
+        self.PriceInp.SetValue(price)
+
 
 if __name__ == "__main__":
     app = wx.App(False)  # Create a new app, don't redirect stdout/stderr to a window.
