@@ -130,6 +130,9 @@ class EditFrame(wx.Frame):
         self.DescInp.SetValue(desc)
         self.PriceInp.SetValue(price)
 
+    def onClickBackButton(self, event):
+        """"""
+        self.Close()
 
     def onClickConfirmButton(self, event):
         """"""
