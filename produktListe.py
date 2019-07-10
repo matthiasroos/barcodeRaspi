@@ -137,10 +137,20 @@ class EditFrame(wx.Frame):
     def onClickConfirmButton(self, event):
         """"""
         nr = frame.prodList.GetItemCount()
+        code = self.CodeInp.GetValue()
         if nr == self.number:
+            for i in range(frame.prodList.GetItemCount()):
+                if (code == frame.prodList.GetItemText(i,1)):
+                    # code is already in list
+                    return
             frame.prodList.Append([str(nr+1), self.CodeInp.GetValue(), self.DescInp.GetValue(), self.PriceInp.GetValue()])
         else:
             ind = int(self.number)-1
+            for i in range(frame.prodList.GetItemCount()):
+                if code == frame.prodList.GetItemText(i,1):
+                    if i != ind:
+                        # code was changed to one already in list
+                        return
             frame.prodList.SetStringItem(ind, 0, str(self.number))
             frame.prodList.SetStringItem(ind, 1, self.CodeInp.GetValue())
             frame.prodList.SetStringItem(ind, 2, self.DescInp.GetValue())
