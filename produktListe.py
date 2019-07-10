@@ -3,7 +3,7 @@ import wx
 import wx.grid
 import time
 
-productlist = "produt.txt"
+productsFile = "produkt.txt"
 btnHeight = 50
 btnWidth = 150
 fontsize = 14
@@ -43,6 +43,7 @@ class ListFrame(wx.Frame):
 
         btnSave = wx.Button(panel, id = wx.ID_ANY, label = "save", name = "save", size = wx.Size(btnWidth, btnHeight), pos = (type(self).width-btnWidth, 5*btnHeight))
         btnSave.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
+        btnSave.Bind(wx.EVT_LEFT_UP, self.onClickSaveButton)
 
         self.prodList = wx.ListCtrl(panel, size=((type(self).width-btnWidth-2*offset), type(self).height-2*offset), pos = (offset, offset), style = wx.LC_REPORT|wx.LC_HRULES)
         self.prodList.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
@@ -76,6 +77,21 @@ class ListFrame(wx.Frame):
             self.prodList.DeleteItem(fi)
             for i in range(fi, self.prodList.GetItemCount()):
                 self.prodList.SetStringItem(i, 0, str(i+1))
+
+    def onClickSaveButton(self, event):
+        """"""
+        fileProdukte = open(productsFile, "w")
+        for i in range(self.prodList.GetItemCount()):
+            line = ""
+            for j in range(4):
+                line = line + self.prodList.GetItemText(i,j)
+                if j < 3:
+                    line = line + ","
+                else:
+                    line = line + "\n"
+            fileProdukte.writelines(line)
+
+
 
 
 class EditFrame(wx.Frame):
