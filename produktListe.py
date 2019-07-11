@@ -146,7 +146,7 @@ class EditFrame(wx.Frame):
         DescTxt = wx.StaticText(self, label = ("descr."), pos = (40, 125), size = (20, 50))
         DescTxt.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.DescInp = wx.TextCtrl(self, pos = (140, 115), size = (300, 50))
-        self.DescInp.SetMaxLength(20)
+        self.DescInp.SetMaxLength(30)
         self.DescInp.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         PriceTxt = wx.StaticText(self, label = ("price"), pos = (40, 180), size = (20, 50))
