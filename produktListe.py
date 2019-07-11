@@ -104,17 +104,21 @@ class ListFrame(wx.Frame):
 
     def onClickSaveButton(self, event):
         """"""
-        fileProdukte = open(productsFile, "w")
-        for i in range(self.prodList.GetItemCount()):
-            line = ""
-            for j in range(4):
-                line = line + self.prodList.GetItemText(i,j)
-                if j < 3:
-                    line = line + ","
-                else:
-                    line = line + "\n"
-            fileProdukte.writelines(line)
-
+        dlg = wx.MessageDialog(None, ('Do you want to save to '+productsFile+'?'), 'Question', wx.OK | wx.CANCEL | wx.ICON_QUESTION)
+        dlg.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
+        if dlg.ShowModal() == wx.ID_OK:
+            fileProdukte = open(productsFile, "w")
+            for i in range(self.prodList.GetItemCount()):
+                line = ""
+                for j in range(4):
+                    line = line + str(self.prodList.GetItemText(i,j))
+                    if j < 3:
+                        line = line + ","
+                    else:
+                        line = line + "\n"
+                fileProdukte.writelines(line)
+            fileProdukte.close()
+            self.btnLoad.Enable()
 
 
 
