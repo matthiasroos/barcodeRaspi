@@ -81,9 +81,13 @@ class ListFrame(wx.Frame):
         """"""
         fi = self.prodList.GetFirstSelected()
         if fi != -1:
-            self.prodList.DeleteItem(fi)
-            for i in range(fi, self.prodList.GetItemCount()):
-                self.prodList.SetStringItem(i, 0, str(i+1))
+            dlg = wx.MessageDialog(None, ('Are you sure to delete #'+str(fi+1)+'?'), 'Question', wx.OK | wx.CANCEL | wx.ICON_QUESTION)
+            dlg.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
+            if dlg.ShowModal() == wx.ID_OK:
+                self.prodList.DeleteItem(fi)
+                for i in range(fi, self.prodList.GetItemCount()):
+                    self.prodList.SetStringItem(i, 0, str(i+1))
+
     def onClickLoadButton(self, event):
         """"""
         dlg = wx.MessageDialog(None, ('Do you want to load '+productsFile+'?'), 'Question', wx.OK | wx.CANCEL | wx.ICON_QUESTION)
