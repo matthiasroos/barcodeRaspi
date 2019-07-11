@@ -129,8 +129,9 @@ class EditFrame(wx.Frame):
 
     def __init__(self):
         """Constructor"""
-        wx.Frame.__init__(self, None, title = "Add/Edit entry", size = (type(self).frameWidth, type(self).frameHeight))
+        wx.Frame.__init__(self, None, title = "Add entry", size = (type(self).frameWidth, type(self).frameHeight))
 
+        self.mode = "add"
         self.number = frame.prodList.GetItemCount()
         self.NummerTxt = wx.StaticText(self, label = ("#"+str(self.number+1)), pos = (40, 20), size = (20, 50))
         self.NummerTxt.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
@@ -169,10 +170,12 @@ class EditFrame(wx.Frame):
     def initValuesEdit(self, number, code, desc, price):
         """"""
         self.number = number
+        self.mode = "edit"
         self.NummerTxt.SetLabel("#"+number)
         self.CodeInp.SetValue(code)
         self.DescInp.SetValue(desc)
         self.PriceInp.SetValue(price)
+        self.SetTitle("Edit entry")
 
     def onClickBackButton(self, event):
         """"""
@@ -182,13 +185,15 @@ class EditFrame(wx.Frame):
         """"""
         nr = frame.prodList.GetItemCount()
         code = self.CodeInp.GetValue()
-        if nr == self.number:
+        if self.mode == "add":
+        # add mode
             for i in range(frame.prodList.GetItemCount()):
                 if (code == frame.prodList.GetItemText(i,1)):
                     # code is already in list
                     return
             frame.prodList.Append([str(nr+1), self.CodeInp.GetValue(), self.DescInp.GetValue(), self.PriceInp.GetValue()])
-        else:
+        elif self.mode == "edit":
+        # edit mode
             ind = int(self.number)-1
             for i in range(frame.prodList.GetItemCount()):
                 if code == frame.prodList.GetItemText(i,1):
