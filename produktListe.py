@@ -158,7 +158,7 @@ class EditFrame(wx.Frame):
 
         btnBack = wx.Button(self, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (60, type(self).frameHeight-2*btnHeight))
         btnBack.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
-        #btnBack.Bind(wx.EVT_LEFT_UP,self.onClickBackButton)
+        btnBack.Bind(wx.EVT_LEFT_UP,self.onClickBackButton)
         
         btnConfirm = wx.Button(self, id = wx.ID_ANY, label = "confirm", name = "confirm", size = wx.Size(btnWidth, btnHeight), pos = (60+btnWidth+5, type(self).frameHeight-2*btnHeight))
         btnConfirm.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
