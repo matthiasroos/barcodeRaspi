@@ -2,6 +2,7 @@
 import wx
 import wx.grid
 import time
+import os.path
 
 productsFile = "produkt.txt"
 btnHeight = 50
@@ -41,7 +42,13 @@ class ListFrame(wx.Frame):
         btnDel.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
         btnDel.Bind(wx.EVT_LEFT_UP, self.onClickDelButton)
 
-        btnSave = wx.Button(panel, id = wx.ID_ANY, label = "save", name = "save", size = wx.Size(btnWidth, btnHeight), pos = (type(self).width-btnWidth, 5*btnHeight))
+        self.btnLoad = wx.Button(panel, id = wx.ID_ANY, label = "load", name = "load", size = wx.Size(btnWidth, btnHeight), pos = (type(self).width-btnWidth, 5*btnHeight))
+        self.btnLoad.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
+        self.btnLoad.Bind(wx.EVT_LEFT_UP, self.onClickLoadButton)
+        if not os.path.isfile(productsFile):
+            self.btnLoad.Disable()
+
+        btnSave = wx.Button(panel, id = wx.ID_ANY, label = "save", name = "save", size = wx.Size(btnWidth, btnHeight), pos = (type(self).width-btnWidth, 6*btnHeight))
         btnSave.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
         btnSave.Bind(wx.EVT_LEFT_UP, self.onClickSaveButton)
 
@@ -77,6 +84,19 @@ class ListFrame(wx.Frame):
             self.prodList.DeleteItem(fi)
             for i in range(fi, self.prodList.GetItemCount()):
                 self.prodList.SetStringItem(i, 0, str(i+1))
+    def onClickLoadButton(self, event):
+        """"""
+        dlg = wx.MessageDialog(None, ('Do you want to load '+productsFile+'?'), 'Question', wx.OK | wx.CANCEL | wx.ICON_QUESTION)
+        dlg.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
+        if dlg.ShowModal() == wx.ID_OK:
+            self.prodList.DeleteAllItems()
+            fileProdukte = open(productsFile, "r")
+            ind = 0
+            for line in fileProdukte:
+                temp = line.split(",")
+                self.prodList.Append([temp[0], temp[1], temp[2], temp[3].rstrip()])
+                ind = ind + 1
+            fileProdukte.close()
 
     def onClickSaveButton(self, event):
         """"""
