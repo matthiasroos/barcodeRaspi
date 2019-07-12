@@ -98,7 +98,7 @@ class ListFrame(wx.Frame):
             ind = 0
             for line in fileProdukte:
                 temp = line.split(",")
-                self.prodList.Append([temp[0], temp[1], temp[2], temp[3].rstrip()])
+                self.prodList.Append([temp[0].decode("utf-8"), temp[1].decode("utf-8"), temp[2].decode("utf-8"), temp[3].decode("utf-8").rstrip()])
                 ind = ind + 1
             fileProdukte.close()
 
@@ -111,7 +111,7 @@ class ListFrame(wx.Frame):
             for i in range(self.prodList.GetItemCount()):
                 line = ""
                 for j in range(4):
-                    line = line + str(self.prodList.GetItemText(i,j))
+                    line = line + self.prodList.GetItemText(i,j).encode("utf-8")
                     if j < 3:
                         line = line + ","
                     else:
