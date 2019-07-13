@@ -4,6 +4,7 @@ import time
 import barcodescanner as basc
 
 usersFile = "user.txt"
+productsFile = "produkt.txt"
 btnHeight = 50
 btnWidth = 150
 
@@ -26,6 +27,9 @@ class UserFrame(wx.Frame):
         users = self.readUsers()
         nrUsers = len(users)
 
+        # read Product list
+        self.products = self.readProducts()
+        nrProducts = len(self.products)
 
         offset = 5
         posX = offset
@@ -61,6 +65,15 @@ class UserFrame(wx.Frame):
             users.append(line.rstrip())
         fileUsers.close()
         return users
+
+    def readProducts(self):
+        """"Read products from productsFile"""
+        fileProducts = open(productsFile, "r")
+        prod = list()
+        for line in fileProducts:
+            prod.append(line.split(","))
+        fileProducts.close()
+        return prod
 
     def onClickNameButton(self, event):
         """
