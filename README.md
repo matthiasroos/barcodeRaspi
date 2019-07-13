@@ -1,17 +1,22 @@
-# Debugging from remote machine
+# Barcode Scanner Raspberry Pi projects
 
+A repository for my barcode scanner projects
 
-sudo ln -s ~pi/.Xauthority /root/.Xauthority
+## Getränkekasse
 
-to redirect the screen output back:
-export DISPLAY=:0
+A small POS software for a small group based on a Raspberry Pi, a touchscreen and a barcode scanner
 
-sudo vi /etc/ssh/sshd_config
-PubkeyAuthentication yes
+Software: Raspbian Stretch with desktop
 
-sudo /etc/init.d/ssh restart
+Additional packages: vim, python-wxgtk3.0, matchbox-keyboard, network-manager
 
-on ssh host:
-ssh-copy-id -i ~/.ssh/mykey user@host
+### getraenkeKasse.py
+
+POS GUI for self-interaction
+
+### produktListe.py
+
+GUI for creating and modifying a list of products
+
 
 
