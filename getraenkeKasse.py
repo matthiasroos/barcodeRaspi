@@ -2,6 +2,7 @@
 import wx
 import time
 import barcodescanner as basc
+import os.path
 
 usersFile = "user.txt"
 productsFile = "produkt.txt"
@@ -59,6 +60,8 @@ class UserFrame(wx.Frame):
     
     def readUsers(self):
         """"Read users from usersFile"""
+        if not os.path.isfile(usersFile):
+            raise Exception("usersFile not found!")
         fileUsers = open(usersFile, "r")
         users = []
         for line in fileUsers:
@@ -68,6 +71,8 @@ class UserFrame(wx.Frame):
 
     def readProducts(self):
         """"Read products from productsFile"""
+        if not os.path.isfile(productsFile):
+            raise Exception("prodcutsFile not found!")
         fileProducts = open(productsFile, "r")
         prod = list()
         for line in fileProducts:
