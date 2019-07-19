@@ -134,16 +134,16 @@ class ScanFrame(wx.Frame):
         self.btnConfirm.Bind(wx.EVT_LEFT_UP,self.onClickConfirmButton)
         self.btnConfirm.Disable()
         
-        self.Text = wx.StaticText(panel, label = (UserFrame.user+", what can I get you?"), pos = (UserFrame.width/3, UserFrame.height*1/5), size = (150, 50))
+        self.Text = wx.StaticText(panel, label = (UserFrame.user+", what can I get you?"), pos = (UserFrame.width/5, UserFrame.height*1/5), size = (150, 50))
         self.Text.SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.Code = wx.TextCtrl(panel, pos = (UserFrame.width/3, UserFrame.height*2/5), size = (300, 120))
+        self.Code = wx.TextCtrl(panel, pos = (UserFrame.width/5, UserFrame.height*1/5+70), size = (300, 50))
         self.Code.SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.Code.SetMaxLength(13)
         self.Code.SetFocus()
         self.Code.Bind(wx.EVT_TEXT,self.onChangeCode)
 
-        self.Product = wx.StaticText(panel,  label = "", pos = (UserFrame.width/3, UserFrame.height*3/5), size = (150, 50))
+        self.Product = wx.StaticText(panel,  label = "", pos = (UserFrame.width/5, UserFrame.height*1/5+150), size = (150, 50))
         self.Product.SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.ShowFullScreen(True)
 
@@ -162,8 +162,11 @@ class ScanFrame(wx.Frame):
         if len(code) in frame.LenCode:
             for pr in frame.products:
                 if code == pr[1]:
-                    self.Product.SetLabel(("#" + pr[0] + ": " + pr[2] + "\t Price: " + pr[3]))
-                    break
+                    self.Product.SetLabel((pr[2] + "\t Price: " + pr[3]))
+                    self.btnConfirm.Enable()
+                    return None
+        self.Product.SetLabel("")
+        self.btnConfirm.Disable()
 
 
 class ListFrame(wx.Frame):
