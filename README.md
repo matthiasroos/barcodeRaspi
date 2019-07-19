@@ -10,6 +10,8 @@ Software: Raspbian Stretch with desktop
 
 Additional packages: vim, python-wxgtk3.0, matchbox-keyboard, network-manager
 
+Requirements: WiFi (for time synchronization + gitbot)
+
 ### getraenkeKasse.py
 
 POS GUI for self-interaction
