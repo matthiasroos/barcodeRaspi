@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import wx
 import time
-import barcodescanner as basc
+#import barcodescanner as basc
 import os.path
 
 usersFile = "user.txt"
@@ -102,7 +102,6 @@ class UserFrame(wx.Frame):
 
         button_id = event.GetId()
         button_by_id = self.FindWindowById(button_id)
-       
         type(self).user = button_by_id.GetLabel()
         frameScan = ScanFrame()
 
@@ -120,16 +119,10 @@ class ScanFrame(wx.Frame):
         wx.Frame.__init__(self, None, title = "ScanFrame", style = wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP)
         panel = wx.Panel(self)
 
-
-        #self.SetBackgroundColour("Gray")
-
         self.btnBack = wx.Button(panel, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (UserFrame.width-2*btnWidth, UserFrame.height-btnHeight))
-        #self.btnBack = wx.Button(panel, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (0, 0))
         self.btnBack.SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.btnBack.Bind(wx.EVT_LEFT_UP,self.onClickBackButton)
-        #self.btnBack.Disable()
         self.btnConfirm = wx.Button(panel, id = wx.ID_ANY, label = "confirm", name = "confirm", size = wx.Size(btnWidth, btnHeight), pos = (UserFrame.width-1*btnWidth, UserFrame.height-btnHeight))
-        #self.btnConfirm = wx.Button(panel, id = wx.ID_ANY, label = "confirm", name = "confirm", size = wx.Size(btnWidth, btnHeight), pos = ( 100, 100))
         self.btnConfirm.SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.btnConfirm.Bind(wx.EVT_LEFT_UP,self.onClickConfirmButton)
         self.btnConfirm.Disable()
@@ -153,8 +146,6 @@ class ScanFrame(wx.Frame):
 
     def onClickConfirmButton(self, event):
         """"""
-        btn = event.GetEventObject().GetLabel()
-        print "Label of pressed button = ", btn
 
     def onChangeCode(self,event):
         """"""
