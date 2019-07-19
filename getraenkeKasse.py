@@ -59,7 +59,9 @@ class UserFrame(wx.Frame):
         self.ShowFullScreen(True)        
     
     def readUsers(self):
-        """"Read users from usersFile"""
+        """"
+        Read users from usersFile
+        """
         if not os.path.isfile(usersFile):
             raise Exception("usersFile not found!")
         fileUsers = open(usersFile, "r")
@@ -70,7 +72,9 @@ class UserFrame(wx.Frame):
         return users
 
     def readProducts(self):
-        """"Read products from productsFile"""
+        """"
+        Read products from productsFile
+        """
         if not os.path.isfile(productsFile):
             raise Exception("prodcutsFile not found!")
         fileProducts = open(productsFile, "r")
@@ -84,25 +88,12 @@ class UserFrame(wx.Frame):
         """
         This method is fired when a User button is pressed
         """
-        #button = event.GetEventObject()
-        #print "The button you pressed was labeled: " + button.GetLabel()
-        #print "The button's name is " + button.GetName()
 
         button_id = event.GetId()
         button_by_id = self.FindWindowById(button_id)
-        print "The button you pressed was labeled: " + button_by_id.GetLabel()
-        print "The button's name is " + button_by_id.GetName()
        
-        #for btn in self.button:
-        #    if button_by_id.GetLabel() != btn.GetLabel():
-        #        btn.Disable()
-        #lbl = wx.StaticText(self, -1, style=wx.ALIGN_CENTER, label=button_by_id.GetName())
-        #self.update()
         type(self).user = button_by_id.GetLabel()
-        #self.btnBack.Enable()
         frameScan = ScanFrame()
-        #while True:
-        #    print(basc.barcode_reader())
 
     def onClickListButton(self, event):
         """
