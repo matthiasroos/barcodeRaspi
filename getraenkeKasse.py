@@ -31,6 +31,7 @@ class UserFrame(wx.Frame):
         # read Product list
         self.products = self.readProducts()
         nrProducts = len(self.products)
+        self.LenCode = self.getLengthCode()
 
         offset = 5
         posX = offset
@@ -84,6 +85,16 @@ class UserFrame(wx.Frame):
         fileProducts.close()
         return prod
 
+    def getLengthCode(self):
+        """"""
+        length = set()
+        for code in self.products:
+            tmpLen = len(code[1])
+            if  tmpLen > 0:
+                if tmpLen not in length:
+                    length.add(tmpLen)
+        return length
+
     def onClickNameButton(self, event):
         """
         This method is fired when a User button is pressed
@@ -127,7 +138,9 @@ class ScanFrame(wx.Frame):
         self.Text.SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.Code = wx.TextCtrl(panel, pos = (UserFrame.width/3, UserFrame.height/2), size = (300, 120))
         self.Code.SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.BOLD))
+        self.Code.SetMaxLength(13)
         self.Code.SetFocus()
+        self.Code.Bind(wx.EVT_TEXT,self.onChangeCode)
 
         self.ShowFullScreen(True)
 
@@ -139,6 +152,13 @@ class ScanFrame(wx.Frame):
         """"""
         btn = event.GetEventObject().GetLabel()
         print "Label of pressed button = ", btn
+
+    def onChangeCode(self,event):
+        """"""
+        code = self.Code.GetValue()
+        if len(code) in frame.LenCode:
+            for pr in frame.products:
+                if code == pr[1]:
 
 
 class ListFrame(wx.Frame):
