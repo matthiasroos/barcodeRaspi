@@ -3,9 +3,11 @@ import wx
 import time
 #import barcodescanner as basc
 import os.path
+import datetime
 
 usersFile = "user.txt"
 productsFile = "produkt.txt"
+purchasesFile = "purchase.txt"
 btnHeight = 50
 btnWidth = 150
 
@@ -146,6 +148,14 @@ class ScanFrame(wx.Frame):
 
     def onClickConfirmButton(self, event):
         """"""
+        if not os.path.isfile(purchasesFile):
+            raise Exception("purchasesFile not found!")
+        filePurchases = open(purchasesFile, "a")
+        line = datetime.datetime.now().isoformat() + "," + UserFrame.user + "," + self.Code.GetValue() + "\n"
+        filePurchases.writelines(line)
+        filePurchases.close()
+
+        self.Close()
 
     def onChangeCode(self,event):
         """"""
