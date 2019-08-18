@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import wx
 import time
 #import barcodescanner as basc
@@ -83,7 +83,7 @@ class UserFrame(wx.Frame):
         fileProducts = open(productsFile, "r")
         prod = list()
         for line in fileProducts:
-            prod.append(line.decode("utf-8").split(","))
+            prod.append(line.split(","))
         fileProducts.close()
         return prod
 
