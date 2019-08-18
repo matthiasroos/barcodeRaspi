@@ -8,7 +8,11 @@ A small POS software for a small group based on a Raspberry Pi, a touchscreen an
 
 Software: Raspbian Stretch with desktop
 
-Additional packages: vim, python-wxgtk3.0, matchbox-keyboard, network-manager
+Additional packages: python3-wxgtk4.0
+
+Reasonable packages: vim
+
+Other packages: matchbox-keyboard, network-manager
 
 Requirements: WiFi (for time synchronization + gitbot)
 
