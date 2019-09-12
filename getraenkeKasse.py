@@ -2,8 +2,11 @@
 import wx
 import time
 #import barcodescanner as basc
-import os.path
+import os
+import sys
+import git
 import datetime
+import hashlib
 
 usersFile = "user.txt"
 productsFile = "produkt.txt"
@@ -197,7 +200,40 @@ class ListFrame(wx.Frame):
 
 
 if __name__ == "__main__":
+
+    # main subfunctions start
+    def getMD5Hash(filename):
+        hasher = hashlib.md5()
+        with open(filename, 'rb') as afile:
+            buf = afile.read()
+            hasher.update(buf)
+        #print(hasher.hexdigest())
+        return hasher
+    # main subfunctions end
+
+
+
     app = wx.App(False)  # Create a new app, don't redirect stdout/stderr to a window.
+    # check for new version of getraenkeKasse.py script on github
+    hasher_old = getMD5Hash("barcodeRaspi/getraenkeKasse.py")
+    try:
+        repoGitHub = git.Repo("barcodeRaspi")
+        repoGitHub.remotes.origin.pull()
+    except git.GitCommandError as exception:
+        print(exception)
+        if exception.stdout:
+            print("!! stdout was:")
+            print(exception.stdout)
+        if exception.stderr:
+            print("!! stderr was:")
+            print(exception.stderr)
+
+    hasher_new = getMD5Hash("barcodeRaspi/getraenkeKasse.py")
+    if (hasher_new.hexdigest() != hasher_old.hexdigest()):
+        # getraenkeKasse.py has changed, script is restarted
+        print("new version from gitHub, script is restarting...")
+        os.execv(__file__, sys.argv)
+
     frame = UserFrame()
     app.MainLoop()
 
