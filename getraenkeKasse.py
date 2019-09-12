@@ -7,6 +7,9 @@ import sys
 import git
 import datetime
 import hashlib
+import socket
+import struct
+
 
 usersFile = "user.txt"
 productsFile = "produkt.txt"
@@ -209,11 +212,30 @@ if __name__ == "__main__":
             hasher.update(buf)
         #print(hasher.hexdigest())
         return hasher
+
+    def getTimefromNTP():
+        addrNTP='0.de.pool.ntp.org'
+        REFRENCE_TIME_1970 = 2208988800      # Reference time
+        client = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
+        data = b'\x1b' + 47 * b'\0'
+        client.sendto( data, (addrNTP, 123))
+        data, address = client.recvfrom( 1024 )
+        if data:
+            t = struct.unpack( '!12I', data )[10]
+            t -= REFRENCE_TIME_1970
+        return time.ctime(t),t
     # main subfunctions end
 
 
 
     app = wx.App(False)  # Create a new app, don't redirect stdout/stderr to a window.
+    # test local time
+    print("testing the local time")
+    timeT = getTimefromNTP()
+    if (timeT[0] != time.ctime()):
+        print("Date/time not synchronized with NTP. Exiting...")
+        sys.exit()
+
     # check for new version of getraenkeKasse.py script on github
     hasher_old = getMD5Hash("barcodeRaspi/getraenkeKasse.py")
     try:
