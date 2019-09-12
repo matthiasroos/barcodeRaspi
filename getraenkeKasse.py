@@ -154,12 +154,34 @@ class ScanFrame(wx.Frame):
 
     def onClickConfirmButton(self, event):
         """"""
+        # check local repo for changes
+        try:
+            repoLocal = git.Repo("./.")
+            repoLocal.remotes.origin.pull()
+        except git.GitCommandError as exception:
+            print(exception)
+            if exception.stdout:
+                print("!! stdout was:")
+                print(exception.stdout)
+            if exception.stderr:
+                print("!! stderr was:")
+                print(exception.stderr)
+
         if not os.path.isfile(purchasesFile):
             raise Exception("purchasesFile not found!")
         filePurchases = open(purchasesFile, "a")
         line = datetime.datetime.now().isoformat() + "," + UserFrame.user + "," + self.Code.GetValue() + "\n"
         filePurchases.writelines(line)
         filePurchases.close()
+
+        # commit & push purchase
+        try:
+            repoLocal.git.add(purchasesFile)
+            repoLocal.index.commit("purchase via getraenkeKasse.py")
+            origin = repoLocal.remote(name='origin')
+            origin.push()
+        except:
+            print('Some error occured while pushing the code')
 
         self.Close()
 
