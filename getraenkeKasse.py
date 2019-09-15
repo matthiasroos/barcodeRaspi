@@ -155,17 +155,7 @@ class ScanFrame(wx.Frame):
     def onClickConfirmButton(self, event):
         """"""
         # check local repo for changes
-        try:
-            repoLocal = git.Repo("./.")
-            repoLocal.remotes.origin.pull()
-        except git.GitCommandError as exception:
-            print(exception)
-            if exception.stdout:
-                print("!! stdout was:")
-                print(exception.stdout)
-            if exception.stderr:
-                print("!! stderr was:")
-                print(exception.stderr)
+        gitPull("./.")
 
         if not os.path.isfile(purchasesFile):
             raise Exception("purchasesFile not found!")
@@ -235,6 +225,20 @@ if __name__ == "__main__":
         #print(hasher.hexdigest())
         return hasher
 
+    def checkNetwork(host="8.8.8.8", port=53, timeout=3):
+        """
+        Host: 8.8.8.8 (google-public-dns-a.google.com)
+        OpenPort: 53/tcp
+        Service: domain (DNS/TCP)
+        """
+        try:
+            socket.setdefaulttimeout(timeout)
+            socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
+            return True
+        except socket.error as ex:
+            print(ex)
+            return False
+
     def getTimefromNTP():
         addrNTP='0.de.pool.ntp.org'
         REFRENCE_TIME_1970 = 2208988800      # Reference time
@@ -246,37 +250,56 @@ if __name__ == "__main__":
             t = struct.unpack( '!12I', data )[10]
             t -= REFRENCE_TIME_1970
         return time.ctime(t),t
+
+    def gitPull(pathRepo):
+        try:
+            repo = git.Repo(pathRepo)
+            repo.remotes.origin.pull()
+            return True
+        except git.GitCommandError as exception:
+            print(exception)
+            if exception.stdout:
+                print("!! stdout was:")
+                print(exception.stdout)
+            if exception.stderr:
+                print("!! stderr was:")
+                print(exception.stderr)
+            return False
+
     # main subfunctions end
 
 
 
     app = wx.App(False)  # Create a new app, don't redirect stdout/stderr to a window.
+
+    # check network
+    if not checkNetwork():
+        print("No network available. Exiting...")
+        sys.exit()
+
     # test local time
-    print("testing the local time")
     timeT = getTimefromNTP()
     if (timeT[0] != time.ctime()):
         print("Date/time not synchronized with NTP. Exiting...")
         sys.exit()
 
+    # check for new commits in local repository
+    if not gitPull("./."):
+        print("Problem with git (local repo). Exiting...")
+        sys.exit()
+
     # check for new version of getraenkeKasse.py script on github
     hasher_old = getMD5Hash("barcodeRaspi/getraenkeKasse.py")
-    try:
-        repoGitHub = git.Repo("barcodeRaspi")
-        repoGitHub.remotes.origin.pull()
-    except git.GitCommandError as exception:
-        print(exception)
-        if exception.stdout:
-            print("!! stdout was:")
-            print(exception.stdout)
-        if exception.stderr:
-            print("!! stderr was:")
-            print(exception.stderr)
+    if not gitPull("barcodeRaspi"):
+        print("Problem with git (GitHub). Exiting...")
+        sys.exit()
 
     hasher_new = getMD5Hash("barcodeRaspi/getraenkeKasse.py")
     if (hasher_new.hexdigest() != hasher_old.hexdigest()):
         # getraenkeKasse.py has changed, script is restarted
         print("new version from gitHub, script is restarting...")
         os.execv(__file__, sys.argv)
+        sys.exit()
 
     frame = UserFrame()
     app.MainLoop()
