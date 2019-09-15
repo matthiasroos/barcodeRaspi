@@ -130,6 +130,9 @@ class ScanFrame(wx.Frame):
         wx.Frame.__init__(self, None, title = "ScanFrame", style = wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP)
         self.panel = wx.Panel(self)
 
+        self.btnNoCode = wx.Button(self.panel, id = wx.ID_ANY, label = "no barcode", name = "no barcode", size = wx.Size(btnWidth, btnHeight), pos = (UserFrame.width-3*btnWidth, UserFrame.height-btnHeight))
+        self.btnNoCode.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+        self.btnNoCode.Bind(wx.EVT_LEFT_UP,self.onClickNoCodeButton)
         self.btnBack = wx.Button(self.panel, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (UserFrame.width-2*btnWidth, UserFrame.height-btnHeight))
         self.btnBack.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.btnBack.Bind(wx.EVT_LEFT_UP,self.onClickBackButton)
@@ -150,6 +153,12 @@ class ScanFrame(wx.Frame):
         self.Product = wx.StaticText(self.panel,  label = "", pos = (UserFrame.width/5, UserFrame.height*1/5+150), size = (150, 50))
         self.Product.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.ShowFullScreen(True)
+    def onClickNoCodeButton(self, event):
+        """"""
+        self.btnNoCode.Disable()
+        self.Code.Hide()
+        self.cmbProducts = wx.ComboBox(self.panel, id = wx.ID_ANY,  pos = (UserFrame.width/5, UserFrame.height*1/5+70), size = (320, 50))
+        nrProducts = len(UserFrame.products)
 
     def onClickBackButton(self, event):
         """"""
