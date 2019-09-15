@@ -24,6 +24,8 @@ class UserFrame(wx.Frame):
     width = []
     height = []
     user = []
+    products = []
+    LenCode = []
 
     def __init__(self):
         """Constructor"""
@@ -38,9 +40,9 @@ class UserFrame(wx.Frame):
         nrUsers = len(users)
 
         # read Product list
-        self.products = self.readProducts()
+        type(self).products = self.readProducts()
         nrProducts = len(self.products)
-        self.LenCode = self.getLengthCode()
+        type(self).LenCode = self.getLengthCode()
 
         offset = 10
         posX = offset
@@ -181,8 +183,8 @@ class ScanFrame(wx.Frame):
     def onChangeCode(self,event):
         """"""
         code = self.Code.GetValue()
-        if len(code) in frame.LenCode:
-            for pr in frame.products:
+        if len(code) in UserFrame.LenCode:
+            for pr in UserFrame.products:
                 if code == pr[1]:
                     self.Product.SetLabel((pr[2] + "\t Price: " + pr[3]))
                     self.btnConfirm.Enable()
