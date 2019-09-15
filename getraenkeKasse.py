@@ -155,6 +155,8 @@ class ScanFrame(wx.Frame):
 
     def onClickConfirmButton(self, event):
         """"""
+        self.Disable()
+        self.btnConfirm.SetLabel("saving...")
         # check local repo for changes
         gitPull("./.")
 
