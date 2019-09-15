@@ -128,26 +128,26 @@ class ScanFrame(wx.Frame):
     def __init__(self):
         """Constructor"""
         wx.Frame.__init__(self, None, title = "ScanFrame", style = wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP)
-        panel = wx.Panel(self)
+        self.panel = wx.Panel(self)
 
-        self.btnBack = wx.Button(panel, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (UserFrame.width-2*btnWidth, UserFrame.height-btnHeight))
+        self.btnBack = wx.Button(self.panel, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (UserFrame.width-2*btnWidth, UserFrame.height-btnHeight))
         self.btnBack.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.btnBack.Bind(wx.EVT_LEFT_UP,self.onClickBackButton)
-        self.btnConfirm = wx.Button(panel, id = wx.ID_ANY, label = "confirm", name = "confirm", size = wx.Size(btnWidth, btnHeight), pos = (UserFrame.width-1*btnWidth, UserFrame.height-btnHeight))
+        self.btnConfirm = wx.Button(self.panel, id = wx.ID_ANY, label = "confirm", name = "confirm", size = wx.Size(btnWidth, btnHeight), pos = (UserFrame.width-1*btnWidth, UserFrame.height-btnHeight))
         self.btnConfirm.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.btnConfirm.Bind(wx.EVT_LEFT_UP,self.onClickConfirmButton)
         self.btnConfirm.Disable()
         
-        self.Text = wx.StaticText(panel, label = (UserFrame.user+", what can I get you?"), pos = (UserFrame.width/5, UserFrame.height*1/5), size = (150, 50))
+        self.Text = wx.StaticText(self.panel, label = (UserFrame.user+", what can I get you?"), pos = (UserFrame.width/5, UserFrame.height*1/5), size = (150, 50))
         self.Text.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.Code = wx.TextCtrl(panel, pos = (UserFrame.width/5, UserFrame.height*1/5+70), size = (320, 50))
+        self.Code = wx.TextCtrl(self.panel, pos = (UserFrame.width/5, UserFrame.height*1/5+70), size = (320, 50))
         self.Code.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.Code.SetMaxLength(13)
         self.Code.SetFocus()
         self.Code.Bind(wx.EVT_TEXT,self.onChangeCode)
 
-        self.Product = wx.StaticText(panel,  label = "", pos = (UserFrame.width/5, UserFrame.height*1/5+150), size = (150, 50))
+        self.Product = wx.StaticText(self.panel,  label = "", pos = (UserFrame.width/5, UserFrame.height*1/5+150), size = (150, 50))
         self.Product.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.ShowFullScreen(True)
 
