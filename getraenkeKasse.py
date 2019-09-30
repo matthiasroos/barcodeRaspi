@@ -171,6 +171,7 @@ class ScanFrame(wx.Frame):
 
         # commit & push purchase
         try:
+            repoLocal = git.Repo("./.")
             repoLocal.git.add(purchasesFile)
             repoLocal.index.commit("purchase via getraenkeKasse.py")
             origin = repoLocal.remote(name='origin')
