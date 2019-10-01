@@ -157,8 +157,13 @@ class ScanFrame(wx.Frame):
         """"""
         self.btnNoCode.Disable()
         self.Code.Hide()
-        self.cmbProducts = wx.ComboBox(self.panel, id = wx.ID_ANY,  pos = (UserFrame.width/5, UserFrame.height*1/5+70), size = (320, 50))
         nrProducts = len(UserFrame.products)
+        pr = []
+        for i in range((nrProducts-1),0,-1):
+            pr.append(UserFrame.products[i][2])
+
+        self.cmbProducts = wx.ComboBox(self.panel, id = wx.ID_ANY, choices = pr, pos = (UserFrame.width/5, UserFrame.height*1/5+70), size = (320, 50))
+        self.cmbProducts.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
 
     def onClickBackButton(self, event):
         """"""
