@@ -21,28 +21,22 @@ fontSize = 25
 
 class UserFrame(wx.Frame):
 
-    width = []
-    height = []
-    user = []
-    products = []
-    LenCode = []
-
     def __init__(self):
         """Constructor"""
         wx.Frame.__init__(self, None, title = "Test Fullscreen")
         panel = wx.Panel(self)
 
-        type(self).width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)
-        type(self).height = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y)
+        type(self).__width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)/2
+        type(self).__height = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y)
 
         # read User list
-        users = self.readUsers()
-        nrUsers = len(users)
+        type(self).__users = self.__readUsers()
+        nrUsers = len(type(self).__users)
 
         # read Product list
-        type(self).products = self.readProducts()
-        nrProducts = len(self.products)
-        type(self).LenCode = self.getLengthCode()
+        type(self).__products = self.__readProducts()
+        nrProducts = len(self.__products)
+        type(self).__LenCode = self.__calcLengthCode()
 
         offset = 10
         posX = offset
@@ -51,26 +45,25 @@ class UserFrame(wx.Frame):
         # User buttons
         self.button = []
         for i in range(0, nrUsers):
-            self.button.append(wx.Button(panel, id = wx.ID_ANY, label = users[i], name = users[i], size = wx.Size(btnWidth, btnHeight), pos = (posX, posY)))
+            self.button.append(wx.Button(panel, id = wx.ID_ANY, label = type(self).__users[i], name = type(self).__users[i], size = wx.Size(btnWidth, btnHeight), pos = (posX, posY)))
             self.button[i].SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
-            self.button[i].Bind(wx.EVT_LEFT_UP, self.onClickNameButton)
+            self.button[i].Bind(wx.EVT_LEFT_UP, self.__onClickNameButton)
             #self.buildButtons(button[i])
-            if ((posY + 2*btnHeight + offset) < type(self).height):
+            if ((posY + 2*btnHeight + offset) < type(self).__height):
                 posY = posY + btnHeight + offset
             else:
                 posY = offset
                 posX = posX + btnWidth + offset
 
         # List button
-        self.btnList = wx.Button(panel, id = wx.ID_ANY, label = "List", name = "list", size = wx.Size(btnWidth, btnHeight), pos = (type(self).width-1*btnWidth, type(self).height-btnHeight))
+        self.btnList = wx.Button(panel, id = wx.ID_ANY, label = "List", name = "list", size = wx.Size(btnWidth, btnHeight), pos = (type(self).__width-1*btnWidth, type(self).__height-btnHeight))
         self.btnList.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
-        self.btnList.Bind(wx.EVT_LEFT_UP, self.onClickListButton)
-
+        self.btnList.Bind(wx.EVT_LEFT_UP, self.__onClickListButton)
 
         self.SetBackgroundColour("Gray")
         self.ShowFullScreen(True)        
     
-    def readUsers(self):
+    def __readUsers(self):
         """"
         Read users from usersFile
         """
@@ -83,7 +76,7 @@ class UserFrame(wx.Frame):
         fileUsers.close()
         return users
 
-    def readProducts(self):
+    def __readProducts(self):
         """"
         Read products from productsFile
         """
@@ -96,17 +89,17 @@ class UserFrame(wx.Frame):
         fileProducts.close()
         return prod
 
-    def getLengthCode(self):
+    def __calcLengthCode(self):
         """"""
         length = set()
-        for code in self.products:
+        for code in self.__products:
             tmpLen = len(code[1])
             if  tmpLen > 0:
                 if tmpLen not in length:
                     length.add(tmpLen)
         return length
 
-    def onClickNameButton(self, event):
+    def __onClickNameButton(self, event):
         """
         This method is fired when a User button is pressed
         """
@@ -116,11 +109,27 @@ class UserFrame(wx.Frame):
         type(self).user = button_by_id.GetLabel()
         frameScan = ScanFrame()
 
-    def onClickListButton(self, event):
+    def __onClickListButton(self, event):
         """
         This method is fired when the List button is pressed
         """
         frameList = ListFrame()
+
+    def getWidth(self):
+        """"""
+        return type(self).__width
+
+    def getHeight(self):
+        """"""
+        return type(self).__height
+
+    def getLengthCode(self):
+        """"""
+        return type(self).__LenCode
+
+    def getProducts(self):
+        """"""
+        return type(self).__products
 
 
 class ScanFrame(wx.Frame):
