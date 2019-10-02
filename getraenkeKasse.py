@@ -200,11 +200,11 @@ class ScanFrame(wx.Frame):
 
         self.Close()
 
-    def onChangeCode(self,event):
+    def __onChangeCode(self, event):
         """"""
         code = self.Code.GetValue()
-        if len(code) in UserFrame.LenCode:
-            for pr in UserFrame.products:
+        if len(code) in frame.getLengthCode():
+            for pr in frame.getProducts():
                 if code == pr[1]:
                     self.Product.SetLabel((pr[2] + "\t Price: " + pr[3]))
                     self.btnConfirm.Enable()
