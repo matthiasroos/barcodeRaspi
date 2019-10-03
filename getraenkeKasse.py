@@ -187,6 +187,7 @@ class ScanFrame(wx.Frame):
         line = datetime.datetime.now().isoformat() + "," + UserFrame.user + "," + self.Code.GetValue() + "\n"
         filePurchases.writelines(line)
         filePurchases.close()
+        line = datetime.datetime.now().isoformat() + "," + frame.user + "," + self.Code.GetValue() + "\n"
 
         # commit & push purchase
         try:
