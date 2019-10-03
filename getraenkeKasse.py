@@ -130,6 +130,7 @@ class ScanFrame(wx.Frame):
         wx.Frame.__init__(self, None, title = "ScanFrame", style = wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP)
         self.panel = wx.Panel(self)
 
+        self.__mode = True
         self.btnNoCode = wx.Button(self.panel, id = wx.ID_ANY, label = "no barcode", name = "no barcode", size = wx.Size(btnWidth, btnHeight), pos = (UserFrame.width-3*btnWidth, UserFrame.height-btnHeight))
         self.btnNoCode.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.btnNoCode.Bind(wx.EVT_LEFT_UP,self.onClickNoCodeButton)
@@ -155,15 +156,24 @@ class ScanFrame(wx.Frame):
         self.ShowFullScreen(True)
     def onClickNoCodeButton(self, event):
         """"""
-        self.btnNoCode.Disable()
-        self.Code.Hide()
-        nrProducts = len(UserFrame.products)
-        pr = []
-        for i in range((nrProducts-1),0,-1):
-            pr.append(UserFrame.products[i][2])
+        self.__mode = not self.__mode
+        if self.__mode is True:
+            self.btnNoCode.SetLabel("no barcode")
+            self.cmbProducts.Hide()
+            self.Product.SetLabel("")
+            self.Code.SetValue("")
+            self.Code.Show()
+        else:
+            self.btnNoCode.SetLabel("barcode")
+            self.Code.Hide()
+            self.Product.SetLabel("")
+            nrProducts = len(UserFrame.products)
+            pr = []
+            for i in range((nrProducts-1),-1,-1):
+                pr.append(UserFrame.products[i][2])
 
-        self.cmbProducts = wx.ComboBox(self.panel, id = wx.ID_ANY, choices = pr, pos = (UserFrame.width/5, UserFrame.height*1/5+70), size = (320, 50))
-        self.cmbProducts.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+            self.cmbProducts = wx.ComboBox(self.panel, id = wx.ID_ANY, choices = pr, pos = (UserFrame.width/5, UserFrame.height*1/5+70), size = (320, 50), style = wx.CB_READONLY)
+            self.cmbProducts.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
 
     def onClickBackButton(self, event):
         """"""
@@ -179,7 +189,7 @@ class ScanFrame(wx.Frame):
         if not os.path.isfile(purchasesFile):
             raise Exception("purchasesFile not found!")
         filePurchases = open(purchasesFile, "a")
-        line = datetime.datetime.now().isoformat() + "," + UserFrame.user + "," + self.Code.GetValue() + "\n"
+        line = datetime.datetime.now().isoformat() + "," + frame.user + "," + self.Code.GetValue() + "\n"
         filePurchases.writelines(line)
         filePurchases.close()
 
