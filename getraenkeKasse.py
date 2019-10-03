@@ -221,21 +221,21 @@ class ListFrame(wx.Frame):
         wx.Frame.__init__(self, None, title = "ListFrame", style = wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP)
         panel = wx.Panel(self)
 
-        self.btnClose = wx.Button(panel, id = wx.ID_ANY, label = "close", name = "close", size = wx.Size(btnWidth, btnHeight), pos = (UserFrame.width-btnWidth, 0))
+        self.btnClose = wx.Button(panel, id = wx.ID_ANY, label = "close", name = "close", size = wx.Size(btnWidth, btnHeight), pos = (frame.getWidth()-btnWidth, 0))
         self.btnClose.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
-        self.btnClose.Bind(wx.EVT_LEFT_UP,self.onClickCloseButton)
-        self.btnBack = wx.Button(panel, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (UserFrame.width-2*btnWidth, UserFrame.height-btnHeight))
+        self.btnClose.Bind(wx.EVT_LEFT_UP,self.__onClickCloseButton)
+        self.btnBack = wx.Button(panel, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (frame.getWidth()-2*btnWidth, frame.getHeight()-btnHeight))
         self.btnBack.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
-        self.btnBack.Bind(wx.EVT_LEFT_UP,self.onClickBackButton)
+        self.btnBack.Bind(wx.EVT_LEFT_UP,self.__onClickBackButton)
 
 
         self.ShowFullScreen(True)
 
-    def onClickCloseButton(self, event):
+    def __onClickCloseButton(self, event):
         """"""
         exit()
 
-    def onClickBackButton(self, event):
+    def __onClickBackButton(self, event):
         """"""
         self.Close()
 
