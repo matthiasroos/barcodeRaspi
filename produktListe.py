@@ -121,12 +121,11 @@ class ListFrame(wx.Frame):
 
 class EditFrame(wx.Frame):
 
-    frameWidth = 500
-    frameHeight = 300
-
     def __init__(self):
         """Constructor"""
-        wx.Frame.__init__(self, None, title = "Add entry", size = (type(self).frameWidth, type(self).frameHeight))
+        frameWidth = 500
+        frameHeight = 500
+        wx.Frame.__init__(self, None, title = "Add entry", size = (frameWidth, frameHeight))
 
         self.mode = "add"
         self.number = frame.prodList.GetItemCount()
@@ -153,13 +152,13 @@ class EditFrame(wx.Frame):
         self.PriceInp.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
 
 
-        btnBack = wx.Button(self, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (60, type(self).frameHeight-2*btnHeight))
+        btnBack = wx.Button(self, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (100, frameHeight-btnHeight))
         btnBack.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
-        btnBack.Bind(wx.EVT_LEFT_UP,self.onClickBackButton)
+        btnBack.Bind(wx.EVT_LEFT_UP,self.__onClickBackButton)
         
-        btnConfirm = wx.Button(self, id = wx.ID_ANY, label = "confirm", name = "confirm", size = wx.Size(btnWidth, btnHeight), pos = (60+btnWidth+5, type(self).frameHeight-2*btnHeight))
+        btnConfirm = wx.Button(self, id = wx.ID_ANY, label = "confirm", name = "confirm", size = wx.Size(btnWidth, btnHeight), pos = (100+btnWidth+5, frameHeight-btnHeight))
         btnConfirm.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
-        btnConfirm.Bind(wx.EVT_LEFT_UP,self.onClickConfirmButton)
+        btnConfirm.Bind(wx.EVT_LEFT_UP,self.__onClickConfirmButton)
         #btnConfirm.Disable()
 
         self.Show()
@@ -174,11 +173,11 @@ class EditFrame(wx.Frame):
         self.PriceInp.SetValue(price)
         self.SetTitle("Edit entry")
 
-    def onClickBackButton(self, event):
+    def __onClickBackButton(self, event):
         """"""
         self.Close()
 
-    def onClickConfirmButton(self, event):
+    def __onClickConfirmButton(self, event):
         """"""
         nr = frame.prodList.GetItemCount()
         code = self.CodeInp.GetValue()
