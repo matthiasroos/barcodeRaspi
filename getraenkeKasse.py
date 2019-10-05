@@ -247,6 +247,16 @@ class ListFrame(wx.Frame):
 
         self.ShowFullScreen(True)
 
+    def __ListCompareFunction(self, item1, item2):
+        """"""
+        if item1 > item2:
+            val = 1
+        elif item1 < item2:
+            val = -1
+        else:
+            val = 0
+        return val
+
     def onClickCloseButton(self, event):
         """"""
         exit()
