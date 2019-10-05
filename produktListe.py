@@ -17,39 +17,38 @@ class ListFrame(wx.Frame):
         wx.Frame.__init__(self, None, title = "ListFrame")
         panel = wx.Panel(self)
 
-        type(self).__width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)
-        type(self).__height = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y)
+        type(self)._width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)
+        type(self)._height = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y)
 
         offset = 5
 
-        #btnClose = wx.Button(panel, id = wx.ID_ANY, label = "close", name = "close", size = wx.Size(btnWidth, btnHeight), pos = ((type(self).width/2)-btnWidth, 0))
-        btnClose = wx.Button(panel, id = wx.ID_ANY, label = "close", name = "close", size = wx.Size(btnWidth, btnHeight), pos = (type(self).__width-btnWidth, 0))
+        btnClose = wx.Button(panel, id = wx.ID_ANY, label = "close", name = "close", size = wx.Size(btnWidth, btnHeight), pos = (type(self)._width-btnWidth, 0))
         btnClose.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
-        btnClose.Bind(wx.EVT_LEFT_UP,self.__onClickCloseButton)
+        btnClose.Bind(wx.EVT_LEFT_UP,self._onClickCloseButton)
 
-        btnAdd = wx.Button(panel, id = wx.ID_ANY, label = "add", name = "add", size = wx.Size(btnWidth, btnHeight), pos = (type(self).__width-btnWidth, 2*btnHeight))
+        btnAdd = wx.Button(panel, id = wx.ID_ANY, label = "add", name = "add", size = wx.Size(btnWidth, btnHeight), pos = (type(self)._width-btnWidth, 2*btnHeight))
         btnAdd.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
-        btnAdd.Bind(wx.EVT_LEFT_UP, self.__onClickAddButton)
+        btnAdd.Bind(wx.EVT_LEFT_UP, self._onClickAddButton)
 
-        btnEdit = wx.Button(panel, id = wx.ID_ANY, label = "edit", name = "edit", size = wx.Size(btnWidth, btnHeight), pos = (type(self).__width-btnWidth, 3*btnHeight))
+        btnEdit = wx.Button(panel, id = wx.ID_ANY, label = "edit", name = "edit", size = wx.Size(btnWidth, btnHeight), pos = (type(self)._width-btnWidth, 3*btnHeight))
         btnEdit.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
-        btnEdit.Bind(wx.EVT_LEFT_UP, self.__onClickEditButton)
+        btnEdit.Bind(wx.EVT_LEFT_UP, self._onClickEditButton)
 
-        btnDel = wx.Button(panel, id = wx.ID_ANY, label = "delete", name = "delete", size = wx.Size(btnWidth, btnHeight), pos = (type(self).__width-btnWidth, 4*btnHeight))
+        btnDel = wx.Button(panel, id = wx.ID_ANY, label = "delete", name = "delete", size = wx.Size(btnWidth, btnHeight), pos = (type(self)._width-btnWidth, 4*btnHeight))
         btnDel.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
-        btnDel.Bind(wx.EVT_LEFT_UP, self.__onClickDelButton)
+        btnDel.Bind(wx.EVT_LEFT_UP, self._onClickDelButton)
 
-        self.btnLoad = wx.Button(panel, id = wx.ID_ANY, label = "load", name = "load", size = wx.Size(btnWidth, btnHeight), pos = (type(self).__width-btnWidth, 5*btnHeight))
+        self.btnLoad = wx.Button(panel, id = wx.ID_ANY, label = "load", name = "load", size = wx.Size(btnWidth, btnHeight), pos = (type(self)._width-btnWidth, 5*btnHeight))
         self.btnLoad.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
-        self.btnLoad.Bind(wx.EVT_LEFT_UP, self.__onClickLoadButton)
+        self.btnLoad.Bind(wx.EVT_LEFT_UP, self._onClickLoadButton)
         if not os.path.isfile(productsFile):
             self.btnLoad.Disable()
 
-        btnSave = wx.Button(panel, id = wx.ID_ANY, label = "save", name = "save", size = wx.Size(btnWidth, btnHeight), pos = (type(self).__width-btnWidth, 6*btnHeight))
+        btnSave = wx.Button(panel, id = wx.ID_ANY, label = "save", name = "save", size = wx.Size(btnWidth, btnHeight), pos = (type(self)._width-btnWidth, 6*btnHeight))
         btnSave.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
-        btnSave.Bind(wx.EVT_LEFT_UP, self.__onClickSaveButton)
+        btnSave.Bind(wx.EVT_LEFT_UP, self._onClickSaveButton)
 
-        self.prodList = wx.ListCtrl(panel, size=((type(self).__width-btnWidth-2*offset), type(self).__height-2*offset), pos = (offset, offset), style = wx.LC_REPORT|wx.LC_HRULES)
+        self.prodList = wx.ListCtrl(panel, size=((type(self)._width-btnWidth-2*offset), type(self)._height-2*offset), pos = (offset, offset), style = wx.LC_REPORT|wx.LC_HRULES)
         self.prodList.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.prodList.InsertColumn(0, '#', width = 50)
         self.prodList.InsertColumn(1, 'code', width = 250)
@@ -59,22 +58,22 @@ class ListFrame(wx.Frame):
         self.SetBackgroundColour("Gray")
         self.ShowFullScreen(True)        
     
-    def __onClickCloseButton(self, event):
+    def _onClickCloseButton(self, event):
         """"""
         exit()
 
-    def __onClickAddButton(self, event):
+    def _onClickAddButton(self, event):
         """"""
         edit = EditFrame()
 
-    def __onClickEditButton(self, event):
+    def _onClickEditButton(self, event):
         """"""
         fi = self.prodList.GetFirstSelected()
         if fi != -1:
             edit = EditFrame()
             edit.initValuesEdit(self.prodList.GetItemText(fi,0), self.prodList.GetItemText(fi,1), self.prodList.GetItemText(fi,2), self.prodList.GetItemText(fi,3))
 
-    def __onClickDelButton(self, event):
+    def _onClickDelButton(self, event):
         """"""
         fi = self.prodList.GetFirstSelected()
         if fi != -1:
@@ -85,7 +84,7 @@ class ListFrame(wx.Frame):
                 for i in range(fi, self.prodList.GetItemCount()):
                     self.prodList.SetStringItem(i, 0, str(i+1))
 
-    def __onClickLoadButton(self, event):
+    def _onClickLoadButton(self, event):
         """"""
         dlg = wx.MessageDialog(None, ('Do you want to load '+productsFile+'?'), 'Question', wx.OK | wx.CANCEL | wx.ICON_QUESTION)
         dlg.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
@@ -99,7 +98,7 @@ class ListFrame(wx.Frame):
                 ind = ind + 1
             fileProdukte.close()
 
-    def __onClickSaveButton(self, event):
+    def _onClickSaveButton(self, event):
         """"""
         dlg = wx.MessageDialog(None, ('Do you want to save to '+productsFile+'?'), 'Question', wx.OK | wx.CANCEL | wx.ICON_QUESTION)
         dlg.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
@@ -154,11 +153,11 @@ class EditFrame(wx.Frame):
 
         btnBack = wx.Button(self, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (100, frameHeight-btnHeight))
         btnBack.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
-        btnBack.Bind(wx.EVT_LEFT_UP,self.__onClickBackButton)
+        btnBack.Bind(wx.EVT_LEFT_UP,self._onClickBackButton)
         
         btnConfirm = wx.Button(self, id = wx.ID_ANY, label = "confirm", name = "confirm", size = wx.Size(btnWidth, btnHeight), pos = (100+btnWidth+5, frameHeight-btnHeight))
         btnConfirm.SetFont(wx.Font(fontsize, wx.SWISS, wx.NORMAL, wx.BOLD))
-        btnConfirm.Bind(wx.EVT_LEFT_UP,self.__onClickConfirmButton)
+        btnConfirm.Bind(wx.EVT_LEFT_UP,self._onClickConfirmButton)
         #btnConfirm.Disable()
 
         self.Show()
@@ -173,11 +172,11 @@ class EditFrame(wx.Frame):
         self.PriceInp.SetValue(price)
         self.SetTitle("Edit entry")
 
-    def __onClickBackButton(self, event):
+    def _onClickBackButton(self, event):
         """"""
         self.Close()
 
-    def __onClickConfirmButton(self, event):
+    def _onClickConfirmButton(self, event):
         """"""
         nr = frame.prodList.GetItemCount()
         code = self.CodeInp.GetValue()
