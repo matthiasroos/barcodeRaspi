@@ -239,9 +239,9 @@ class ListFrame(wx.Frame):
         offset = 5
         self.purchList = wx.ListCtrl(panel, size=((frame.width-btnWidth-2*offset), frame.height-2*offset), pos = (offset, offset), style = wx.LC_REPORT|wx.LC_HRULES|wx.LC_SORT_DESCENDING)
         self.purchList.SetFont(wx.Font((fontSize-5), wx.SWISS, wx.NORMAL, wx.BOLD))
-        self.purchList.InsertColumn(0, 'name', width = 250)
-        self.purchList.InsertColumn(1, 'drinks', width = 250)
-        self.purchList.InsertColumn(2, 'money', width = 250)
+        self.purchList.InsertColumn(0, 'name', width = 200)
+        self.purchList.InsertColumn(1, 'drinks', width = 200)
+        self.purchList.InsertColumn(2, 'money', width = 200)
         for userline in usersPurchases:
             self.purchList.Append([userline[0], userline[1], "{:.2f}".format(userline[2])])
 
