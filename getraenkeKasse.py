@@ -40,7 +40,7 @@ class UserFrame(wx.Frame):
         nrUsers = len(users)
 
         # read Product list
-        type(self).products = self.readProducts()
+        type(self).products, type(self).productsDict = self.readProducts()
         nrProducts = len(self.products)
         type(self).LenCode = self.getLengthCode()
 
@@ -91,10 +91,14 @@ class UserFrame(wx.Frame):
             raise Exception("prodcutsFile not found!")
         fileProducts = open(productsFile, "r")
         prod = list()
+        prodDict = {}
         for line in fileProducts:
-            prod.append(line.split(","))
+            ll = line.split(",")
+            ll[3] = ll[3][:-1]
+            prod.append(ll)
+            prodDict[ll[1]] = ll[3]
         fileProducts.close()
-        return prod
+        return prod, prodDict
 
     def getLengthCode(self):
         """"""
@@ -217,8 +221,41 @@ class ListFrame(wx.Frame):
         self.btnBack.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.btnBack.Bind(wx.EVT_LEFT_UP,self.onClickBackButton)
 
+        # calculate sum for each user
+        if not os.path.isfile(purchasesFile):
+            raise Exception("purchasesFile not found!")
+        filePurchases = open(purchasesFile, "r")
+        usersPurchases = list()
+        for line in filePurchases:
+            ll = line.split(",")
+            for userline in usersPurchases:
+                if userline[0] == ll[1]:
+                    userline[1] += 1
+                    userline[2] += float(frame.productsDict[ll[2].rstrip()])
+                    break
+            else:
+                usersPurchases.append([ll[1], 1, float(frame.productsDict[ll[2].rstrip()])])
+        # show sums for each user
+        offset = 5
+        self.purchList = wx.ListCtrl(panel, size=((frame.width-btnWidth-2*offset), frame.height-2*offset), pos = (offset, offset), style = wx.LC_REPORT|wx.LC_HRULES|wx.LC_SORT_DESCENDING)
+        self.purchList.SetFont(wx.Font((fontSize-5), wx.SWISS, wx.NORMAL, wx.BOLD))
+        self.purchList.InsertColumn(0, 'name', width = 250)
+        self.purchList.InsertColumn(1, 'drinks', width = 250)
+        self.purchList.InsertColumn(2, 'money', width = 250)
+        for userline in usersPurchases:
+            self.purchList.Append([userline[0], userline[1], "{:.2f}".format(userline[2])])
 
         self.ShowFullScreen(True)
+
+    def __ListCompareFunction(self, item1, item2):
+        """"""
+        if item1 > item2:
+            val = 1
+        elif item1 < item2:
+            val = -1
+        else:
+            val = 0
+        return val
 
     def onClickCloseButton(self, event):
         """"""
