@@ -15,8 +15,8 @@ import struct
 usersFile = "user.txt"
 productsFile = "produkt.txt"
 purchasesFile = "purchase.txt"
-btnHeight = 100
-btnWidth = 230
+btnHeight = 80
+btnWidth = 200
 fontSize = 25
 
 
