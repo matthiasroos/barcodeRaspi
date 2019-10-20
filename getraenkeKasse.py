@@ -22,28 +22,22 @@ fontSize = 25
 
 class UserFrame(wx.Frame):
 
-    width = []
-    height = []
-    user = []
-    products = []
-    LenCode = []
-
     def __init__(self):
         """Constructor"""
         wx.Frame.__init__(self, None, title = "Test Fullscreen")
         panel = wx.Panel(self)
 
-        type(self).width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)
-        type(self).height = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y)
+        type(self)._width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)
+        type(self)._height = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y)
 
         # read User list
-        users = self.readUsers()
-        nrUsers = len(users)
+        type(self)._users = self._readUsers()
+        nrUsers = len(type(self)._users)
 
         # read Product list
-        type(self).products, type(self).productsDict = self.readProducts()
-        nrProducts = len(self.products)
-        type(self).LenCode = self.getLengthCode()
+        type(self)._products = self._readProducts()
+        nrProducts = len(self._products)
+        type(self)._LenCode = self._calcLengthCode()
 
         offset = 10
         posX = offset
@@ -52,26 +46,25 @@ class UserFrame(wx.Frame):
         # User buttons
         self.button = []
         for i in range(0, nrUsers):
-            self.button.append(wx.Button(panel, id = wx.ID_ANY, label = users[i], name = users[i], size = wx.Size(btnWidth, btnHeight), pos = (posX, posY)))
+            self.button.append(wx.Button(panel, id = wx.ID_ANY, label = type(self)._users[i], name = type(self)._users[i], size = wx.Size(btnWidth, btnHeight), pos = (posX, posY)))
             self.button[i].SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
-            self.button[i].Bind(wx.EVT_LEFT_UP, self.onClickNameButton)
+            self.button[i].Bind(wx.EVT_LEFT_UP, self._onClickNameButton)
             #self.buildButtons(button[i])
-            if ((posY + 2*btnHeight + offset) < type(self).height):
+            if ((posY + 2*btnHeight + offset) < type(self)._height):
                 posY = posY + btnHeight + offset
             else:
                 posY = offset
                 posX = posX + btnWidth + offset
 
         # List button
-        self.btnList = wx.Button(panel, id = wx.ID_ANY, label = "List", name = "list", size = wx.Size(btnWidth, btnHeight), pos = (type(self).width-1*btnWidth, type(self).height-btnHeight))
+        self.btnList = wx.Button(panel, id = wx.ID_ANY, label = "List", name = "list", size = wx.Size(btnWidth, btnHeight), pos = (type(self).__width-1*btnWidth, type(self).__height-btnHeight))
         self.btnList.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
-        self.btnList.Bind(wx.EVT_LEFT_UP, self.onClickListButton)
-
+        self.btnList.Bind(wx.EVT_LEFT_UP, self._onClickListButton)
 
         self.SetBackgroundColour("Gray")
         self.ShowFullScreen(True)        
     
-    def readUsers(self):
+    def _readUsers(self):
         """"
         Read users from usersFile
         """
@@ -84,7 +77,7 @@ class UserFrame(wx.Frame):
         fileUsers.close()
         return users
 
-    def readProducts(self):
+    def _readProducts(self):
         """"
         Read products from productsFile
         """
@@ -101,17 +94,17 @@ class UserFrame(wx.Frame):
         fileProducts.close()
         return prod, prodDict
 
-    def getLengthCode(self):
+    def _calcLengthCode(self):
         """"""
         length = set()
-        for code in self.products:
+        for code in self._products:
             tmpLen = len(code[1])
             if  tmpLen > 0:
                 if tmpLen not in length:
                     length.add(tmpLen)
         return length
 
-    def onClickNameButton(self, event):
+    def _onClickNameButton(self, event):
         """
         This method is fired when a User button is pressed
         """
@@ -121,11 +114,27 @@ class UserFrame(wx.Frame):
         type(self).user = button_by_id.GetLabel()
         frameScan = ScanFrame()
 
-    def onClickListButton(self, event):
+    def _onClickListButton(self, event):
         """
         This method is fired when the List button is pressed
         """
         frameList = ListFrame()
+
+    def getWidth(self):
+        """"""
+        return type(self).__width
+
+    def getHeight(self):
+        """"""
+        return type(self).__height
+
+    def getLengthCode(self):
+        """"""
+        return type(self).__LenCode
+
+    def getProducts(self):
+        """"""
+        return type(self).__products
 
 
 class ScanFrame(wx.Frame):
@@ -135,41 +144,42 @@ class ScanFrame(wx.Frame):
         wx.Frame.__init__(self, None, title = "ScanFrame", style = wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP)
         self.panel = wx.Panel(self)
 
-        self.btnNoCode = wx.Button(self.panel, id = wx.ID_ANY, label = "no barcode", name = "no barcode", size = wx.Size(btnWidth, btnHeight), pos = (UserFrame.width-3*btnWidth, UserFrame.height-btnHeight))
+        self.btnNoCode = wx.Button(self.panel, id = wx.ID_ANY, label = "no barcode", name = "no barcode", size = wx.Size(btnWidth, btnHeight), pos = (frame.getWidth()-3*btnWidth, frame.getHeight()-btnHeight))
         self.btnNoCode.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
-        self.btnNoCode.Bind(wx.EVT_LEFT_UP,self.onClickNoCodeButton)
-        self.btnBack = wx.Button(self.panel, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (UserFrame.width-2*btnWidth, UserFrame.height-btnHeight))
+        self.btnNoCode.Bind(wx.EVT_LEFT_UP,self._onClickNoCodeButton)
+        self.btnBack = wx.Button(self.panel, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (frame.getWidth()-2*btnWidth, frame.getHeight()-btnHeight))
         self.btnBack.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
-        self.btnBack.Bind(wx.EVT_LEFT_UP,self.onClickBackButton)
-        self.btnConfirm = wx.Button(self.panel, id = wx.ID_ANY, label = "confirm", name = "confirm", size = wx.Size(btnWidth, btnHeight), pos = (UserFrame.width-1*btnWidth, UserFrame.height-btnHeight))
+        self.btnBack.Bind(wx.EVT_LEFT_UP,self._onClickBackButton)
+        self.btnConfirm = wx.Button(self.panel, id = wx.ID_ANY, label = "confirm", name = "confirm", size = wx.Size(btnWidth, btnHeight), pos = (frame.getWidth()-1*btnWidth, frame.getHeight()-btnHeight))
         self.btnConfirm.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
-        self.btnConfirm.Bind(wx.EVT_LEFT_UP,self.onClickConfirmButton)
+        self.btnConfirm.Bind(wx.EVT_LEFT_UP,self._onClickConfirmButton)
         self.btnConfirm.Disable()
         
-        self.Text = wx.StaticText(self.panel, label = (UserFrame.user+", what can I get you?"), pos = (UserFrame.width/5, UserFrame.height*1/5), size = (150, 50))
+        self.Text = wx.StaticText(self.panel, label = (UserFrame.user+", what can I get you?"), pos = (frame.getWidth()/5, frame.getHeight()*1/5), size = (150, 50))
         self.Text.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-        self.Code = wx.TextCtrl(self.panel, pos = (UserFrame.width/5, UserFrame.height*1/5+70), size = (320, 50))
+        self.Code = wx.TextCtrl(self.panel, pos = (frame.getWidth()/5, frame.getHeight()*1/5+70), size = (320, 50))
         self.Code.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.Code.SetMaxLength(13)
         self.Code.SetFocus()
-        self.Code.Bind(wx.EVT_TEXT,self.onChangeCode)
+        self.Code.Bind(wx.EVT_TEXT, self._onChangeCode)
 
-        self.Product = wx.StaticText(self.panel,  label = "", pos = (UserFrame.width/5, UserFrame.height*1/5+150), size = (150, 50))
+        self.Product = wx.StaticText(self.panel,  label = "", pos = (frame.getWidth()/5, frame.getHeight()*1/5+150), size = (150, 50))
         self.Product.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.ShowFullScreen(True)
-    def onClickNoCodeButton(self, event):
+
+    def _onClickNoCodeButton(self, event):
         """"""
         self.btnNoCode.Disable()
         self.Code.Hide()
-        self.cmbProducts = wx.ComboBox(self.panel, id = wx.ID_ANY,  pos = (UserFrame.width/5, UserFrame.height*1/5+70), size = (320, 50))
+        self.cmbProducts = wx.ComboBox(self.panel, id = wx.ID_ANY,  pos = (frame.getWidth()/5, frame.getHeight()*1/5+70), size = (320, 50))
         nrProducts = len(UserFrame.products)
 
-    def onClickBackButton(self, event):
+    def _onClickBackButton(self, event):
         """"""
         self.Close()
 
-    def onClickConfirmButton(self, event):
+    def _onClickConfirmButton(self, event):
         """"""
         self.Disable()
         self.btnConfirm.SetLabel("saving...")
@@ -182,6 +192,7 @@ class ScanFrame(wx.Frame):
         line = datetime.datetime.now().isoformat() + "," + UserFrame.user + "," + self.Code.GetValue() + "\n"
         filePurchases.writelines(line)
         filePurchases.close()
+        line = datetime.datetime.now().isoformat() + "," + frame.user + "," + self.Code.GetValue() + "\n"
 
         # commit & push purchase
         try:
@@ -195,11 +206,11 @@ class ScanFrame(wx.Frame):
 
         self.Close()
 
-    def onChangeCode(self,event):
+    def _onChangeCode(self, event):
         """"""
         code = self.Code.GetValue()
-        if len(code) in UserFrame.LenCode:
-            for pr in UserFrame.products:
+        if len(code) in frame.getLengthCode():
+            for pr in frame.getProducts():
                 if code == pr[1]:
                     self.Product.SetLabel((pr[2] + "\t Price: " + pr[3]))
                     self.btnConfirm.Enable()
@@ -268,20 +279,20 @@ class ListFrame(wx.Frame):
         wx.Frame.__init__(self, None, title = "ListFrame", style = wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP)
         panel = SortableListCtrlPanel(self)
 
-        self.btnClose = wx.Button(panel, id = wx.ID_ANY, label = "close", name = "close", size = wx.Size(btnWidth, btnHeight), pos = (UserFrame.width-btnWidth, 0))
+        self.btnClose = wx.Button(panel, id = wx.ID_ANY, label = "close", name = "close", size = wx.Size(btnWidth, btnHeight), pos = (frame.getWidth()-btnWidth, 0))
         self.btnClose.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
-        self.btnClose.Bind(wx.EVT_LEFT_UP,self.onClickCloseButton)
-        self.btnBack = wx.Button(panel, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (UserFrame.width-btnWidth, UserFrame.height-btnHeight))
+        self.btnClose.Bind(wx.EVT_LEFT_UP,self._onClickCloseButton)
+        self.btnBack = wx.Button(panel, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (frame.getWidth()-2*btnWidth, frame.getHeight()-btnHeight))
         self.btnBack.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
-        self.btnBack.Bind(wx.EVT_LEFT_UP,self.onClickBackButton)
+        self.btnBack.Bind(wx.EVT_LEFT_UP,self._onClickBackButton)
 
         self.ShowFullScreen(True)
 
-    def onClickCloseButton(self, event):
+    def _onClickCloseButton(self, event):
         """"""
         exit()
 
-    def onClickBackButton(self, event):
+    def _onClickBackButton(self, event):
         """"""
         self.Close()
 
