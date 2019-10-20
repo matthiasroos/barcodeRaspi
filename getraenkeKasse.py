@@ -151,6 +151,7 @@ class ScanFrame(wx.Frame):
         self.btnNoCode = wx.Button(self.panel, id = wx.ID_ANY, label = "no barcode", name = "no barcode", size = wx.Size(btnWidth, btnHeight), pos = (frame.getWidth()-3*btnWidth, frame.getHeight()-btnHeight))
         self.btnNoCode.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.btnNoCode.Bind(wx.EVT_LEFT_UP,self._onClickNoCodeButton)
+        self.btnNoCode.Disable()
         self.btnBack = wx.Button(self.panel, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (frame.getWidth()-2*btnWidth, frame.getHeight()-btnHeight))
         self.btnBack.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.btnBack.Bind(wx.EVT_LEFT_UP,self._onClickBackButton)
