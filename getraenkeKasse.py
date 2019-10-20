@@ -234,7 +234,7 @@ class SortableListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
             else:
                 nr = len(usersPurchases)
                 usersPurchases[nr] = (ll[1], 1, float(frame.productsDict[ll[2].rstrip()]))
-        print(usersPurchases)
+
         # show sums for each user
         offset = 5
         self.purchList = SortableListCtrl(parent = self, size = ((frame.width-btnWidth-2*offset), frame.height-2*offset), pos = (offset, offset), style = wx.LC_REPORT|wx.LC_HRULES|wx.LC_SORT_DESCENDING)
@@ -249,10 +249,11 @@ class SortableListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
             self.purchList.SetItemData(index, key)
             index += 1
 
-        self.itemDataMap = usersPurchases
+        self.itemDataMap = usersPurchases # used by ColumnCorterMixin
         listmix.ColumnSorterMixin.__init__(self, 3)
         self.purchList.Bind(wx.EVT_LIST_COL_CLICK, self._OnColumnClick)
 
+    # used by ColumnSorterMixin
     def GetListCtrl(self):
         return self.purchList
 
@@ -275,16 +276,6 @@ class ListFrame(wx.Frame):
         self.btnBack.Bind(wx.EVT_LEFT_UP,self.onClickBackButton)
 
         self.ShowFullScreen(True)
-
-    def __ListCompareFunction(self, item1, item2):
-        """"""
-        if item1 > item2:
-            val = 1
-        elif item1 < item2:
-            val = -1
-        else:
-            val = 0
-        return val
 
     def onClickCloseButton(self, event):
         """"""
