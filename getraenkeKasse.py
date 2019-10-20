@@ -35,7 +35,7 @@ class UserFrame(wx.Frame):
         nrUsers = len(type(self)._users)
 
         # read Product list
-        type(self)._products = self._readProducts()
+        type(self)._products, type(self)._productsDict  = self._readProducts()
         nrProducts = len(self._products)
         type(self)._LenCode = self._calcLengthCode()
 
@@ -57,7 +57,7 @@ class UserFrame(wx.Frame):
                 posX = posX + btnWidth + offset
 
         # List button
-        self.btnList = wx.Button(panel, id = wx.ID_ANY, label = "List", name = "list", size = wx.Size(btnWidth, btnHeight), pos = (type(self).__width-1*btnWidth, type(self).__height-btnHeight))
+        self.btnList = wx.Button(panel, id = wx.ID_ANY, label = "List", name = "list", size = wx.Size(btnWidth, btnHeight), pos = (type(self)._width-1*btnWidth, type(self)._height-btnHeight))
         self.btnList.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.btnList.Bind(wx.EVT_LEFT_UP, self._onClickListButton)
 
@@ -98,7 +98,7 @@ class UserFrame(wx.Frame):
         """"""
         length = set()
         for code in self._products:
-            tmpLen = len(code[1])
+            tmpLen = len(code)
             if  tmpLen > 0:
                 if tmpLen not in length:
                     length.add(tmpLen)
@@ -122,19 +122,23 @@ class UserFrame(wx.Frame):
 
     def getWidth(self):
         """"""
-        return type(self).__width
+        return type(self)._width
 
     def getHeight(self):
         """"""
-        return type(self).__height
+        return type(self)._height
 
     def getLengthCode(self):
         """"""
-        return type(self).__LenCode
+        return type(self)._LenCode
 
     def getProducts(self):
         """"""
-        return type(self).__products
+        return type(self)._products
+
+    def getProductsDict(self):
+        """"""
+        return type(self)._productsDict
 
 
 class ScanFrame(wx.Frame):
@@ -240,15 +244,15 @@ class SortableListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
             for key, value in usersPurchases.items():
                 user, nr, money = value
                 if user == ll[1]:
-                    usersPurchases[key] = (user, nr + 1, money + float(frame.productsDict[ll[2].rstrip()]))
+                    usersPurchases[key] = (user, nr + 1, money + float(frame.getProductsDict()[ll[2].rstrip()]))
                     break
             else:
                 nr = len(usersPurchases)
-                usersPurchases[nr] = (ll[1], 1, float(frame.productsDict[ll[2].rstrip()]))
+                usersPurchases[nr] = (ll[1], 1, float(frame.getProductsDict()[ll[2].rstrip()]))
 
         # show sums for each user
         offset = 5
-        self.purchList = SortableListCtrl(parent = self, size = ((frame.width-btnWidth-2*offset), frame.height-2*offset), pos = (offset, offset), style = wx.LC_REPORT|wx.LC_HRULES|wx.LC_SORT_DESCENDING)
+        self.purchList = SortableListCtrl(parent = self, size = ((frame.getWidth()-btnWidth-2*offset), frame.getHeight()-2*offset), pos = (offset, offset), style = wx.LC_REPORT|wx.LC_HRULES|wx.LC_SORT_DESCENDING)
         self.purchList.SetFont(wx.Font((fontSize-5), wx.SWISS, wx.NORMAL, wx.BOLD))
         self.purchList.InsertColumn(0, 'name', width = 180)
         self.purchList.InsertColumn(1, 'drinks', width = 180)
@@ -282,7 +286,7 @@ class ListFrame(wx.Frame):
         self.btnClose = wx.Button(panel, id = wx.ID_ANY, label = "close", name = "close", size = wx.Size(btnWidth, btnHeight), pos = (frame.getWidth()-btnWidth, 0))
         self.btnClose.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.btnClose.Bind(wx.EVT_LEFT_UP,self._onClickCloseButton)
-        self.btnBack = wx.Button(panel, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (frame.getWidth()-2*btnWidth, frame.getHeight()-btnHeight))
+        self.btnBack = wx.Button(panel, id = wx.ID_ANY, label = "back", name = "back", size = wx.Size(btnWidth, btnHeight), pos = (frame.getWidth()-1*btnWidth, frame.getHeight()-btnHeight))
         self.btnBack.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.btnBack.Bind(wx.EVT_LEFT_UP,self._onClickBackButton)
 
