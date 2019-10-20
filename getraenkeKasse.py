@@ -239,9 +239,9 @@ class SortableListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         offset = 5
         self.purchList = SortableListCtrl(parent = self, size = ((frame.width-btnWidth-2*offset), frame.height-2*offset), pos = (offset, offset), style = wx.LC_REPORT|wx.LC_HRULES|wx.LC_SORT_DESCENDING)
         self.purchList.SetFont(wx.Font((fontSize-5), wx.SWISS, wx.NORMAL, wx.BOLD))
-        self.purchList.InsertColumn(0, 'name', width = 200)
-        self.purchList.InsertColumn(1, 'drinks', width = 200)
-        self.purchList.InsertColumn(2, 'money', width = 200)
+        self.purchList.InsertColumn(0, 'name', width = 180)
+        self.purchList.InsertColumn(1, 'drinks', width = 180)
+        self.purchList.InsertColumn(2, 'money', width = 180)
         index = 0
         for key, value in usersPurchases.items():
             user, nr, money = value
