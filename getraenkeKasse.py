@@ -98,7 +98,7 @@ class UserFrame(wx.Frame):
         """"""
         length = set()
         for code in self._products:
-            tmpLen = len(code)
+            tmpLen = len(code[1])
             if  tmpLen > 0:
                 if tmpLen not in length:
                     length.add(tmpLen)
