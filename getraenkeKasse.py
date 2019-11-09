@@ -300,6 +300,7 @@ class SortableListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.itemDataMap = usersPurchases  # used by ColumnCorterMixin
         listmix.ColumnSorterMixin.__init__(self, 3)
         self.purchList.Bind(wx.EVT_LIST_COL_CLICK, self._OnColumnClick)
+        self.purchList.Bind(wx.EVT_LIST_ITEM_SELECTED, self._OnItemClick)
 
     # used by ColumnSorterMixin
     def GetListCtrl(self):
@@ -307,6 +308,10 @@ class SortableListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
 
     def _OnColumnClick(self, event):
         event.Skip()
+
+    def _OnItemClick(self, event):
+        focus = self.purchList.GetFocusedItem()
+        print(self.purchList.GetItem(focus).GetText())
 
 
 class ListFrame(wx.Frame):
