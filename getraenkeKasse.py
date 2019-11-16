@@ -1,16 +1,16 @@
 #!/usr/bin/python3
-import wx
-import wx.lib.mixins.listctrl as listmix
-import time
-#import barcodescanner as basc
-import os
-import sys
-import git
 import datetime
 import hashlib
+import os
 import socket
 import struct
+import sys
+import time
 
+import git
+import pandas as pd
+import wx
+import wx.lib.mixins.listctrl as listmix
 
 usersFile = "user.txt"
 productsFile = "produkt.txt"
@@ -53,8 +53,8 @@ class UserFrame(wx.Frame):
                                          size=wx.Size(btnWidth, btnHeight), pos=(posX, posY)))
             self.button[i].SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
             self.button[i].Bind(wx.EVT_LEFT_UP, self._onClickNameButton)
-            #self.buildButtons(button[i])
-            if ((posY + 2 * btnHeight + offset) < self._height):
+            # self.buildButtons(button[i])
+            if (posY + 2 * btnHeight + offset) < self._height:
                 posY = posY + btnHeight + offset
             else:
                 posY = offset
@@ -87,7 +87,7 @@ class UserFrame(wx.Frame):
         Read products from productsFile
         """
         if not os.path.isfile(productsFile):
-            raise Exception("prodcutsFile not found!")
+            raise Exception("productsFile not found!")
         fileProducts = open(productsFile, "r")
         prod = list()
         prodDict = {}
@@ -189,7 +189,7 @@ class ScanFrame(wx.Frame):
         self.Code.Bind(wx.EVT_TEXT, self._onChangeCode)
 
         self.Product = wx.StaticText(self.panel, label="", pos=(
-        self.userframeObj.getWidth()/5, self.userframeObj.getHeight()*1/5 + 150), size=(150, 50))
+            self.userframeObj.getWidth() / 5, self.userframeObj.getHeight() * 1 / 5 + 150), size=(150, 50))
         self.Product.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.ShowFullScreen(True)
@@ -261,7 +261,7 @@ class SortableListCtrl(wx.ListCtrl):
 class SortableListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
 
     def __init__(self, parent, userframe):
-        """Constrcutor"""
+        """Constructor"""
         wx.Panel.__init__(self, parent, -1, style=wx.WANTS_CHARS)
 
         # calculate sum for each user
