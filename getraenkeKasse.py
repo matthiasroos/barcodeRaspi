@@ -242,7 +242,9 @@ class ScanFrame(wx.Frame):
             prod_df = frame.getProducts()
             select_df = prod_df[prod_df['code'] == code]
             if not select_df.empty:
-                self.Product.SetLabel(select_df.at[0, 'desc'] + "\t Price: " + select_df.at[0, 'price'])
+                ind = select_df.first_valid_index()
+                self.Product.SetLabel(str(select_df.at[ind, 'desc']) + "\t Price: " +
+                                      "{:.2f}".format(select_df.at[ind, 'price']))
                 self.btnConfirm.Enable()
                 return None
         self.Product.SetLabel("")
