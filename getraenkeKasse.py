@@ -98,6 +98,8 @@ class UserFrame(wx.Frame):
             prodDict[ll[1]] = ll[3]
         fileProducts.close()
         prod_df = pd.DataFrame(prod, columns=['nr', 'code', 'desc', 'price', 'alcohol'])
+        prod_df['code'] = prod_df['code'].astype(str)
+        prod_df['price'] = prod_df['price'].astype(float)
         return prod_df, prodDict
 
     def _calcLengthCode(self):
@@ -269,18 +271,10 @@ class SortableListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         # calculate sum for each user
         if not os.path.isfile(purchasesFile):
             raise Exception("purchasesFile not found!")
-        filePurchases = open(purchasesFile, "r")
-        usersPurchases = dict()
-        for line in filePurchases:
-            ll = line.split(",")
-            for key, value in usersPurchases.items():
-                user, nr, money = value
-                if user == ll[1]:
-                    usersPurchases[key] = (user, nr + 1, money + float(userframe.getProductsDict()[ll[2].rstrip()]))
-                    break
-            else:
-                nr = len(usersPurchases)
-                usersPurchases[nr] = (ll[1], 1, float(userframe.getProductsDict()[ll[2].rstrip()]))
+        usersPurchases_df = pd.read_csv(purchasesFile, header=None)
+        usersPurchases_df.columns = ['timestamp', 'user', 'code']
+        usersPurchases_df['code'] = usersPurchases_df['code'].astype(str)
+        usersPurchases_df = usersPurchases_df.merge(userframe.getProducts(), on='code', how='left', sort=False)
 
         # show sums for each user
         offset = 5
@@ -293,13 +287,18 @@ class SortableListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.purchList.InsertColumn(1, 'drinks', width=180)
         self.purchList.InsertColumn(2, 'money', width=180)
         index = 0
-        for key, value in usersPurchases.items():
-            user, nr, money = value
+        unique_users = usersPurchases_df['user'].unique()
+        usersPurchases_dict = {}
+        for user in unique_users:
+            user_df = usersPurchases_df[usersPurchases_df['user'] == user]
+            nr = user_df['timestamp'].count()
+            money = user_df['price'].sum()
+            usersPurchases_dict[index] = [user, int(nr), float("{:.2f}".format(money))]
             self.purchList.Append([user, nr, "{:.2f}".format(money)])
-            self.purchList.SetItemData(index, key)
+            self.purchList.SetItemData(index, index)
             index += 1
 
-        self.itemDataMap = usersPurchases  # used by ColumnCorterMixin
+        self.itemDataMap = usersPurchases_dict # used by ColumnSorterMixin
         listmix.ColumnSorterMixin.__init__(self, 3)
         self.purchList.Bind(wx.EVT_LIST_COL_CLICK, self._OnColumnClick)
         self.purchList.Bind(wx.EVT_LIST_ITEM_SELECTED, self._OnItemClick)
