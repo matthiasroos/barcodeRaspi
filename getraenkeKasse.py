@@ -38,8 +38,7 @@ class UserFrame(wx.Frame):
         nrUsers = len(self._users)
 
         # read Product list
-        self._products, self._productsDict = self._readProducts()
-        nrProducts = len(self._products)
+        self._products_df, self._productsDict = self._readProducts()
         self._LenCode = self._calcLengthCode()
 
         offset = 10
@@ -94,16 +93,18 @@ class UserFrame(wx.Frame):
         for line in fileProducts:
             ll = line.split(",")
             ll[3] = ll[3][:-1]
+            ll.append('None')
             prod.append(ll)
             prodDict[ll[1]] = ll[3]
         fileProducts.close()
-        return prod, prodDict
+        prod_df = pd.DataFrame(prod, columns=['nr', 'code', 'desc', 'price', 'alcohol'])
+        return prod_df, prodDict
 
     def _calcLengthCode(self):
         """"""
         length = set()
-        for code in self._products:
-            tmpLen = len(code[1])
+        for index, row in self._products_df.iterrows():
+            tmpLen = len(row[1])
             if tmpLen > 0:
                 if tmpLen not in length:
                     length.add(tmpLen)
@@ -139,7 +140,7 @@ class UserFrame(wx.Frame):
 
     def getProducts(self):
         """"""
-        return self._products
+        return self._products_df
 
     def getProductsDict(self):
         """"""
@@ -242,11 +243,12 @@ class ScanFrame(wx.Frame):
         """"""
         code = self.Code.GetValue()
         if len(code) in frame.getLengthCode():
-            for pr in frame.getProducts():
-                if code == pr[1]:
-                    self.Product.SetLabel((pr[2] + "\t Price: " + pr[3]))
-                    self.btnConfirm.Enable()
-                    return None
+            prod_df = frame.getProducts()
+            select_df = prod_df[prod_df['code'] == code]
+            if not select_df.empty:
+                self.Product.SetLabel(select_df.at[0, 'desc'] + "\t Price: " + select_df.at[0, 'price'])
+                self.btnConfirm.Enable()
+                return None
         self.Product.SetLabel("")
         self.btnConfirm.Disable()
 
