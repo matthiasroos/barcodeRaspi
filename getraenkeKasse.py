@@ -1,16 +1,16 @@
 #!/usr/bin/python3
-import wx
-import wx.lib.mixins.listctrl as listmix
-import time
-#import barcodescanner as basc
-import os
-import sys
-import git
 import datetime
 import hashlib
+import os
 import socket
 import struct
+import sys
+import time
 
+import git
+import pandas as pd
+import wx
+import wx.lib.mixins.listctrl as listmix
 
 usersFile = "user.txt"
 productsFile = "produkt.txt"
@@ -39,8 +39,7 @@ class UserFrame(wx.Frame):
         nrUsers = len(self._users)
 
         # read Product list
-        self._products, self._productsDict = self._readProducts()
-        nrProducts = len(self._products)
+        self._products_df, self._productsDict = self._readProducts()
         self._LenCode = self._calcLengthCode()
 
         offset = 10
@@ -54,8 +53,8 @@ class UserFrame(wx.Frame):
                                          size=wx.Size(btnWidth, btnHeight), pos=(posX, posY)))
             self.button[i].SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
             self.button[i].Bind(wx.EVT_LEFT_UP, self._onClickNameButton)
-            #self.buildButtons(button[i])
-            if ((posY + 2 * btnHeight + offset) < self._height):
+            # self.buildButtons(button[i])
+            if (posY + 2 * btnHeight + offset) < self._height:
                 posY = posY + btnHeight + offset
             else:
                 posY = offset
@@ -88,23 +87,27 @@ class UserFrame(wx.Frame):
         Read products from productsFile
         """
         if not os.path.isfile(productsFile):
-            raise Exception("prodcutsFile not found!")
+            raise Exception("productsFile not found!")
         fileProducts = open(productsFile, "r")
         prod = list()
         prodDict = {}
         for line in fileProducts:
             ll = line.split(",")
             ll[3] = ll[3][:-1]
+            ll.append('None')
             prod.append(ll)
             prodDict[ll[1]] = ll[3]
         fileProducts.close()
-        return prod, prodDict
+        prod_df = pd.DataFrame(prod, columns=['nr', 'code', 'desc', 'price', 'alcohol'])
+        prod_df['code'] = prod_df['code'].astype(str)
+        prod_df['price'] = prod_df['price'].astype(float)
+        return prod_df, prodDict
 
     def _calcLengthCode(self):
         """"""
         length = set()
-        for code in self._products:
-            tmpLen = len(code[1])
+        for index, row in self._products_df.iterrows():
+            tmpLen = len(row[1])
             if tmpLen > 0:
                 if tmpLen not in length:
                     length.add(tmpLen)
@@ -140,7 +143,7 @@ class UserFrame(wx.Frame):
 
     def getProducts(self):
         """"""
-        return self._products
+        return self._products_df
 
     def getProductsDict(self):
         """"""
@@ -190,7 +193,7 @@ class ScanFrame(wx.Frame):
         self.Code.Bind(wx.EVT_TEXT, self._onChangeCode)
 
         self.Product = wx.StaticText(self.panel, label="", pos=(
-        self.userframeObj.getWidth()/5, self.userframeObj.getHeight()*1/5 + 150), size=(150, 50))
+            self.userframeObj.getWidth() / 5, self.userframeObj.getHeight() * 1 / 5 + 150), size=(150, 50))
         self.Product.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         self.ShowFullScreen(True)
@@ -241,11 +244,14 @@ class ScanFrame(wx.Frame):
         """"""
         code = self.Code.GetValue()
         if len(code) in frame.getLengthCode():
-            for pr in frame.getProducts():
-                if code == pr[1]:
-                    self.Product.SetLabel((pr[2] + "\t Price: " + pr[3]))
-                    self.btnConfirm.Enable()
-                    return None
+            prod_df = frame.getProducts()
+            select_df = prod_df[prod_df['code'] == code]
+            if not select_df.empty:
+                ind = select_df.first_valid_index()
+                self.Product.SetLabel(str(select_df.at[ind, 'desc']) + "\t Price: " +
+                                      "{:.2f}".format(select_df.at[ind, 'price']))
+                self.btnConfirm.Enable()
+                return None
         self.Product.SetLabel("")
         self.btnConfirm.Disable()
 
@@ -260,24 +266,16 @@ class SortableListCtrl(wx.ListCtrl):
 class SortableListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
 
     def __init__(self, parent, userframe):
-        """Constrcutor"""
+        """Constructor"""
         wx.Panel.__init__(self, parent, -1, style=wx.WANTS_CHARS)
 
         # calculate sum for each user
         if not os.path.isfile(purchasesFile):
             raise Exception("purchasesFile not found!")
-        filePurchases = open(purchasesFile, "r")
-        usersPurchases = dict()
-        for line in filePurchases:
-            ll = line.split(",")
-            for key, value in usersPurchases.items():
-                user, nr, money = value
-                if user == ll[1]:
-                    usersPurchases[key] = (user, nr + 1, money + float(userframe.getProductsDict()[ll[2].rstrip()]))
-                    break
-            else:
-                nr = len(usersPurchases)
-                usersPurchases[nr] = (ll[1], 1, float(userframe.getProductsDict()[ll[2].rstrip()]))
+        usersPurchases_df = pd.read_csv(purchasesFile, header=None)
+        usersPurchases_df.columns = ['timestamp', 'user', 'code']
+        usersPurchases_df['code'] = usersPurchases_df['code'].astype(str)
+        usersPurchases_df = usersPurchases_df.merge(userframe.getProducts(), on='code', how='left', sort=False)
 
         # show sums for each user
         offset = 5
@@ -290,15 +288,21 @@ class SortableListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.purchList.InsertColumn(1, 'drinks', width=180)
         self.purchList.InsertColumn(2, 'money', width=180)
         index = 0
-        for key, value in usersPurchases.items():
-            user, nr, money = value
+        unique_users = usersPurchases_df['user'].unique()
+        usersPurchases_dict = {}
+        for user in unique_users:
+            user_df = usersPurchases_df[usersPurchases_df['user'] == user]
+            nr = user_df['timestamp'].count()
+            money = user_df['price'].sum()
+            usersPurchases_dict[index] = [user, int(nr), float("{:.2f}".format(money))]
             self.purchList.Append([user, nr, "{:.2f}".format(money)])
-            self.purchList.SetItemData(index, key)
+            self.purchList.SetItemData(index, index)
             index += 1
 
-        self.itemDataMap = usersPurchases  # used by ColumnCorterMixin
+        self.itemDataMap = usersPurchases_dict # used by ColumnSorterMixin
         listmix.ColumnSorterMixin.__init__(self, 3)
         self.purchList.Bind(wx.EVT_LIST_COL_CLICK, self._OnColumnClick)
+        self.purchList.Bind(wx.EVT_LIST_ITEM_SELECTED, self._OnItemClick)
 
     # used by ColumnSorterMixin
     def GetListCtrl(self):
@@ -306,6 +310,10 @@ class SortableListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
 
     def _OnColumnClick(self, event):
         event.Skip()
+
+    def _OnItemClick(self, event):
+        focus = self.purchList.GetFocusedItem()
+        print(self.purchList.GetItem(focus).GetText())
 
 
 class ListFrame(wx.Frame):
