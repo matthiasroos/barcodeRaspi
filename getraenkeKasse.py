@@ -216,8 +216,10 @@ class ScanFrame(wx.Frame):
         """"""
         self.Disable()
         self.btnConfirm.SetLabel("saving...")
-        # check local repo for changes
-        gitPull("./.")
+
+        if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
+            # check local repo for changes
+            gitPull("./.")
 
         if not os.path.isfile(purchasesFile):
             raise Exception("purchasesFile not found!")
