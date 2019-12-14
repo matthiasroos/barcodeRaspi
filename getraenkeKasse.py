@@ -27,8 +27,12 @@ class UserFrame(wx.Frame):
         wx.Frame.__init__(self, None, title="Test Fullscreen")
         panel = wx.Panel(self)
 
-        self._width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)
-        self._height = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y)
+        if 'BARCODE_DEV' in os.environ:
+            type(self)._width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)/2
+        else:
+            type(self)._width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)
+        type(self)._height = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y)
+
 
         # read User list
         self._users = self._readUsers()
@@ -220,15 +224,16 @@ class ScanFrame(wx.Frame):
         filePurchases.close()
         line = datetime.datetime.now().isoformat() + "," + self.userframeObj.user + "," + self.Code.GetValue() + "\n"
 
-        # commit & push purchase
-        try:
-            repoLocal = git.Repo("./.")
-            repoLocal.git.add(purchasesFile)
-            repoLocal.index.commit("purchase via getraenkeKasse.py")
-            origin = repoLocal.remote(name='origin')
-            origin.push()
-        except:
-            print('Some error occured while pushing the code')
+        if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
+            # commit & push purchase
+            try:
+                repoLocal = git.Repo("./.")
+                repoLocal.git.add(purchasesFile)
+                repoLocal.index.commit("purchase via getraenkeKasse.py")
+                origin = repoLocal.remote(name='origin')
+                origin.push()
+            except:
+                print('Some error occured while pushing the code')
 
         self.Close()
 
@@ -389,34 +394,37 @@ if __name__ == "__main__":
 
     app = wx.App(False)  # Create a new app, don't redirect stdout/stderr to a window.
 
-    # check network
-    if not checkNetwork():
-        print("No network available. Exiting...")
-        sys.exit()
+    if 'BARCODE_DEV' not in os.environ:
+        # check network
+        if not checkNetwork():
+            print("No network available. Exiting...")
+            sys.exit()
 
-    # test local time
-    timeT = getTimefromNTP()
-    if (timeT[0] != time.ctime()):
-        print("Date/time not synchronized with NTP. Exiting...")
-        sys.exit()
+        # test local time
+        timeT = getTimefromNTP()
+        if (timeT[0] != time.ctime()):
+            print("Date/time not synchronized with NTP. Exiting...")
+            sys.exit()
 
-    # check for new commits in local repository
-    if not gitPull("./."):
-        print("Problem with git (local repo). Exiting...")
-        sys.exit()
+    if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
+        print('yes2')
+        # check for new commits in local repository
+        if not gitPull("./."):
+            print("Problem with git (local repo). Exiting...")
+            sys.exit()
 
-    # check for new version of getraenkeKasse.py script on github
-    hasher_old = getMD5Hash("barcodeRaspi/getraenkeKasse.py")
-    if not gitPull("barcodeRaspi"):
-        print("Problem with git (GitHub). Exiting...")
-        sys.exit()
+        # check for new version of getraenkeKasse.py script on github
+        hasher_old = getMD5Hash("barcodeRaspi/getraenkeKasse.py")
+        if not gitPull("barcodeRaspi"):
+            print("Problem with git (GitHub). Exiting...")
+            sys.exit()
 
-    hasher_new = getMD5Hash("barcodeRaspi/getraenkeKasse.py")
-    if (hasher_new.hexdigest() != hasher_old.hexdigest()):
-        # getraenkeKasse.py has changed, script is restarted
-        print("new version from gitHub, script is restarting...")
-        os.execv(__file__, sys.argv)
-        sys.exit()
+        hasher_new = getMD5Hash("barcodeRaspi/getraenkeKasse.py")
+        if (hasher_new.hexdigest() != hasher_old.hexdigest()):
+            # getraenkeKasse.py has changed, script is restarted
+            print("new version from gitHub, script is restarting...")
+            os.execv(__file__, sys.argv)
+            sys.exit()
 
     frame = UserFrame()
     app.MainLoop()
