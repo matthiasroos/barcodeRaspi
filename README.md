@@ -8,7 +8,7 @@ A small POS software for a small group based on a Raspberry Pi, a touchscreen an
 
 Software: Raspbian Buster with desktop
 
-Additional packages: python3-wxgtk4.0, python3-git
+Additional packages: python3-wxgtk4.0, python3-git, python3-pandas
 
 Reasonable packages: vim
 
