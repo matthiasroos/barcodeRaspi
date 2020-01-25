@@ -24,9 +24,28 @@ def test_readUsers1():
     assert users_list == expected_users_list
 
 
-#def test_readProducta
- # Create in-memory file
+def test_readProducts0():
+    with unittest.mock.patch('os.path.isfile', return_value=False) as mocked_os, \
+            pytest.raises(Exception) as exc:
+        functions.readProducts()
+    mocked_os.assert_called_once_with('produkt.txt')
+    assert 'productsFile not found!' in str(exc.value)
 
+
+# problematic: prod_df: 'None' as string
+#              prod_dict: price as float
+def test_readProducts1():
+    file_content = """1,1111111111111,xxxx,0.60\n2,2222222222222,yyyy,0.80"""
+    expected_df = pd.DataFrame([['1', '1111111111111', 'xxxx', 0.60, 'None'],
+                                ['2', '2222222222222', 'yyyy', 0.80, 'None']],
+                               columns=['nr', 'code', 'desc', 'price', 'alcohol'])
+    expected_dict = {'1111111111111': '0.60', '2222222222222': '0.80'}
+    with unittest.mock.patch('os.path.isfile', return_value=True) as mocked_os,\
+            unittest.mock.patch('builtins.open', unittest.mock.mock_open(read_data=file_content)):
+        prod_df, prod_dict = functions.readProducts()
+    mocked_os.assert_called_once_with('produkt.txt')
+    assert prod_df.equals(expected_df)
+    assert prod_dict == expected_dict
 
 
 @pytest.mark.parametrize(['input_df', 'expected_set'],
@@ -46,9 +65,7 @@ def test_getPurchases0():
 
 
 def test_getPurchases1():
-    file_content = """
-2019-12-10T12:20:00,aaa,111111111111
-2019-12-10T16:30:00,bbb,222222222222
+    file_content = """2019-12-10T12:20:00,aaa,111111111111\n2019-12-10T16:30:00,bbb,222222222222\n
 2019-12-10T16:35:00,bbb,222222222222"""
     df_from_file = pd.read_csv(io.StringIO(file_content), header=None)
     products_df = pd.DataFrame([[1, '111111111111', 'xxxx', 0.60, None],
@@ -59,10 +76,10 @@ def test_getPurchases1():
                                 ['2019-12-10T16:35:00', 'bbb', '222222222222', 2, 'yyyy', 1.20, None]],
                                columns=['timestamp', 'user', 'code', 'nr', 'desc', 'price', 'alcohol'])
     with unittest.mock.patch('os.path.isfile') as mocked_os, \
-        unittest.mock.patch('pandas.read_csv') as mocked_open, \
+        unittest.mock.patch('pandas.read_csv') as mocked_readcsv, \
             unittest.mock.patch('functions.readProducts') as mocked_readProducts:
         mocked_os.return_value = True
-        mocked_open.return_value = df_from_file
+        mocked_readcsv.return_value = df_from_file
         mocked_readProducts.return_value = (products_df, None)
         usersPurchases_df = functions.getPurchases()
     mocked_os.assert_called_once_with('purchase.txt')

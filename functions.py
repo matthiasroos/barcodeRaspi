@@ -40,14 +40,14 @@ def checkNetwork(host="8.8.8.8", port=53, timeout=3):
 
 def getTimefromNTP():
     addrNTP = '0.de.pool.ntp.org'
-    REFRENCE_TIME_1970 = 2208988800  # Reference time
+    REFERENCE_TIME_1970 = 2208988800  # Reference time
     client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     data = b'\x1b' + 47 * b'\0'
     client.sendto(data, (addrNTP, 123))
     data, address = client.recvfrom(1024)
     if data:
         t = struct.unpack('!12I', data)[10]
-        t -= REFRENCE_TIME_1970
+        t -= REFERENCE_TIME_1970
     return time.ctime(t), t
 
 
@@ -99,19 +99,19 @@ def readProducts() -> typing.Tuple[pd.DataFrame, dict]:
     if not os.path.isfile(productsFile):
         raise Exception("productsFile not found!")
     fileProducts = open(productsFile, "r")
-    prod = list()
-    prodDict = {}
+    prod_list = list()
+    prod_dict = {}
     for line in fileProducts:
         ll = line.split(",")
         ll[3] = ll[3][:-1]
         ll.append('None')
-        prod.append(ll)
-        prodDict[ll[1]] = ll[3]
+        prod_list.append(ll)
+        prod_dict[ll[1]] = ll[3]
     fileProducts.close()
-    prod_df = pd.DataFrame(prod, columns=['nr', 'code', 'desc', 'price', 'alcohol'])
+    prod_df = pd.DataFrame(prod_list, columns=['nr', 'code', 'desc', 'price', 'alcohol'])
     prod_df['code'] = prod_df['code'].astype(str)
     prod_df['price'] = prod_df['price'].astype(float)
-    return prod_df, prodDict
+    return prod_df, prod_dict
 
 
 def calcLengthCode(products_df: pd.DataFrame) -> set:
