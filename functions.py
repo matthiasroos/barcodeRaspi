@@ -118,7 +118,7 @@ def calcLengthCode(products_df: pd.DataFrame) -> set:
     """"""
     length = set()
     for index, row in products_df.iterrows():
-        tmpLen = len(row['code'])
+        tmpLen = len(str(row['code']))
         if tmpLen > 0:
             length.add(tmpLen)
     return length
@@ -135,8 +135,8 @@ def getPurchases() -> pd.DataFrame:
     return usersPurchases_df
 
 
-def getUserPurchases(userspurchases_df: pd.DataFrame, user: str) -> typing.Tuple[np.int64, np.float64]:
-    user_df = userspurchases_df[userspurchases_df['user'] == user]
+def getUserPurchases(users_purchases_df: pd.DataFrame, user: str) -> typing.Tuple[np.int64, np.float64]:
+    user_df = users_purchases_df[users_purchases_df['user'] == user]
     nr = user_df['timestamp'].count()
     money = user_df['price'].sum()
     return nr, money

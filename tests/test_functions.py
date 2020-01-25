@@ -7,20 +7,12 @@ import unittest.mock
 import functions
 
 
-class TestFileNotFound(unittest.TestCase):
-    def test_readUsers0(self):
-        with unittest.mock.patch('os.path.isfile', return_value=False) as mocked_os, \
-                self.assertRaises(Exception) as exc:
-            functions.readUsers()
-        mocked_os.assert_called_once_with('user.txt')
-        self.assertEqual(exc.value, {'usersFile not found!', })
-
-    def test_getPurchases0(self):
-        with unittest.mock.patch('os.path.isfile', return_value=False) as mocked_os, \
-                self.assertRaises(Exception) as exc:
-            functions.getPurchases()
-        mocked_os.assert_called_once_with('purchase.txt')
-        self.assertEqual(exc.value, {'purchasesFile not found!', })
+def test_readUsers0():
+    with unittest.mock.patch('os.path.isfile', return_value=False) as mocked_os, \
+            pytest.raises(Exception) as exc:
+        functions.readUsers()
+    mocked_os.assert_called_once_with('user.txt')
+    assert 'usersFile not found!' in str(exc.value)
 
 
 def test_readUsers1():
@@ -43,6 +35,14 @@ def test_readUsers1():
 def test_calcLengthCode(input_df, expected_set):
     output_set = functions.calcLengthCode(input_df)
     assert output_set == expected_set
+
+
+def test_getPurchases0():
+    with unittest.mock.patch('os.path.isfile', return_value=False) as mocked_os, \
+            pytest.raises(Exception) as exc:
+        functions.getPurchases()
+    mocked_os.assert_called_once_with('purchase.txt')
+    assert 'purchasesFile not found!' in str(exc.value)
 
 
 def test_getPurchases1():
