@@ -1,0 +1,79 @@
+
+import io
+import pandas as pd
+import pytest
+import unittest.mock
+
+import functions
+
+
+class TestFileNotFound(unittest.TestCase):
+    def test_readUsers0(self):
+        with unittest.mock.patch('os.path.isfile', return_value=False) as mocked_os, \
+                self.assertRaises(Exception) as exc:
+            functions.readUsers()
+        mocked_os.assert_called_once_with('user.txt')
+        self.assertEqual(exc.value, {'usersFile not found!', })
+
+    def test_getPurchases0(self):
+        with unittest.mock.patch('os.path.isfile', return_value=False) as mocked_os, \
+                self.assertRaises(Exception) as exc:
+            functions.getPurchases()
+        mocked_os.assert_called_once_with('purchase.txt')
+        self.assertEqual(exc.value, {'purchasesFile not found!', })
+
+
+def test_readUsers1():
+    expected_users_list = ['aaa', 'bbb', 'ccc']
+    with unittest.mock.patch('os.path.isfile', return_value=True) as mocked_os,\
+            unittest.mock.patch('builtins.open', unittest.mock.mock_open(read_data='aaa\nbbb\nccc')):
+        users_list = functions.readUsers()
+    mocked_os.assert_called_once_with('user.txt')
+    assert users_list == expected_users_list
+
+
+#def test_readProducta
+ # Create in-memory file
+
+
+
+@pytest.mark.parametrize(['input_df', 'expected_set'],
+                         [(pd.DataFrame([1, 22, '', 4444], columns=['code']), {1, 2, 4}),
+                          (pd.DataFrame(['1', '22', '', '4444'], columns=['code']), {1, 2, 4})])
+def test_calcLengthCode(input_df, expected_set):
+    output_set = functions.calcLengthCode(input_df)
+    assert output_set == expected_set
+
+
+def test_getPurchases1():
+    file_content = """
+2019-12-10T12:20:00,aaa,111111111111
+2019-12-10T16:30:00,bbb,222222222222
+2019-12-10T16:35:00,bbb,222222222222"""
+    df_from_file = pd.read_csv(io.StringIO(file_content), header=None)
+    products_df = pd.DataFrame([[1, '111111111111', 'xxxx', 0.60, None],
+                                [2, '222222222222', 'yyyy', 1.20, None]],
+                               columns=['nr', 'code', 'desc', 'price', 'alcohol'])
+    expected_df = pd.DataFrame([['2019-12-10T12:20:00', 'aaa', '111111111111', 1, 'xxxx', 0.60, None],
+                                ['2019-12-10T16:30:00', 'bbb', '222222222222', 2, 'yyyy', 1.20, None],
+                                ['2019-12-10T16:35:00', 'bbb', '222222222222', 2, 'yyyy', 1.20, None]],
+                               columns=['timestamp', 'user', 'code', 'nr', 'desc', 'price', 'alcohol'])
+    with unittest.mock.patch('os.path.isfile') as mocked_os, \
+        unittest.mock.patch('pandas.read_csv') as mocked_open, \
+            unittest.mock.patch('functions.readProducts') as mocked_readProducts:
+        mocked_os.return_value = True
+        mocked_open.return_value = df_from_file
+        mocked_readProducts.return_value = (products_df, None)
+        usersPurchases_df = functions.getPurchases()
+    mocked_os.assert_called_once_with('purchase.txt')
+    assert usersPurchases_df.equals(expected_df)
+
+
+def test_getUserPurchases():
+    users_purchases_df = pd.DataFrame([['2020-01-24T17:13:35', 'aaa', '1111111111111', 1.0],
+                                      ['2020-01-24T17:13:36', 'aaa', '2222222222222', 1.5],
+                                      ['2020-01-24T17:13:36', 'bbb', '1111111111111', 1.2]],
+                                      columns=['timestamp', 'user', 'code', 'price'])
+    nr, money = functions.getUserPurchases(users_purchases_df, 'aaa')
+    assert nr == 2
+    assert money == 2.5
