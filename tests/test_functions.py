@@ -31,9 +31,10 @@ def test_readUsers0():
 def test_readUsers1():
     expected_users_list = ['aaa', 'bbb', 'ccc']
     with unittest.mock.patch('os.path.isfile', return_value=True) as mocked_os,\
-            unittest.mock.patch('builtins.open', unittest.mock.mock_open(read_data='aaa\nbbb\nccc')):
+            unittest.mock.patch('builtins.open', unittest.mock.mock_open(read_data='aaa\nbbb\nccc')) as mocked_open:
         users_list = functions.readUsers()
     mocked_os.assert_called_once_with('user.txt')
+    mocked_open.assert_called_once_with('user.txt', 'r')
     assert users_list == expected_users_list
 
 
@@ -52,9 +53,10 @@ def test_readProducts1():
                                columns=['nr', 'code', 'desc', 'price', 'alcohol'])
     expected_dict = {'1111111111111': 0.60, '2222222222222': 0.80}
     with unittest.mock.patch('os.path.isfile', return_value=True) as mocked_os,\
-            unittest.mock.patch('builtins.open', unittest.mock.mock_open(read_data=file_content)):
+            unittest.mock.patch('builtins.open', unittest.mock.mock_open(read_data=file_content)) as mocked_open:
         prod_df, prod_dict = functions.readProducts()
     mocked_os.assert_called_once_with('produkt.txt')
+    mocked_open.assert_called_once_with('produkt.txt', 'r')
     assert prod_df.equals(expected_df)
     assert prod_dict == expected_dict
 
