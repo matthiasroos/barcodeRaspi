@@ -65,6 +65,9 @@ def gitPull(path_repo: str) -> bool:
             print("!! stderr was:")
             print(exception.stderr)
         return False
+    except git.InvalidGitRepositoryError as exception:
+        print('Invalid Git Repository')
+        return False
 
 
 def gitPush(path_repo: str):
@@ -104,9 +107,9 @@ def readProducts() -> typing.Tuple[pd.DataFrame, dict]:
     for line in fileProducts:
         ll = line.split(",")
         ll[3] = ll[3][:-1]
-        ll.append('None')
+        ll.append('N/A')
         prod_list.append(ll)
-        prod_dict[ll[1]] = ll[3]
+        prod_dict[ll[1]] = float(ll[3])
     fileProducts.close()
     prod_df = pd.DataFrame(prod_list, columns=['nr', 'code', 'desc', 'price', 'alcohol'])
     prod_df['code'] = prod_df['code'].astype(str)

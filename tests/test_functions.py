@@ -1,10 +1,23 @@
 
+import git
 import io
 import pandas as pd
 import pytest
 import unittest.mock
 
 import functions
+
+
+def test_gitPull0():
+    with unittest.mock.patch('git.Repo') as mock_git_repo:
+        status = functions.gitPull('./.')
+    mock_git_repo.assert_called_once_with('./.')
+    assert status is True
+
+
+def test_gitPull1():
+    status = functions.gitPull('./.')
+    assert status is False
 
 
 def test_readUsers0():
@@ -32,14 +45,12 @@ def test_readProducts0():
     assert 'productsFile not found!' in str(exc.value)
 
 
-# problematic: prod_df: 'None' as string
-#              prod_dict: price as float
 def test_readProducts1():
     file_content = """1,1111111111111,xxxx,0.60\n2,2222222222222,yyyy,0.80"""
-    expected_df = pd.DataFrame([['1', '1111111111111', 'xxxx', 0.60, 'None'],
-                                ['2', '2222222222222', 'yyyy', 0.80, 'None']],
+    expected_df = pd.DataFrame([['1', '1111111111111', 'xxxx', 0.60, 'N/A'],
+                                ['2', '2222222222222', 'yyyy', 0.80, 'N/A']],
                                columns=['nr', 'code', 'desc', 'price', 'alcohol'])
-    expected_dict = {'1111111111111': '0.60', '2222222222222': '0.80'}
+    expected_dict = {'1111111111111': 0.60, '2222222222222': 0.80}
     with unittest.mock.patch('os.path.isfile', return_value=True) as mocked_os,\
             unittest.mock.patch('builtins.open', unittest.mock.mock_open(read_data=file_content)):
         prod_df, prod_dict = functions.readProducts()
