@@ -17,7 +17,7 @@ class UserFrame(wx.Frame):
     def __init__(self):
         """Constructor"""
         wx.Frame.__init__(self, None, title="Test Fullscreen")
-        panel = wx.Panel(self)
+        self.panel = wx.Panel(self)
 
         if 'BARCODE_DEV' in os.environ:
             self._width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)/2
@@ -40,7 +40,7 @@ class UserFrame(wx.Frame):
         # User buttons
         self.button = []
         for i in range(0, nrUsers):
-            self.button.append(wx.Button(panel, id=wx.ID_ANY, label=self._users[i], name=self._users[i],
+            self.button.append(wx.Button(self.panel, id=wx.ID_ANY, label=self._users[i], name=self._users[i],
                                          size=wx.Size(btnWidth, btnHeight), pos=(posX, posY)))
             self.button[i].SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
             self.button[i].Bind(wx.EVT_LEFT_UP, self._onClickNameButton)
@@ -52,7 +52,7 @@ class UserFrame(wx.Frame):
                 posX = posX + btnWidth + offset
 
         # List button
-        self.btnList = wx.Button(panel, id=wx.ID_ANY, label="List", name="list", size=wx.Size(btnWidth, btnHeight),
+        self.btnList = wx.Button(self.panel, id=wx.ID_ANY, label="List", name="list", size=wx.Size(btnWidth, btnHeight),
                                  pos=(self._width - 1*btnWidth, self._height - btnHeight))
         self.btnList.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.btnList.Bind(wx.EVT_LEFT_UP, self._onClickListButton)

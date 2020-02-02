@@ -16,20 +16,20 @@ class ListFrame(wx.Frame):
 
     def __init__(self, userframe):
         """Constructor"""
-        wx.Frame.__init__(self, None, title="ListFrame", style=wx.DEFAULT_FRAME_STYLE)
-        panel = SortableListCtrlPanel(self, userframe)
+        wx.Frame.__init__(self, None, title='ListFrame', style=wx.DEFAULT_FRAME_STYLE)
+        self.panel = SortableListCtrlPanel(self, userframe)
 
-        self.btnClose = wx.Button(panel, id=wx.ID_ANY, label="close", name="close", size=wx.Size(btnWidth, btnHeight),
+        self.btnClose = wx.Button(self.panel, id=wx.ID_ANY, label='close', name='close', size=wx.Size(btnWidth, btnHeight),
                                   pos=(userframe.getWidth() - btnWidth, 0))
         self.btnClose.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.btnClose.Bind(wx.EVT_LEFT_UP, self._onClickCloseButton)
-        self.btnBack = wx.Button(panel, id=wx.ID_ANY, label="back", name="back", size=wx.Size(btnWidth, btnHeight),
 
         self.btnRestart = wx.Button(self.panel, id=wx.ID_ANY, label='restart', name='restart',
                                     size=wx.Size(btnWidth, btnHeight), pos=(userframe.getWidth() - btnWidth, btnHeight))
         self.btnRestart.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.btnRestart.Bind(wx.EVT_LEFT_UP, self._onClickRestartButton)
 
+        self.btnBack = wx.Button(self.panel, id=wx.ID_ANY, label='back', name='back', size=wx.Size(btnWidth, btnHeight),
                                  pos=(userframe.getWidth() - 1 * btnWidth, userframe.getHeight() - btnHeight))
         self.btnBack.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.btnBack.Bind(wx.EVT_LEFT_UP, self._onClickBackButton)
@@ -78,8 +78,8 @@ class SortableListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         usersPurchases_dict = {}
         for user in unique_users:
             nr, money = functions.getUserPurchases(users_purchases_df, user)
-            usersPurchases_dict[index] = [user, int(nr), float("{:.2f}".format(money))]
-            self.purchList.Append([user, nr, "{:.2f}".format(money)])
+            usersPurchases_dict[index] = [user, int(nr), float('{:.2f}'.format(money))]
+            self.purchList.Append([user, nr, '{:.2f}'.format(money)])
             self.purchList.SetItemData(index, index)
             index += 1
 
