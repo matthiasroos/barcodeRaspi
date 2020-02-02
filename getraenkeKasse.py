@@ -10,6 +10,11 @@ import functions
 import userframe
 
 
+def restart():
+    os.execl(sys.executable, sys.executable, *sys.argv)
+    sys.exit()
+
+
 if __name__ == "__main__":
 
     app = wx.App(False)  # Create a new app, don't redirect stdout/stderr to a window.
@@ -43,8 +48,7 @@ if __name__ == "__main__":
         if hasher_new.hexdigest() != hasher_old.hexdigest():
             # getraenkeKasse.py has changed, script is restarted
             print("new version from gitHub, script is restarting...")
-            os.execv(__file__, sys.argv)
-            sys.exit()
+            restart()
 
     frame = userframe.UserFrame()
     app.MainLoop()

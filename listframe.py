@@ -5,6 +5,7 @@ import wx
 import wx.lib.mixins.listctrl as listmix
 
 import functions
+import getraenkeKasse
 
 btnHeight = 80
 btnWidth = 200
@@ -23,6 +24,12 @@ class ListFrame(wx.Frame):
         self.btnClose.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.btnClose.Bind(wx.EVT_LEFT_UP, self._onClickCloseButton)
         self.btnBack = wx.Button(panel, id=wx.ID_ANY, label="back", name="back", size=wx.Size(btnWidth, btnHeight),
+
+        self.btnRestart = wx.Button(self.panel, id=wx.ID_ANY, label='restart', name='restart',
+                                    size=wx.Size(btnWidth, btnHeight), pos=(userframe.getWidth() - btnWidth, btnHeight))
+        self.btnRestart.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+        self.btnRestart.Bind(wx.EVT_LEFT_UP, self._onClickRestartButton)
+
                                  pos=(userframe.getWidth() - 1 * btnWidth, userframe.getHeight() - btnHeight))
         self.btnBack.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.btnBack.Bind(wx.EVT_LEFT_UP, self._onClickBackButton)
@@ -36,6 +43,10 @@ class ListFrame(wx.Frame):
     def _onClickBackButton(self, event):
         """"""
         self.Close()
+
+    def _onClickRestartButton(self, event):
+        """"""
+        getraenkeKasse.restart()
 
 
 class SortableListCtrl(wx.ListCtrl):
