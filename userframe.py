@@ -3,6 +3,7 @@ import os
 import wx
 
 import functions
+import getraenkeKasse
 import listframe
 import scanframe
 
@@ -56,6 +57,10 @@ class UserFrame(wx.Frame):
         self.btnList.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.btnList.Bind(wx.EVT_LEFT_UP, self._onClickListButton)
 
+        self.textVersion = wx.StaticText(self.panel, label='ver. ' + getraenkeKasse.version,
+                                         size=wx.Size(btnWidth, btnHeight),
+                                         pos=(self._width - 1*btnWidth, self._height - 1.7 * btnHeight))
+        self.textVersion.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
         self.SetBackgroundColour("Gray")
         self.ShowFullScreen(True)
 

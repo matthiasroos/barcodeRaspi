@@ -9,6 +9,8 @@ import wx
 import functions
 import userframe
 
+version = '0.1.2'
+
 
 def restart():
     os.execl(sys.executable, sys.executable, *sys.argv)
