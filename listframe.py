@@ -12,12 +12,26 @@ btnWidth = 200
 fontSize = 25
 
 
+class TabTwo(wx.Panel):
+    def __init__(self, parent):
+        wx.Panel.__init__(self, parent)
+        t = wx.StaticText(self, -1, "This is the second tab", (20,20))
+
+
 class ListFrame(wx.Frame):
 
     def __init__(self, userframe):
         """Constructor"""
         wx.Frame.__init__(self, None, title='ListFrame', style=wx.DEFAULT_FRAME_STYLE)
-        self.panel = SortableListCtrlPanel(self, userframe)
+        self.panel = wx.Panel(self)
+        notebook = wx.Notebook(self.panel, pos=(0, 0), size=wx.Size(userframe.getWidth()-btnWidth,
+                                                                    userframe.getHeight()))
+
+        tab1 = SortableListCtrlPanel(notebook, userframe)
+        tab2 = TabTwo(notebook)
+        notebook.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+        notebook.AddPage(tab1, 'USER')
+        notebook.AddPage(tab2, 'STOCK')
 
         self.btnClose = wx.Button(self.panel, id=wx.ID_ANY, label='close', name='close', size=wx.Size(btnWidth, btnHeight),
                                   pos=(userframe.getWidth() - btnWidth, 0))
