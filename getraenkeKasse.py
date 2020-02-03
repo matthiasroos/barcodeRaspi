@@ -17,9 +17,31 @@ def restart():
     sys.exit()
 
 
-if __name__ == "__main__":
+class getraenkeKasse():
 
-    app = wx.App(False)  # Create a new app, don't redirect stdout/stderr to a window.
+    def __init__(self):
+        self.products = None
+        self.version = version
+        self.purchases = None
+        self.users = None
+        self._clickedUser = None
+
+        self.app = wx.App(False)
+
+    def run(self):
+        frame = userframe.UserFrame()
+        self.app.MainLoop()
+
+    @property
+    def clickedUser(self) -> str:
+        return self._clickedUser
+
+    @clickedUser.setter
+    def clickedUser(self, user: str):
+        self._clickedUser = user
+
+
+if __name__ == "__main__":
 
     if 'BARCODE_DEV' not in os.environ:
         # check network
@@ -52,6 +74,6 @@ if __name__ == "__main__":
             print("new version from gitHub, script is restarting...")
             restart()
 
-    frame = userframe.UserFrame()
-    app.MainLoop()
+    gk = getraenkeKasse()
+    gk.run()
 

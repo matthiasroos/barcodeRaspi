@@ -3,6 +3,7 @@ import os
 import wx
 
 import functions
+import getraenkeKasse
 
 btnHeight = 80
 btnWidth = 200
@@ -38,7 +39,7 @@ class ScanFrame(wx.Frame):
         self.btnConfirm.Bind(wx.EVT_LEFT_UP, self._onClickConfirmButton)
         self.btnConfirm.Disable()
 
-        self.Text = wx.StaticText(self.panel, label=(self.userframeObj.user + ", what can I get you?"),
+        self.Text = wx.StaticText(self.panel, label=(getraenkeKasse.clickedUser + ", what can I get you?"),
                                   pos=(self.userframeObj.getWidth()/5,
                                        self.userframeObj.getHeight()*1/5), size=(150, 50))
         self.Text.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))

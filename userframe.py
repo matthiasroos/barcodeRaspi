@@ -68,7 +68,7 @@ class UserFrame(wx.Frame):
         """"""
         button_id = event.GetId()
         button_by_id = self.FindWindowById(button_id)
-        self.user = button_by_id.GetLabel()
+        getraenkeKasse.clickedUser = button_by_id.GetLabel()
         scanframe.ScanFrame(self)
 
     def _onClickListButton(self, event):
