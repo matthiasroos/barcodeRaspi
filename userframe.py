@@ -30,8 +30,8 @@ class UserFrame(wx.Frame):
         nrUsers = len(self._users)
 
         # read Product list
-        self._products_df, self._productsDict = functions.readProducts()
         self._LenCode = functions.calcLengthCode(self._products_df)
+        self._products_df = functions.readProducts()
 
         offset = 10
         posX = offset
@@ -91,6 +91,3 @@ class UserFrame(wx.Frame):
         """"""
         return self._products_df
 
-    def getProductsDict(self):
-        """"""
-        return self._productsDict

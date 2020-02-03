@@ -95,7 +95,7 @@ def readUsers() -> list:
     return users
 
 
-def readProducts() -> typing.Tuple[pd.DataFrame, dict]:
+def readProducts() -> pd.DataFrame:
     """"
     Read products from productsFile
     """
@@ -114,7 +114,7 @@ def readProducts() -> typing.Tuple[pd.DataFrame, dict]:
     prod_df = pd.DataFrame(prod_list, columns=['nr', 'code', 'desc', 'price', 'alcohol'])
     prod_df['code'] = prod_df['code'].astype(str)
     prod_df['price'] = prod_df['price'].astype(float)
-    return prod_df, prod_dict
+    return prod_df
 
 
 def calcLengthCode(products_df: pd.DataFrame) -> set:
@@ -133,7 +133,7 @@ def getPurchases() -> pd.DataFrame:
     usersPurchases_df = pd.read_csv(purchasesFile, header=None)
     usersPurchases_df.columns = ['timestamp', 'user', 'code']
     usersPurchases_df['code'] = usersPurchases_df['code'].astype(str)
-    products_df, _ = readProducts()
+    products_df = readProducts()
     usersPurchases_df = usersPurchases_df.merge(products_df, on='code', how='left', sort=False)
     return usersPurchases_df
 
