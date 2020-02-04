@@ -7,30 +7,54 @@ import time
 import wx
 
 import functions
+import listframe
+import scanframe
 import userframe
 
 version = '0.1.2'
+btnHeight = 80
+btnWidth = 200
+fontSize = 25
 
 
-def restart():
-    os.execl(sys.executable, sys.executable, *sys.argv)
-    sys.exit()
-
-
-class getraenkeKasse():
+class getraenkeKasse(object):
 
     def __init__(self):
         self.products = None
         self.version = version
+        self.btnHeight = btnHeight
+        self.btnWidth = btnWidth
+        self.fontSize = fontSize
         self.purchases = None
         self.users = None
         self._clickedUser = None
 
         self.app = wx.App(False)
+        if 'BARCODE_DEV' in os.environ:
+            self.screen_width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)/2
+        else:
+            self.screen_width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)
+        self.screen_height = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        pass
 
     def run(self):
-        frame = userframe.UserFrame()
+        userframe.UserFrame(self)
         self.app.MainLoop()
+
+    def restart(self):
+        os.execl(sys.executable, sys.executable, *sys.argv)
+        sys.exit()
+
+    def showListFrame(self):
+        listframe.ListFrame(self)
+
+    def showScanFrame(self):
+        scanframe.ScanFrame(self)
 
     @property
     def clickedUser(self) -> str:
@@ -76,4 +100,3 @@ if __name__ == "__main__":
 
     gk = getraenkeKasse()
     gk.run()
-

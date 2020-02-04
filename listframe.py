@@ -2,51 +2,51 @@
 import os
 import sys
 import wx
-import wx.lib.mixins.listctrl as listmix
 
 import functions
-import getraenkeKasse
+import sortable
 
-btnHeight = 80
-btnWidth = 200
-fontSize = 25
 
 
 class TabTwo(wx.Panel):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
-        t = wx.StaticText(self, -1, "This is the second tab", (20,20))
+        t = wx.StaticText(self, -1, "This is the second tab", (20, 20))
 
 
 class ListFrame(wx.Frame):
 
-    def __init__(self, userframe):
+    def __init__(self, parent):
         """Constructor"""
+        self.parent = parent
         wx.Frame.__init__(self, None, title='ListFrame', style=wx.DEFAULT_FRAME_STYLE)
-        self.panel = wx.Panel(self)
-        notebook = wx.Notebook(self.panel, pos=(0, 0), size=wx.Size(userframe.getWidth()-btnWidth,
-                                                                    userframe.getHeight()))
+        with self.parent as prt:
+            self.panel = wx.Panel(self)
+            notebook = wx.Notebook(self.panel, pos=(0, 0), size=wx.Size(prt.screen_width-prt.btnWidth, prt.screen_height))
 
-        tab1 = SortableListCtrlPanel(notebook, userframe)
-        tab2 = TabTwo(notebook)
-        notebook.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
-        notebook.AddPage(tab1, 'USER')
-        notebook.AddPage(tab2, 'STOCK')
+            tab1 = sortable.SortableListCtrlPanel(notebook, prt)
+            tab2 = TabTwo(notebook)
+            notebook.SetFont(wx.Font(prt.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+            notebook.AddPage(tab1, 'USER')
+            notebook.AddPage(tab2, 'STOCK')
 
-        self.btnClose = wx.Button(self.panel, id=wx.ID_ANY, label='close', name='close', size=wx.Size(btnWidth, btnHeight),
-                                  pos=(userframe.getWidth() - btnWidth, 0))
-        self.btnClose.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
-        self.btnClose.Bind(wx.EVT_LEFT_UP, self._onClickCloseButton)
+            self.btnClose = wx.Button(self.panel, id=wx.ID_ANY, label='close', name='close',
+                                      size=wx.Size(prt.btnWidth, prt.btnHeight),
+                                      pos=(prt.screen_width - prt.btnWidth, 0))
+            self.btnClose.SetFont(wx.Font(prt.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+            self.btnClose.Bind(wx.EVT_LEFT_UP, self._onClickCloseButton)
 
-        self.btnRestart = wx.Button(self.panel, id=wx.ID_ANY, label='restart', name='restart',
-                                    size=wx.Size(btnWidth, btnHeight), pos=(userframe.getWidth() - btnWidth, btnHeight))
-        self.btnRestart.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
-        self.btnRestart.Bind(wx.EVT_LEFT_UP, self._onClickRestartButton)
+            self.btnRestart = wx.Button(self.panel, id=wx.ID_ANY, label='restart', name='restart',
+                                        size=wx.Size(prt.btnWidth, prt.btnHeight),
+                                        pos=(prt.screen_width - prt.btnWidth, prt.btnHeight))
+            self.btnRestart.SetFont(wx.Font(prt.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+            self.btnRestart.Bind(wx.EVT_LEFT_UP, self._onClickRestartButton)
 
-        self.btnBack = wx.Button(self.panel, id=wx.ID_ANY, label='back', name='back', size=wx.Size(btnWidth, btnHeight),
-                                 pos=(userframe.getWidth() - 1 * btnWidth, userframe.getHeight() - btnHeight))
-        self.btnBack.SetFont(wx.Font(fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
-        self.btnBack.Bind(wx.EVT_LEFT_UP, self._onClickBackButton)
+            self.btnBack = wx.Button(self.panel, id=wx.ID_ANY, label='back', name='back',
+                                     size=wx.Size(prt.btnWidth, prt.btnHeight),
+                                     pos=(prt.screen_width - 1*prt.btnWidth, prt.screen_height - prt.btnHeight))
+            self.btnBack.SetFont(wx.Font(prt.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+            self.btnBack.Bind(wx.EVT_LEFT_UP, self._onClickBackButton)
 
         self.ShowFullScreen(True)
 
@@ -60,55 +60,7 @@ class ListFrame(wx.Frame):
 
     def _onClickRestartButton(self, event):
         """"""
-        getraenkeKasse.restart()
+        self.parent.restart()
 
 
-class SortableListCtrl(wx.ListCtrl):
 
-    def __init__(self, parent, size, pos, style):
-        """Constructor"""
-        wx.ListCtrl.__init__(self, parent, wx.ID_ANY, pos, size, style)
-
-
-class SortableListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
-
-    def __init__(self, parent, userframe):
-        """Constructor"""
-        wx.Panel.__init__(self, parent, -1, style=wx.WANTS_CHARS)
-
-        # show sums for each user
-        offset = 5
-        self.purchList = SortableListCtrl(parent=self, size=((userframe.getWidth() - btnWidth - 2*offset),
-                                                             userframe.getHeight() - 2*offset),
-                                          pos=(offset, offset),
-                                          style=wx.LC_REPORT | wx.LC_HRULES | wx.LC_SORT_DESCENDING)
-        self.purchList.SetFont(wx.Font((fontSize - 5), wx.SWISS, wx.NORMAL, wx.BOLD))
-        self.purchList.InsertColumn(0, 'name', width=180)
-        self.purchList.InsertColumn(1, 'drinks', width=180)
-        self.purchList.InsertColumn(2, 'money', width=180)
-        index = 0
-        users_purchases_df = functions.getPurchases()
-        unique_users = users_purchases_df['user'].unique()
-        usersPurchases_dict = {}
-        for user in unique_users:
-            nr, money = functions.getUserPurchases(users_purchases_df, user)
-            usersPurchases_dict[index] = [user, int(nr), float('{:.2f}'.format(money))]
-            self.purchList.Append([user, nr, '{:.2f}'.format(money)])
-            self.purchList.SetItemData(index, index)
-            index += 1
-
-        self.itemDataMap = usersPurchases_dict  # used by ColumnSorterMixin
-        listmix.ColumnSorterMixin.__init__(self, 3)
-        self.purchList.Bind(wx.EVT_LIST_COL_CLICK, self._OnColumnClick)
-        self.purchList.Bind(wx.EVT_LIST_ITEM_SELECTED, self._OnItemClick)
-
-    # used by ColumnSorterMixin
-    def GetListCtrl(self):
-        return self.purchList
-
-    def _OnColumnClick(self, event):
-        event.Skip()
-
-    def _OnItemClick(self, event):
-        focus = self.purchList.GetFocusedItem()
-        print(self.purchList.GetItem(focus).GetText())
