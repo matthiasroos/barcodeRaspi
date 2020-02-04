@@ -145,6 +145,16 @@ def getUserPurchases(users_purchases_df: pd.DataFrame, user: str) -> typing.Tupl
     return nr, money
 
 
+def summarizeUserPurchases() -> pd.DataFrame:
+    usersPurchases_df = getPurchases()
+    usersPurchases_df = usersPurchases_df.groupby()
+    unique_users = users_purchases_df['user'].unique()
+
+    nr, money = functions.getUserPurchases(users_purchases_df, user)
+    summary_purchases_df = pd.DataFrame()
+    return summary_purchases_df
+
+
 def savePurchase(user: str, code: str):
     if not os.path.isfile(purchasesFile):
         raise Exception("purchasesFile not found!")

@@ -105,3 +105,17 @@ def test_getUserPurchases():
     nr, money = functions.getUserPurchases(users_purchases_df, 'aaa')
     assert nr == 2
     assert money == 2.5
+
+
+def test_summarizeUserPurchases():
+    input_df = pd.DataFrame([['2019-12-10T12:20:00', 'aaa', '111111111111', 1, 'xxxx', 0.60, None],
+                             ['2019-12-10T16:30:00', 'bbb', '222222222222', 2, 'yyyy', 1.20, None],
+                             ['2019-12-10T16:35:00', 'bbb', '222222222222', 2, 'yyyy', 1.20, None],
+                             ['2019-12-10T16:40:00', 'aaa', '222222222222', 2, 'yyyy', 1.20, None],
+                             ['2019-12-10T16:45:00', 'aaa', '333333333333', 3, 'yzzz', 1.50, None]],
+                            columns=['timestamp', 'user', 'code', 'nr', 'desc', 'price', 'alcohol'])
+    expected_df = pd.DataFrame()
+    with unittest.mock.patch('functions.getPurchases') as mocked_purchases:
+        mocked_purchases.return_value = input_df
+        output_df = functions.summarizeUserPurchases()
+    assert output_df.equals(expected_df)
