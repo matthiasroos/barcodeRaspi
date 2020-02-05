@@ -22,19 +22,18 @@ class ListFrame(wx.Frame):
         wx.Frame.__init__(self, None, title='ListFrame', style=wx.DEFAULT_FRAME_STYLE)
         with self.parent as prt:
             self.panel = wx.Panel(self)
-            notebook = wx.Notebook(self.panel, pos=(0, 0), size=wx.Size(prt.screen_width-prt.btnWidth, prt.screen_height))
+            notebook = wx.Notebook(self.panel, pos=(0, 0),
+                                   size=wx.Size(prt.screen_width-prt.btnWidth, prt.screen_height))
 
             tab1 = sortable.SortableListCtrlPanel(parent=notebook, super_parent=prt,
-                                                  columns={'names': ['name', 'drinks', 'money'], 'width': [180, 180, 180]},
+                                                  columns={'names': ['name', 'drinks', 'money'],
+                                                           'width': [180, 180, 180],
+                                                           'type': [str, int, '{:,.2f}'.format]},
                                                   data_frame=functions.summarizeUserPurchases())
             tab2 = TabTwo(notebook)
-            tab3 = sortable.SortableListCtrlPanel(parent=notebook, super_parent=prt,
-                                                  columns={'names': ['xxx', 'yyy', 'zzz'], 'width': [180, 180, 180]},
-                                                  data_frame=None)
             notebook.SetFont(wx.Font(prt.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
             notebook.AddPage(tab1, 'USER')
             notebook.AddPage(tab2, 'STOCK')
-            notebook.AddPage(tab3, 'XYZ')
 
             self.btnClose = wx.Button(self.panel, id=wx.ID_ANY, label='close', name='close',
                                       size=wx.Size(prt.btnWidth, prt.btnHeight),

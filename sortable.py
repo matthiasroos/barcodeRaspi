@@ -19,7 +19,6 @@ class SortableListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         wx.Panel.__init__(self, parent, -1, style=wx.WANTS_CHARS)
 
         with self.super_parent as sprt:
-            # show sums for each user
             offset = 5
             self.sortable_list_ctrl = SortableListCtrl(parent=self, size=((sprt.screen_width - sprt.btnWidth - 2*offset),
                                                                           sprt.screen_height - 2 * offset),
@@ -32,9 +31,9 @@ class SortableListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
             index = 0
             values_dict = {}
             for index, row in data_frame.iterrows():
-                values_list = [row[column] for column in columns.get['names']]
+                values_list = [row[column] for column in columns.get('names')]
                 values_dict[index] = values_list
-                self.sortable_list_ctrl.Append(values_list)
+                self.sortable_list_ctrl.Append([columns.get('type')[i](value) for i, value in enumerate(values_list)])
                 self.sortable_list_ctrl.SetItemData(index, index)
                 index += 1
 
