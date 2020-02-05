@@ -76,6 +76,23 @@ def test_getPurchases0():
 
 
 def test_getPurchases1():
+    df_from_file = pd.read_csv(io.StringIO(''), header=None)
+    products_df = pd.DataFrame([[1, '111111111111', 'xxxx', 0.60, None],
+                                [2, '222222222222', 'yyyy', 1.20, None]],
+                               columns=['nr', 'code', 'desc', 'price', 'alcohol'])
+    expected_df = pd.DataFrame([], columns=['timestamp', 'user', 'code', 'nr', 'desc', 'price', 'alcohol'])
+    with unittest.mock.patch('os.path.isfile', return_value=False) as mocked_os, \
+            unittest.mock.patch('pandas.read_csv') as mocked_readcsv, \
+            unittest.mock.patch('functions.readProducts') as mocked_readProducts, \
+            pytest.raises(Exception) as exc:
+        mocked_readcsv.return_value = df_from_file
+        mocked_readProducts.return_value = products_df
+        usersPurchases_df = functions.getPurchases()
+    mocked_os.assert_called_once_with('purchase.txt')
+    assert usersPurchases_df.equals(expected_df)
+
+
+def test_getPurchases2():
     file_content = """2019-12-10T12:20:00,aaa,111111111111\n2019-12-10T16:30:00,bbb,222222222222\n
 2019-12-10T16:35:00,bbb,222222222222"""
     df_from_file = pd.read_csv(io.StringIO(file_content), header=None)
@@ -114,7 +131,7 @@ def test_summarizeUserPurchases():
                              ['2019-12-10T16:40:00', 'aaa', '222222222222', 2, 'yyyy', 1.20, None],
                              ['2019-12-10T16:45:00', 'aaa', '333333333333', 3, 'yzzz', 1.50, None]],
                             columns=['timestamp', 'user', 'code', 'nr', 'desc', 'price', 'alcohol'])
-    expected_df = pd.DataFrame()
+    expected_df = pd.DataFrame([['aaa', 3, 3.30], ['bbb', 2, 2.40]], columns=['name', 'drinks', 'money'])
     with unittest.mock.patch('functions.getPurchases') as mocked_purchases:
         mocked_purchases.return_value = input_df
         output_df = functions.summarizeUserPurchases()
