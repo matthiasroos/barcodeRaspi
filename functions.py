@@ -147,8 +147,7 @@ def getUserPurchases(users_purchases_df: pd.DataFrame, user: str) -> typing.Tupl
 
 def summarizeUserPurchases() -> pd.DataFrame:
     usersPurchases_df = getPurchases()
-    summary_purchases_df = usersPurchases_df.groupby('user').agg(drinks=('code', 'count'),
-                                                                 money=('price', sum))
+    summary_purchases_df = usersPurchases_df.groupby('user').agg({'code': 'count', 'price': 'sum'})
     summary_purchases_df.reset_index(inplace=True)
     summary_purchases_df.columns = ['name', 'drinks', 'money']
     return summary_purchases_df
