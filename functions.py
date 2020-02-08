@@ -127,15 +127,22 @@ def calcLengthCode(products_df: pd.DataFrame) -> set:
     return length
 
 
-def getPurchases() -> pd.DataFrame:
+def readPurchases() -> pd.DataFrame:
+    purchases_df = pd.DataFrame([], columns=['timestamp', 'user', 'code'])
     if not os.path.isfile(purchasesFile):
         raise Exception("purchasesFile not found!")
     try:
-        usersPurchases_df = pd.read_csv(purchasesFile, header=None)
+        purchases_df = pd.read_csv(purchasesFile, header=None)
+        purchases_df.columns = ['timestamp', 'user', 'code']
+        purchases_df['code'] = purchases_df['code'].astype(str)
     except pd.errors.EmptyDataError:
-        return pd.DataFrame([], columns=['timestamp', 'user', 'code', 'nr', 'desc', 'price', 'alcohol'])
-    usersPurchases_df.columns = ['timestamp', 'user', 'code']
-    usersPurchases_df['code'] = usersPurchases_df['code'].astype(str)
+        pass
+
+    return purchases_df
+
+
+def getPurchases() -> pd.DataFrame:
+    usersPurchases_df = readPurchases()
     products_df = readProducts()
     usersPurchases_df = usersPurchases_df.merge(products_df, on='code', how='left', sort=False)
     return usersPurchases_df
@@ -163,3 +170,11 @@ def savePurchase(user: str, code: str):
     line = datetime.datetime.now().isoformat() + "," + user + "," + code + "\n"
     filePurchases.writelines(line)
     filePurchases.close()
+
+
+def transformPurchases():
+    purchases_df = getPurchases()
+
+
+def retransformPurchases():
+    pass
