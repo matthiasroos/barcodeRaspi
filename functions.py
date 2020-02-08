@@ -130,7 +130,10 @@ def calcLengthCode(products_df: pd.DataFrame) -> set:
 def getPurchases() -> pd.DataFrame:
     if not os.path.isfile(purchasesFile):
         raise Exception("purchasesFile not found!")
-    usersPurchases_df = pd.read_csv(purchasesFile, header=None)
+    try:
+        usersPurchases_df = pd.read_csv(purchasesFile, header=None)
+    except pd.errors.EmptyDataError:
+        return pd.DataFrame([], columns=['timestamp', 'user', 'code', 'nr', 'desc', 'price', 'alcohol'])
     usersPurchases_df.columns = ['timestamp', 'user', 'code']
     usersPurchases_df['code'] = usersPurchases_df['code'].astype(str)
     products_df = readProducts()
