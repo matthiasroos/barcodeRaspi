@@ -56,6 +56,11 @@ class getraenkeKasse(object):
     def showScanFrame(self):
         scanframe.ScanFrame(self)
 
+    def showErrorDialog(self, error_message: str):
+        dlg = wx.MessageDialog(None, message=error_message, caption='ERROR', style=wx.OK | wx.ICON_WARNING)
+        dlg.SetFont(wx.Font(self.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+        dlg.ShowModal()
+
     @property
     def clickedUser(self) -> str:
         return self._clickedUser
@@ -67,36 +72,36 @@ class getraenkeKasse(object):
 
 if __name__ == "__main__":
 
+    gk = getraenkeKasse()
     if 'BARCODE_DEV' not in os.environ:
         # check network
         if not functions.checkNetwork():
-            print("No network available. Exiting...")
+            gk.showErrorDialog(error_message='No network available. Exiting...')
             sys.exit()
 
         # test local time
         timeT = functions.getTimefromNTP()
         if timeT[0] != time.ctime():
-            print("Date/time not synchronized with NTP. Exiting...")
+            gk.showErrorDialog(error_message='Date/time not synchronized with NTP. Exiting...')
             sys.exit()
 
     if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
         print('yes2')
         # check for new commits in local repository
         if not functions.gitPull("./."):
-            print("Problem with git (local repo). Exiting...")
+            gk.showErrorDialog(error_message='Problem with git (local repo). Exiting...')
             sys.exit()
 
         # check for new version of getraenkeKasse.py script on github
         hasher_old = functions.getMD5Hash("barcodeRaspi/getraenkeKasse.py")
         if not functions.gitPull("barcodeRaspi"):
-            print("Problem with git (GitHub). Exiting...")
+            gk.showErrorDialog(error_message='Problem with git (GitHub). Exiting...')
             sys.exit()
 
         hasher_new = functions.getMD5Hash("barcodeRaspi/getraenkeKasse.py")
         if hasher_new.hexdigest() != hasher_old.hexdigest():
             # getraenkeKasse.py has changed, script is restarted
             print("new version from gitHub, script is restarting...")
-            restart()
+            gk.restart()
 
-    gk = getraenkeKasse()
     gk.run()
