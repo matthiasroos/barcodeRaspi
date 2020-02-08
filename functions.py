@@ -174,7 +174,28 @@ def savePurchase(user: str, code: str):
 
 def transformPurchases():
     purchases_df = getPurchases()
+    purchases_df['paid'] = False
+    purchases_df['paid'] = purchases_df['paid'].astype(str)
+    filePurchases_new = open('purchase_new.txt', 'w+')
+    for index, row in purchases_df.iterrows():
+        line = row['timestamp']+','+row['user']+','+row['code']+','+row['paid']+'\n'
+        filePurchases_new.writelines(line)
+    filePurchases_new.close()
 
 
 def retransformPurchases():
-    pass
+    purchases_df = pd.DataFrame([], columns=['timestamp', 'user', 'code', 'paid'])
+    if not os.path.isfile('purchase_new.txt'):
+        raise Exception("purchases_new.txt not found!")
+    try:
+        purchases_df = pd.read_csv('purchase_new.txt', header=None)
+        purchases_df.columns = ['timestamp', 'user', 'code', 'paid']
+        purchases_df['code'] = purchases_df['code'].astype(str)
+        purchases_df['paid'] = purchases_df['paid'].astype(bool)
+    except pd.errors.EmptyDataError:
+        pass
+    filePurchases_old = open('purchase_old.txt', 'w+')
+    for index, row in purchases_df.iterrows():
+        line = row['timestamp'] + ',' + row['user'] + ',' + row['code'] + '\n'
+        filePurchases_old.writelines(line)
+    filePurchases_old.close()

@@ -1,6 +1,6 @@
 #!/usr/bin/python3
-import datetime
 
+import datetime
 import os
 import sys
 import time
