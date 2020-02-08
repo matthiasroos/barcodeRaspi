@@ -20,7 +20,7 @@ def test_gitPull1():
     assert status is False
 
 
-def test_readUsers0():
+def test_readUsers0_file_not_found():
     with unittest.mock.patch('os.path.isfile', return_value=False) as mocked_os, \
             pytest.raises(Exception) as exc:
         functions.readUsers()
@@ -38,7 +38,7 @@ def test_readUsers1():
     assert users_list == expected_users_list
 
 
-def test_readProducts0():
+def test_readProducts0_file_not_found():
     with unittest.mock.patch('os.path.isfile', return_value=False) as mocked_os, \
             pytest.raises(Exception) as exc:
         functions.readProducts()
@@ -67,29 +67,12 @@ def test_calcLengthCode(input_df, expected_set):
     assert output_set == expected_set
 
 
-def test_getPurchases0():
+def test_getPurchases0_file_not_found():
     with unittest.mock.patch('os.path.isfile', return_value=False) as mocked_os, \
             pytest.raises(Exception) as exc:
         functions.getPurchases()
     mocked_os.assert_called_once_with('purchase.txt')
     assert 'purchasesFile not found!' in str(exc.value)
-
-
-def test_getPurchases1():
-    df_from_file = pd.read_csv(io.StringIO(''), header=None)
-    products_df = pd.DataFrame([[1, '111111111111', 'xxxx', 0.60, None],
-                                [2, '222222222222', 'yyyy', 1.20, None]],
-                               columns=['nr', 'code', 'desc', 'price', 'alcohol'])
-    expected_df = pd.DataFrame([], columns=['timestamp', 'user', 'code', 'nr', 'desc', 'price', 'alcohol'])
-    with unittest.mock.patch('os.path.isfile', return_value=False) as mocked_os, \
-            unittest.mock.patch('pandas.read_csv') as mocked_readcsv, \
-            unittest.mock.patch('functions.readProducts') as mocked_readProducts, \
-            pytest.raises(Exception) as exc:
-        mocked_readcsv.return_value = df_from_file
-        mocked_readProducts.return_value = products_df
-        usersPurchases_df = functions.getPurchases()
-    mocked_os.assert_called_once_with('purchase.txt')
-    assert usersPurchases_df.equals(expected_df)
 
 
 def test_getPurchases2():
