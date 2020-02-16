@@ -128,7 +128,6 @@ def calcLengthCode(products_df: pd.DataFrame) -> set:
 
 
 def readPurchases() -> pd.DataFrame:
-    purchases_df = pd.DataFrame([], columns=['timestamp', 'user', 'code'])
     if not os.path.isfile(purchasesFile):
         raise Exception("purchasesFile not found!")
     try:
@@ -136,7 +135,7 @@ def readPurchases() -> pd.DataFrame:
         purchases_df.columns = ['timestamp', 'user', 'code']
         purchases_df['code'] = purchases_df['code'].astype(str)
     except pd.errors.EmptyDataError:
-        pass
+        purchases_df = pd.DataFrame([], columns=['timestamp', 'user', 'code'])
 
     return purchases_df
 

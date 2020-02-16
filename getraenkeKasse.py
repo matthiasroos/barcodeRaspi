@@ -7,6 +7,7 @@ import time
 import wx
 
 import functions
+import adminframe
 import listframe
 import scanframe
 import userframe
@@ -49,6 +50,9 @@ class getraenkeKasse(object):
     def restart(self):
         os.execl(sys.executable, sys.executable, *sys.argv)
         sys.exit()
+
+    def showAdminFrame(self):
+        adminframe.AdminFrame(self)
 
     def showListFrame(self):
         listframe.ListFrame(self)

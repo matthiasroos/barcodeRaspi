@@ -10,7 +10,7 @@ class UserFrame(wx.Frame):
     def __init__(self, parent):
         """Constructor"""
         self.parent = parent
-        wx.Frame.__init__(self, None, title="Test Fullscreen")
+        wx.Frame.__init__(self, None, title="UserFrame")
         self.panel = wx.Panel(self)
 
         # read User list
@@ -47,10 +47,17 @@ class UserFrame(wx.Frame):
             self.btnList.SetFont(wx.Font(prt.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
             self.btnList.Bind(wx.EVT_LEFT_UP, self._onClickListButton)
 
+            # Admin button
+            self.btnAdmin = wx.Button(self.panel, id=wx.ID_ANY, label="Admin", name="admin",
+                                      size=wx.Size(prt.btnWidth, prt.btnHeight),
+                                      pos=(prt.screen_width - 1 * prt.btnWidth, prt.screen_height - 2*prt.btnHeight))
+            self.btnAdmin.SetFont(wx.Font(prt.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+            self.btnAdmin.Bind(wx.EVT_LEFT_UP, self._onClickAdminButton)
+
             self.textVersion = wx.StaticText(self.panel, label='ver. ' + prt.version,
                                              size=wx.Size(prt.btnWidth, prt.btnHeight),
                                              pos=(prt.screen_width - 1*prt.btnWidth,
-                                                  prt.screen_height - 1.7*prt.btnHeight))
+                                                  prt.screen_height - 2.7*prt.btnHeight))
             self.textVersion.SetFont(wx.Font(prt.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
             self.SetBackgroundColour("Gray")
 
@@ -66,6 +73,10 @@ class UserFrame(wx.Frame):
     def _onClickListButton(self, event):
         """"""
         self.parent.showListFrame()
+
+    def _onClickAdminButton(self, event):
+        """"""
+        self.parent.showAdminFrame()
 
     def getLengthCode(self):
         """"""
