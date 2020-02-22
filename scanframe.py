@@ -1,5 +1,7 @@
 
 import os
+import time
+
 import wx
 
 import functions
@@ -71,7 +73,10 @@ class ScanFrame(wx.Frame):
     def _onClickConfirmButton(self, event):
         """"""
         self.Disable()
-        self.btnConfirm.SetLabel("saving...")
+        self.Update()
+
+        if 'BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ:
+            time.sleep(7)
 
         if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
             # check local repo for changes
