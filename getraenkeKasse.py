@@ -1,13 +1,13 @@
 #!/usr/bin/python3
 
-import datetime
 import os
 import sys
 import time
+
 import wx
 
-import functions
 import adminframe
+import functions
 import listframe
 import scanframe
 import userframe
@@ -18,7 +18,7 @@ btnWidth = 200
 fontSize = 25
 
 
-class getraenkeKasse(object):
+class GetraenkeKasse():
 
     def __init__(self):
         self.products = None
@@ -28,7 +28,7 @@ class getraenkeKasse(object):
         self.fontSize = fontSize
         self.purchases = None
         self.users = None
-        self._clickedUser = None
+        self._clicked_user = None
 
         self.app = wx.App(False)
         if 'BARCODE_DEV' in os.environ:
@@ -44,62 +44,73 @@ class getraenkeKasse(object):
         pass
 
     def run(self):
+        self.get_users()
+        self.get_products()
         userframe.UserFrame(self)
         self.app.MainLoop()
+
+    def exit(self):
+        sys.exit()
 
     def restart(self):
         os.execl(sys.executable, sys.executable, *sys.argv)
         sys.exit()
 
-    def showAdminFrame(self):
+    def show_admin_frame(self):
         adminframe.AdminFrame(self)
 
-    def showListFrame(self):
+    def show_list_frame(self):
         listframe.ListFrame(self)
 
-    def showScanFrame(self):
+    def show_scan_frame(self):
         scanframe.ScanFrame(self)
 
-    def showErrorDialog(self, error_message: str):
+    def show_error_dialog(self, error_message: str):
         dlg = wx.MessageDialog(None, message=error_message, caption='ERROR', style=wx.OK | wx.ICON_WARNING)
         dlg.SetFont(wx.Font(self.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
         dlg.ShowModal()
 
-    @property
-    def clickedUser(self) -> str:
-        return self._clickedUser
+    def get_users(self):
+        self.users = functions.read_users()
 
-    @clickedUser.setter
-    def clickedUser(self, user: str):
-        self._clickedUser = user
+    def get_products(self):
+        self.products = functions.read_products()
+
+    @property
+    def clicked_user(self) -> str:
+        return self._clicked_user
+
+    @clicked_user.setter
+    def clicked_user(self, user: str):
+        self._clicked_user = user
 
 
 if __name__ == "__main__":
 
-    gk = getraenkeKasse()
+    gk = GetraenkeKasse()
     if 'BARCODE_DEV' not in os.environ:
         # check network
         if not functions.checkNetwork():
-            gk.showErrorDialog(error_message='No network available. Exiting...')
+            gk.show_error_dialog(error_message='No network available. Exiting...')
             sys.exit()
 
         # test local time
         timeT = functions.getTimefromNTP()
         if timeT[0] != time.ctime():
-            gk.showErrorDialog(error_message='Date/time not synchronized with NTP. Exiting...')
+            gk.show_error_dialog(error_message='Date/time not synchronized with NTP. Exiting...')
             sys.exit()
 
     if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
         print('yes2')
         # check for new commits in local repository
-        if not functions.gitPull("./."):
-            gk.showErrorDialog(error_message='Problem with git (local repo). Exiting...')
+        if not functions.git_pull("./."):
+            gk.show_error_dialog(error_message='Problem with git (local repo). Exiting...')
             sys.exit()
 
         # check for new version of getraenkeKasse.py script on github
         hasher_old = functions.getMD5Hash("barcodeRaspi/getraenkeKasse.py")
-        if not functions.gitPull("barcodeRaspi"):
-            gk.showErrorDialog(error_message='Problem with git (GitHub). Exiting...')
+        if not functions.git_pull("barcodeRaspi"):
+            gk.show_error_dialog(error_message='Problem with git (GitHub). Exiting...')
             sys.exit()
 
         hasher_new = functions.getMD5Hash("barcodeRaspi/getraenkeKasse.py")

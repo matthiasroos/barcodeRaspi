@@ -1,8 +1,6 @@
 
 import wx
 
-import functions
-
 
 class AdminFrame(wx.Frame):
 

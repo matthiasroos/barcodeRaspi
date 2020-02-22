@@ -1,18 +1,19 @@
 
 import datetime
-import git
 import hashlib
-import numpy as np
 import os
-import pandas as pd
 import socket
 import struct
 import time
 import typing
 
-usersFile = "user.txt"
-productsFile = "produkt.txt"
-purchasesFile = "purchase.txt"
+import git
+import numpy as np
+import pandas as pd
+
+USERS_FILE = "user.txt"
+PRODUCTS_FILE = "produkt.txt"
+PURCHASES_FILE = "purchase.txt"
 
 
 def getMD5Hash(filename: str):
@@ -51,7 +52,7 @@ def getTimefromNTP():
     return time.ctime(t), t
 
 
-def gitPull(path_repo: str) -> bool:
+def git_pull(path_repo: str) -> bool:
     try:
         repo = git.Repo(path_repo)
         repo.remotes.origin.pull()
@@ -70,54 +71,54 @@ def gitPull(path_repo: str) -> bool:
         return False
 
 
-def gitPush(path_repo: str):
+def git_push(path_repo: str):
     try:
-        repoLocal = git.Repo(path_repo)
-        repoLocal.git.add(purchasesFile)
-        repoLocal.index.commit("purchase via getraenkeKasse.py")
-        origin = repoLocal.remote(name='origin')
+        repo_local = git.Repo(path_repo)
+        repo_local.git.add(PURCHASES_FILE)
+        repo_local.index.commit("purchase via getraenkeKasse.py")
+        origin = repo_local.remote(name='origin')
         origin.push()
     except git.GitCommandError as exception:
         print(exception)
 
 
-def readUsers() -> list:
+def read_users() -> list:
     """"
     Read users from usersFile
     """
-    if not os.path.isfile(usersFile):
+    if not os.path.isfile(USERS_FILE):
         raise Exception("usersFile not found!")
-    fileUsers = open(usersFile, "r")
+    file_users = open(USERS_FILE, "r")
     users = []
-    for line in fileUsers:
+    for line in file_users:
         users.append(line.rstrip())
-    fileUsers.close()
+    file_users.close()
     return users
 
 
-def readProducts() -> pd.DataFrame:
+def read_products() -> pd.DataFrame:
     """"
     Read products from productsFile
     """
-    if not os.path.isfile(productsFile):
+    if not os.path.isfile(PRODUCTS_FILE):
         raise Exception("productsFile not found!")
-    fileProducts = open(productsFile, "r")
+    file_products = open(PRODUCTS_FILE, "r")
     prod_list = list()
     prod_dict = {}
-    for line in fileProducts:
+    for line in file_products:
         ll = line.split(",")
         ll[3] = ll[3][:-1]
         ll.append('N/A')
         prod_list.append(ll)
         prod_dict[ll[1]] = float(ll[3])
-    fileProducts.close()
+    file_products.close()
     prod_df = pd.DataFrame(prod_list, columns=['nr', 'code', 'desc', 'price', 'alcohol'])
     prod_df['code'] = prod_df['code'].astype(str)
     prod_df['price'] = prod_df['price'].astype(float)
     return prod_df
 
 
-def calcLengthCode(products_df: pd.DataFrame) -> set:
+def calc_length_code(products_df: pd.DataFrame) -> set:
     """"""
     length = set()
     for index, row in products_df.iterrows():
@@ -127,11 +128,11 @@ def calcLengthCode(products_df: pd.DataFrame) -> set:
     return length
 
 
-def readPurchases() -> pd.DataFrame:
-    if not os.path.isfile(purchasesFile):
+def read_purchases() -> pd.DataFrame:
+    if not os.path.isfile(PURCHASES_FILE):
         raise Exception("purchasesFile not found!")
     try:
-        purchases_df = pd.read_csv(purchasesFile, header=None)
+        purchases_df = pd.read_csv(PURCHASES_FILE, header=None)
         purchases_df.columns = ['timestamp', 'user', 'code']
         purchases_df['code'] = purchases_df['code'].astype(str)
     except pd.errors.EmptyDataError:
@@ -140,49 +141,49 @@ def readPurchases() -> pd.DataFrame:
     return purchases_df
 
 
-def getPurchases() -> pd.DataFrame:
-    usersPurchases_df = readPurchases()
-    products_df = readProducts()
+def get_purchases() -> pd.DataFrame:
+    usersPurchases_df = read_purchases()
+    products_df = read_products()
     usersPurchases_df = usersPurchases_df.merge(products_df, on='code', how='left', sort=False)
     return usersPurchases_df
 
 
-def getUserPurchases(users_purchases_df: pd.DataFrame, user: str) -> typing.Tuple[np.int64, np.float64]:
+def get_user_purchases(users_purchases_df: pd.DataFrame, user: str) -> typing.Tuple[np.int64, np.float64]:
     user_df = users_purchases_df[users_purchases_df['user'] == user]
     nr = user_df['timestamp'].count()
     money = user_df['price'].sum()
     return nr, money
 
 
-def summarizeUserPurchases() -> pd.DataFrame:
-    usersPurchases_df = getPurchases()
+def summarize_user_purchases() -> pd.DataFrame:
+    usersPurchases_df = get_purchases()
     summary_purchases_df = usersPurchases_df.groupby('user').agg({'code': 'count', 'price': 'sum'})
     summary_purchases_df.reset_index(inplace=True)
     summary_purchases_df.columns = ['name', 'drinks', 'money']
     return summary_purchases_df
 
 
-def savePurchase(user: str, code: str):
-    if not os.path.isfile(purchasesFile):
+def save_purchase(user: str, code: str):
+    if not os.path.isfile(PURCHASES_FILE):
         raise Exception("purchasesFile not found!")
-    filePurchases = open(purchasesFile, "a")
+    filePurchases = open(PURCHASES_FILE, "a")
     line = datetime.datetime.now().isoformat() + "," + user + "," + code + "\n"
     filePurchases.writelines(line)
     filePurchases.close()
 
 
-def transformPurchases():
-    purchases_df = getPurchases()
+def transform_purchases():
+    purchases_df = get_purchases()
     purchases_df['paid'] = False
     purchases_df['paid'] = purchases_df['paid'].astype(str)
     filePurchases_new = open('purchase_new.txt', 'w+')
-    for index, row in purchases_df.iterrows():
+    for _, row in purchases_df.iterrows():
         line = row['timestamp']+','+row['user']+','+row['code']+','+row['paid']+'\n'
         filePurchases_new.writelines(line)
     filePurchases_new.close()
 
 
-def retransformPurchases():
+def retransform_purchases():
     purchases_df = pd.DataFrame([], columns=['timestamp', 'user', 'code', 'paid'])
     if not os.path.isfile('purchase_new.txt'):
         raise Exception("purchases_new.txt not found!")

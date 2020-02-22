@@ -1,11 +1,8 @@
 
-import os
-import sys
 import wx
 
 import functions
 import sortable
-
 
 
 class TabTwo(wx.Panel):
@@ -29,7 +26,7 @@ class ListFrame(wx.Frame):
                                                   columns={'names': ['name', 'drinks', 'money'],
                                                            'width': [180, 180, 180],
                                                            'type': [str, int, '{:,.2f}'.format]},
-                                                  data_frame=functions.summarizeUserPurchases())
+                                                  data_frame=functions.summarize_user_purchases())
             tab2 = TabTwo(notebook)
             notebook.SetFont(wx.Font(prt.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
             notebook.AddPage(tab1, 'USER')
@@ -57,7 +54,7 @@ class ListFrame(wx.Frame):
 
     def _onClickCloseButton(self, event):
         """"""
-        sys.exit()
+        self.parent.exit()
 
     def _onClickBackButton(self, event):
         """"""

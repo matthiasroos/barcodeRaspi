@@ -14,6 +14,7 @@ class ScanFrame(wx.Frame):
         self.parent = parent
 
         with self.parent as prt:
+            prt.get_products()
             self.btnNoCode = wx.Button(self.panel, id=wx.ID_ANY, label="no barcode", name="no barcode",
                                        size=wx.Size(prt.btnWidth, prt.btnHeight),
                                        pos=(prt.screen_width - 3*prt.btnWidth,
@@ -30,12 +31,12 @@ class ScanFrame(wx.Frame):
             self.btnConfirm = wx.Button(self.panel, id=wx.ID_ANY, label="confirm", name="confirm",
                                         size=wx.Size(prt.btnWidth, prt.btnHeight),
                                         pos=(prt.screen_width - 1*prt.btnWidth,
-                                             prt.screen_width - prt.btnHeight))
+                                             prt.screen_height - prt.btnHeight))
             self.btnConfirm.SetFont(wx.Font(prt.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
             self.btnConfirm.Bind(wx.EVT_LEFT_UP, self._onClickConfirmButton)
             self.btnConfirm.Disable()
 
-            self.Text = wx.StaticText(self.panel, label=(prt.clickedUser + ", what can I get you?"),
+            self.Text = wx.StaticText(self.panel, label=(prt.clicked_user + ", what can I get you?"),
                                       pos=(prt.screen_width / 5, prt.screen_height * 1 / 5), size=(150, 50))
             self.Text.SetFont(wx.Font(prt.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
 
@@ -74,20 +75,20 @@ class ScanFrame(wx.Frame):
 
         if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
             # check local repo for changes
-            functions.gitPull("./.")
+            functions.git_pull("./.")
 
-        functions.savePurchase(user=self.parent.clickedUser, code=self.Code.GetValue())
+        functions.save_purchase(user=self.parent.clicked_user, code=self.Code.GetValue())
 
         if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
             # commit & push purchase
-            functions.gitPush("./.")
+            functions.git_push("./.")
         self.Close()
 
     def _onChangeCode(self, event):
         """"""
         code = self.Code.GetValue()
-        if len(code) in self.parent.getLengthCode():
-            prod_df = self.parent.getProducts()
+        if len(code) in functions.calc_length_code(self.parent.products):
+            prod_df = self.parent.products
             select_df = prod_df[prod_df['code'] == code]
             if not select_df.empty:
                 ind = select_df.first_valid_index()

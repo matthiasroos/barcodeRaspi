@@ -1,8 +1,5 @@
 
-import os
 import wx
-
-import functions
 
 
 class UserFrame(wx.Frame):
@@ -13,14 +10,6 @@ class UserFrame(wx.Frame):
         wx.Frame.__init__(self, None, title="UserFrame")
         self.panel = wx.Panel(self)
 
-        # read User list
-        self._users = functions.readUsers()
-        nrUsers = len(self._users)
-
-        # read Product list
-        self._products_df = functions.readProducts()
-        self._LenCode = functions.calcLengthCode(self._products_df)
-
         offset = 10
         posX = offset
         posY = offset
@@ -28,8 +17,8 @@ class UserFrame(wx.Frame):
         with self.parent as prt:
             # User buttons
             self.button = []
-            for i in range(0, nrUsers):
-                self.button.append(wx.Button(self.panel, id=wx.ID_ANY, label=self._users[i], name=self._users[i],
+            for i in range(0, len(prt.users)):
+                self.button.append(wx.Button(self.panel, id=wx.ID_ANY, label=prt.users[i], name=prt.users[i],
                                              size=wx.Size(prt.btnWidth, prt.btnHeight), pos=(posX, posY)))
                 self.button[i].SetFont(wx.Font(prt.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
                 self.button[i].Bind(wx.EVT_LEFT_UP, self._onClickNameButton)
@@ -67,22 +56,14 @@ class UserFrame(wx.Frame):
         """"""
         button_id = event.GetId()
         button_by_id = self.FindWindowById(button_id)
-        self.parent.clickedUser = button_by_id.GetLabel()
-        self.parent.showScanFrame()
+        self.parent.clicked_user = button_by_id.GetLabel()
+        self.parent.show_scan_frame()
 
     def _onClickListButton(self, event):
         """"""
-        self.parent.showListFrame()
+        self.parent.show_list_frame()
 
     def _onClickAdminButton(self, event):
         """"""
-        self.parent.showAdminFrame()
-
-    def getLengthCode(self):
-        """"""
-        return self._LenCode
-
-    def getProducts(self):
-        """"""
-        return self._products_df
+        self.parent.show_admin_frame()
 
