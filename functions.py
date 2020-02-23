@@ -89,7 +89,7 @@ def read_users() -> list:
     Read users from usersFile
     """
     if not os.path.isfile(USERS_FILE):
-        raise Exception("usersFile not found!")
+        raise Exception('USERS_FILE not found!')
     file_users = open(USERS_FILE, "r")
     users = []
     for line in file_users:
@@ -103,7 +103,7 @@ def read_products() -> pd.DataFrame:
     Read products from productsFile
     """
     if not os.path.isfile(PRODUCTS_FILE):
-        raise Exception("productsFile not found!")
+        raise Exception('PRODUCTS_FILE not found!')
     file_products = open(PRODUCTS_FILE, "r")
     prod_list = list()
     prod_dict = {}
@@ -132,7 +132,7 @@ def calc_length_code(products_df: pd.DataFrame) -> set:
 
 def read_purchases() -> pd.DataFrame:
     if not os.path.isfile(PURCHASES_FILE):
-        raise Exception("purchasesFile not found!")
+        raise Exception('PURCHASES_FILE not found!')
     try:
         purchases_df = pd.read_csv(PURCHASES_FILE, header=None)
         purchases_df.columns = ['timestamp', 'user', 'code']

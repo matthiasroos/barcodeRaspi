@@ -45,7 +45,6 @@ class GetraenkeKasse():
 
     def run(self):
         self.get_users()
-        self.get_products()
         userframe.UserFrame(self)
         self.app.MainLoop()
 

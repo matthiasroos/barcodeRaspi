@@ -39,10 +39,10 @@ class ScanFrame(wx.Frame):
             self.btnConfirm.Disable()
 
             self.Text = wx.StaticText(self.panel, label=(prt.clicked_user + ", what can I get you?"),
-                                      pos=(prt.screen_width / 5, prt.screen_height * 1 / 5), size=(150, 50))
+                                      pos=(prt.screen_width/5, prt.screen_height*1/5), size=(150, 50))
             self.Text.SetFont(wx.Font(prt.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
 
-            self.Code = wx.TextCtrl(self.panel, pos=(prt.screen_width / 5, prt.screen_height * 1 / 5 + 70),
+            self.Code = wx.TextCtrl(self.panel, pos=(prt.screen_width/5, prt.screen_height*1/5 + 70),
                                     size=(320, 50))
             self.Code.SetFont(wx.Font(prt.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
             self.Code.SetMaxLength(13)
@@ -50,7 +50,7 @@ class ScanFrame(wx.Frame):
             self.Code.Bind(wx.EVT_TEXT, self._onChangeCode)
 
             self.Product = wx.StaticText(self.panel, label="",
-                                         pos=(prt.screen_width / 5, prt.screen_height * 1 / 5 + 150),
+                                         pos=(prt.screen_width/5, prt.screen_height*1/5 + 150),
                                          size=(150, 50))
             self.Product.SetFont(wx.Font(prt.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
 
