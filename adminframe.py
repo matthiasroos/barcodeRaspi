@@ -1,6 +1,7 @@
 
 import wx
 
+import functions
 
 class AdminFrame(wx.Frame):
 
@@ -37,12 +38,15 @@ class UserTab(wx.Panel):
     def __init__(self, parent, super_parent):
         self.parent = parent
         self.super_parent = super_parent
-        wx.Panel.__init__(self, parent)
+        wx.Panel.__init__(self, self.parent)
         with self.super_parent as sprt:
-            pass
-            #self.Text = wx.StaticText(parent, label='User:',
-            #                          pos=(sprt.screen_width / 5, sprt.screen_height * 1 / 5), size=(150, 50))
-            t = wx.StaticText(self, -1, "User:", (20, 20))
+            self.Text = wx.StaticText(self, label='User:',
+                                      pos=(50, sprt.screen_height*1/5), size=(150, 50))
+            self.Text.SetFont(wx.Font(sprt.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+            users_list = functions.summarize_user_purchases()['name'].to_list()
+            self.userChoice = wx.ComboBox(self, choices=users_list,
+                                          pos=(200, sprt.screen_height*1/5), size=(150, 50))
+            self.userChoice.SetFont(wx.Font(sprt.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
 
         # self.btnBack = wx.Button(self.panel, id=wx.ID_ANY, label='back', name='back',
         #                         size=wx.Size(prt.btnWidth, prt.btnHeight),
