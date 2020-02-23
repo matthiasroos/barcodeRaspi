@@ -71,15 +71,17 @@ def git_pull(path_repo: str) -> bool:
         return False
 
 
-def git_push(path_repo: str):
+def git_push(path_repo: str) -> bool:
     try:
         repo_local = git.Repo(path_repo)
         repo_local.git.add(PURCHASES_FILE)
         repo_local.index.commit("purchase via getraenkeKasse.py")
         origin = repo_local.remote(name='origin')
         origin.push()
+        return True
     except git.GitCommandError as exception:
         print(exception)
+        return False
 
 
 def read_users() -> list:
