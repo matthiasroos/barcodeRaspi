@@ -25,7 +25,7 @@ def test_read_users0_file_not_found():
             pytest.raises(Exception) as exc:
         functions.read_users()
     mocked_os.assert_called_once_with('user.txt')
-    assert 'usersFile not found!' in str(exc.value)
+    assert 'USERS_FILE not found!' in str(exc.value)
 
 
 def test_read_users1():
@@ -43,7 +43,7 @@ def test_read_products0_file_not_found():
             pytest.raises(Exception) as exc:
         functions.read_products()
     mocked_os.assert_called_once_with('produkt.txt')
-    assert 'productsFile not found!' in str(exc.value)
+    assert 'PRODUCTS_FILE not found!' in str(exc.value)
 
 
 def test_read_products1():
@@ -72,7 +72,7 @@ def test_read_purchases0_file_not_found():
             pytest.raises(Exception) as exc:
         functions.read_purchases()
     mocked_os.assert_called_once_with('purchase.txt')
-    assert 'purchasesFile not found!' in str(exc.value)
+    assert 'PURCHASES_FILE not found!' in str(exc.value)
 
 
 def test_read_purchases1_empty_file():
@@ -108,8 +108,8 @@ def test_get_purchases():
                                 ['2019-12-10T16:35:00', 'bbb', '222222222222', 2, 'yyyy', 1.20, None]],
                                columns=['timestamp', 'user', 'code', 'nr', 'desc', 'price', 'alcohol'])
     with unittest.mock.patch('os.path.isfile', return_value=True), \
-        unittest.mock.patch('functions.readPurchases', return_value=purchases_df), \
-            unittest.mock.patch('functions.readProducts', return_value=products_df):
+        unittest.mock.patch('functions.read_purchases', return_value=purchases_df), \
+            unittest.mock.patch('functions.read_products', return_value=products_df):
         users_purchases_df = functions.get_purchases()
     assert users_purchases_df.equals(expected_df)
 
@@ -132,7 +132,7 @@ def test_summarize_user_purchases():
                              ['2019-12-10T16:45:00', 'aaa', '333333333333', 3, 'yzzz', 1.50, None]],
                             columns=['timestamp', 'user', 'code', 'nr', 'desc', 'price', 'alcohol'])
     expected_df = pd.DataFrame([['aaa', 3, 3.30], ['bbb', 2, 2.40]], columns=['name', 'drinks', 'money'])
-    with unittest.mock.patch('functions.getPurchases') as mocked_purchases:
+    with unittest.mock.patch('functions.get_purchases') as mocked_purchases:
         mocked_purchases.return_value = input_df
         output_df = functions.summarize_user_purchases()
     assert output_df.equals(expected_df)
