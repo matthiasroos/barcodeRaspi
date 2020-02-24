@@ -139,7 +139,6 @@ def read_purchases() -> pd.DataFrame:
         purchases_df['code'] = purchases_df['code'].astype(str)
     except pd.errors.EmptyDataError:
         purchases_df = pd.DataFrame([], columns=['timestamp', 'user', 'code'])
-
     return purchases_df
 
 

@@ -1,9 +1,11 @@
 #!/usr/bin/python3
 
+import dataclasses
 import os
 import sys
 import time
 
+import pandas as pd
 import wx
 
 import adminframe
@@ -12,30 +14,42 @@ import listframe
 import scanframe
 import userframe
 
-version = '0.1.2'
-btnHeight = 80
-btnWidth = 200
-fontSize = 25
+VERSION = '0.1.2'
+BUTTON_HEIGHT = 80
+BUTTON_WIDTH = 200
+FONT_SIZE = 25
+
+
+@dataclasses.dataclass()
+class FileContents:
+    products: pd.DataFrame = None
+    purchases: pd.DataFrame = None
+    users: pd.DataFrame = None
+
+
+@dataclasses.dataclass()
+class DisplaySettings:
+    btnHeight = BUTTON_HEIGHT
+    btnWidth = BUTTON_WIDTH
+    fontSize = FONT_SIZE
+    screen_width: int = None
+    screen_height: int = None
 
 
 class GetraenkeKasse():
 
     def __init__(self):
-        self.products = None
-        self.version = version
-        self.btnHeight = btnHeight
-        self.btnWidth = btnWidth
-        self.fontSize = fontSize
-        self.purchases = None
-        self.users = None
+        self.version = VERSION
+        self.displaySettings = DisplaySettings()
+        self.fileContents = FileContents()
         self._clicked_user = None
 
         self.app = wx.App(False)
         if 'BARCODE_DEV' in os.environ:
-            self.screen_width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)/2
+            self.displaySettings.screen_width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)/2
         else:
-            self.screen_width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)
-        self.screen_height = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y)
+            self.displaySettings.screen_width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)
+        self.displaySettings.screen_height = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y)
 
     def __enter__(self):
         return self
@@ -66,14 +80,17 @@ class GetraenkeKasse():
 
     def show_error_dialog(self, error_message: str):
         dlg = wx.MessageDialog(None, message=error_message, caption='ERROR', style=wx.OK | wx.ICON_WARNING)
-        dlg.SetFont(wx.Font(self.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+        dlg.SetFont(wx.Font(self.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
         dlg.ShowModal()
 
     def get_users(self):
-        self.users = functions.read_users()
+        self.fileContents.users = functions.read_users()
 
     def get_products(self):
-        self.products = functions.read_products()
+        self.fileContents.products = functions.read_products()
+
+    def get_purchases(self):
+        self.fileContents.purchases = functions.read_purchases()
 
     @property
     def clicked_user(self) -> str:

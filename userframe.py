@@ -17,37 +17,41 @@ class UserFrame(wx.Frame):
         with self.parent as prt:
             # User buttons
             self.button = []
-            for i in range(0, len(prt.users)):
-                self.button.append(wx.Button(self.panel, id=wx.ID_ANY, label=prt.users[i], name=prt.users[i],
-                                             size=wx.Size(prt.btnWidth, prt.btnHeight), pos=(posX, posY)))
-                self.button[i].SetFont(wx.Font(prt.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+            for i in range(0, len(prt.fileContents.users)):
+                self.button.append(wx.Button(self.panel, id=wx.ID_ANY, label=prt.fileContents.users[i],
+                                             name=prt.fileContents.users[i],
+                                             size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
+                                             pos=(posX, posY)))
+                self.button[i].SetFont(wx.Font(prt.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
                 self.button[i].Bind(wx.EVT_LEFT_UP, self._onClickNameButton)
                 # self.buildButtons(button[i])
-                if (posY + 2 * prt.btnHeight + offset) < prt.screen_height:
-                    posY = posY + prt.btnHeight + offset
+                if (posY + 2 * prt.displaySettings.btnHeight + offset) < prt.displaySettings.screen_height:
+                    posY = posY + prt.displaySettings.btnHeight + offset
                 else:
                     posY = offset
-                    posX = posX + prt.btnWidth + offset
+                    posX = posX + prt.displaySettings.btnWidth + offset
 
             # List button
             self.btnList = wx.Button(self.panel, id=wx.ID_ANY, label="List", name="list",
-                                     size=wx.Size(prt.btnWidth, prt.btnHeight),
-                                     pos=(prt.screen_width - 1*prt.btnWidth, prt.screen_height - prt.btnHeight))
-            self.btnList.SetFont(wx.Font(prt.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+                                     size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
+                                     pos=(prt.displaySettings.screen_width - 1*prt.displaySettings.btnWidth,
+                                          prt.displaySettings.screen_height - prt.displaySettings.btnHeight))
+            self.btnList.SetFont(wx.Font(prt.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
             self.btnList.Bind(wx.EVT_LEFT_UP, self._onClickListButton)
 
             # Admin button
             self.btnAdmin = wx.Button(self.panel, id=wx.ID_ANY, label="Admin", name="admin",
-                                      size=wx.Size(prt.btnWidth, prt.btnHeight),
-                                      pos=(prt.screen_width - 1 * prt.btnWidth, prt.screen_height - 2*prt.btnHeight))
-            self.btnAdmin.SetFont(wx.Font(prt.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+                                      size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
+                                      pos=(prt.displaySettings.screen_width - 1 * prt.displaySettings.btnWidth,
+                                           prt.displaySettings.screen_height - 2*prt.displaySettings.btnHeight))
+            self.btnAdmin.SetFont(wx.Font(prt.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
             self.btnAdmin.Bind(wx.EVT_LEFT_UP, self._onClickAdminButton)
 
             self.textVersion = wx.StaticText(self.panel, label='ver. ' + prt.version,
-                                             size=wx.Size(prt.btnWidth, prt.btnHeight),
-                                             pos=(prt.screen_width - 1*prt.btnWidth,
-                                                  prt.screen_height - 2.7*prt.btnHeight))
-            self.textVersion.SetFont(wx.Font(prt.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+                                             size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
+                                             pos=(prt.displaySettings.screen_width - 1*prt.displaySettings.btnWidth,
+                                                  prt.displaySettings.screen_height - 2.7*prt.displaySettings.btnHeight))
+            self.textVersion.SetFont(wx.Font(prt.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
             self.SetBackgroundColour("Gray")
 
         self.ShowFullScreen(True)
