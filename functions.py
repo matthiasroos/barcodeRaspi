@@ -166,9 +166,9 @@ def summarize_user_purchases() -> pd.DataFrame:
 
 def save_purchase(user: str, code: str):
     if not os.path.isfile(PURCHASES_FILE):
-        raise Exception("purchasesFile not found!")
-    filePurchases = open(PURCHASES_FILE, "a")
-    line = datetime.datetime.now().isoformat() + "," + user + "," + code + "\n"
+        raise Exception('PURCHASES_FILE not found!')
+    filePurchases = open(PURCHASES_FILE, 'a')
+    line = f'{datetime.datetime.now().isoformat()},{user},{code}\n'
     filePurchases.writelines(line)
     filePurchases.close()
 
