@@ -179,7 +179,7 @@ def transform_purchases():
     purchases_df['paid'] = purchases_df['paid'].astype(str)
     filePurchases_new = open('purchase_new.txt', 'w+')
     for _, row in purchases_df.iterrows():
-        line = row['timestamp']+','+row['user']+','+row['code']+','+row['paid']+'\n'
+        line = f"{row['timestamp']},{row['user']},{row['code']},{row['paid']}\n"
         filePurchases_new.writelines(line)
     filePurchases_new.close()
 

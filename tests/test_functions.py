@@ -153,3 +153,17 @@ def test_save_purchase1():
         functions.save_purchase(user='test', code='1111111111111')
     mocked_open.assert_called_once_with(functions.PURCHASES_FILE, 'a')
     mocked_open.return_value.writelines.assert_called_once_with('2020-02-29T12:00:00,test,1111111111111\n')
+
+
+def test_transform_purchases():
+    input_df = pd.DataFrame([['2019-12-10T12:20:00', 'aaa', '111111111111', 1, 'xxxx', 0.60, None],
+                             ['2019-12-10T16:30:00', 'bbb', '222222222222', 2, 'yyyy', 1.20, None],
+                             ['2019-12-10T16:35:00', 'bbb', '222222222222', 2, 'yyyy', 1.20, None]],
+                            columns=['timestamp', 'user', 'code', 'nr', 'desc', 'price', 'alcohol'])
+    with unittest.mock.patch('functions.get_purchases', return_value=input_df), \
+            unittest.mock.patch('builtins.open', unittest.mock.mock_open(), create=True) as mocked_open:
+        functions.transform_purchases()
+        mocked_open.assert_called_once_with('purchase_new.txt', 'w+')
+        mocked_open.mock_calls = [unittest.mock.call.writelines('2019-12-10T12:20:00,aaa,111111111111,False\n'),
+                                  unittest.mock.call.writelines('2019-12-10T16:30:00,bbb,222222222222,False\n'),
+                                  unittest.mock.call.writelines('2019-12-10T16:35:00,bbb,222222222222,False\n')]
