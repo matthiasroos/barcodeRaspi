@@ -95,7 +95,7 @@ def test_read_purchases2():
     assert purchases_df.equals(expected_df)
 
 
-def test_get_purchases():
+def test_merge_purchases_products():
     purchases_df = pd.DataFrame([['2019-12-10T12:20:00', 'aaa', '111111111111'],
                                  ['2019-12-10T16:30:00', 'bbb', '222222222222'],
                                  ['2019-12-10T16:35:00', 'bbb', '222222222222']],
@@ -107,24 +107,11 @@ def test_get_purchases():
                                 ['2019-12-10T16:30:00', 'bbb', '222222222222', 2, 'yyyy', 1.20, None],
                                 ['2019-12-10T16:35:00', 'bbb', '222222222222', 2, 'yyyy', 1.20, None]],
                                columns=['timestamp', 'user', 'code', 'nr', 'desc', 'price', 'alcohol'])
-    with unittest.mock.patch('os.path.isfile', return_value=True), \
-        unittest.mock.patch('functions.read_purchases', return_value=purchases_df), \
-            unittest.mock.patch('functions.read_products', return_value=products_df):
-        users_purchases_df = functions.get_purchases()
+    users_purchases_df = functions.merge_purchases_products(purchases=purchases_df, products=products_df)
     assert users_purchases_df.equals(expected_df)
 
 
-def test_get_user_purchases():
-    users_purchases_df = pd.DataFrame([['2020-01-24T17:13:35', 'aaa', '1111111111111', 1.0],
-                                       ['2020-01-24T17:13:36', 'aaa', '2222222222222', 1.5],
-                                       ['2020-01-24T17:13:36', 'bbb', '1111111111111', 1.2]],
-                                      columns=['timestamp', 'user', 'code', 'price'])
-    nr, money = functions.get_user_purchases(users_purchases_df, 'aaa')
-    assert nr == 2
-    assert money == 2.5
-
-
-def test_summarize_user_purchases():
+def test_summarize_user_purchases_standalone():
     input_df = pd.DataFrame([['2019-12-10T12:20:00', 'aaa', '111111111111', 1, 'xxxx', 0.60, None],
                              ['2019-12-10T16:30:00', 'bbb', '222222222222', 2, 'yyyy', 1.20, None],
                              ['2019-12-10T16:35:00', 'bbb', '222222222222', 2, 'yyyy', 1.20, None],
@@ -132,9 +119,25 @@ def test_summarize_user_purchases():
                              ['2019-12-10T16:45:00', 'aaa', '333333333333', 3, 'yzzz', 1.50, None]],
                             columns=['timestamp', 'user', 'code', 'nr', 'desc', 'price', 'alcohol'])
     expected_df = pd.DataFrame([['aaa', 3, 3.30], ['bbb', 2, 2.40]], columns=['name', 'drinks', 'money'])
-    with unittest.mock.patch('functions.get_purchases') as mocked_purchases:
+    with unittest.mock.patch('functions.merge_purchases_products') as mocked_purchases:
         mocked_purchases.return_value = input_df
-        output_df = functions.summarize_user_purchases()
+        output_df = functions.summarize_user_purchases(purchases=None, products=None)
+    assert output_df.equals(expected_df)
+
+
+def test_summarize_user_purchases_integration():
+    purchases_df = pd.DataFrame([['2019-12-10T12:20:00', 'aaa', '111111111111'],
+                                 ['2019-12-10T16:30:00', 'bbb', '222222222222'],
+                                 ['2019-12-10T16:35:00', 'bbb', '222222222222'],
+                                 ['2019-12-10T16:40:00', 'aaa', '222222222222'],
+                                 ['2019-12-10T16:45:00', 'aaa', '333333333333']],
+                                columns=['timestamp', 'user', 'code'])
+    products_df = pd.DataFrame([[1, '111111111111', 'xxxx', 0.60, None],
+                                [2, '222222222222', 'yyyy', 1.20, None],
+                                [3, '333333333333', 'yzzz', 1.50, None]],
+                               columns=['nr', 'code', 'desc', 'price', 'alcohol'])
+    expected_df = pd.DataFrame([['aaa', 3, 3.30], ['bbb', 2, 2.40]], columns=['name', 'drinks', 'money'])
+    output_df = functions.summarize_user_purchases(purchases=purchases_df, products=products_df)
     assert output_df.equals(expected_df)
 
 
@@ -156,11 +159,11 @@ def test_save_purchase1():
 
 
 def test_transform_purchases():
-    input_df = pd.DataFrame([['2019-12-10T12:20:00', 'aaa', '111111111111', 1, 'xxxx', 0.60, None],
-                             ['2019-12-10T16:30:00', 'bbb', '222222222222', 2, 'yyyy', 1.20, None],
-                             ['2019-12-10T16:35:00', 'bbb', '222222222222', 2, 'yyyy', 1.20, None]],
-                            columns=['timestamp', 'user', 'code', 'nr', 'desc', 'price', 'alcohol'])
-    with unittest.mock.patch('functions.get_purchases', return_value=input_df), \
+    input_df = pd.DataFrame([['2019-12-10T12:20:00', 'aaa', '111111111111'],
+                             ['2019-12-10T16:30:00', 'bbb', '222222222222'],
+                             ['2019-12-10T16:35:00', 'bbb', '222222222222']],
+                            columns=['timestamp', 'user', 'code'])
+    with unittest.mock.patch('functions.read_purchases', return_value=input_df), \
             unittest.mock.patch('builtins.open', unittest.mock.mock_open(), create=True) as mocked_open:
         functions.transform_purchases()
         mocked_open.assert_called_once_with('purchase_new.txt', 'w+')

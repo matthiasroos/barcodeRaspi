@@ -142,22 +142,13 @@ def read_purchases() -> pd.DataFrame:
     return purchases_df
 
 
-def get_purchases() -> pd.DataFrame:
-    usersPurchases_df = read_purchases()
-    products_df = read_products()
-    usersPurchases_df = usersPurchases_df.merge(products_df, on='code', how='left', sort=False)
+def merge_purchases_products(purchases: pd.DataFrame, products: pd.DataFrame) -> pd.DataFrame:
+    usersPurchases_df = purchases.merge(products, on='code', how='left', sort=False)
     return usersPurchases_df
 
 
-def get_user_purchases(users_purchases_df: pd.DataFrame, user: str) -> typing.Tuple[np.int64, np.float64]:
-    user_df = users_purchases_df[users_purchases_df['user'] == user]
-    nr = user_df['timestamp'].count()
-    money = user_df['price'].sum()
-    return nr, money
-
-
-def summarize_user_purchases() -> pd.DataFrame:
-    usersPurchases_df = get_purchases()
+def summarize_user_purchases(purchases: pd.DataFrame, products: pd.DataFrame) -> pd.DataFrame:
+    usersPurchases_df = merge_purchases_products(purchases=purchases, products=products)
     summary_purchases_df = usersPurchases_df.groupby('user').agg({'code': 'count', 'price': 'sum'})
     summary_purchases_df.reset_index(inplace=True)
     summary_purchases_df.columns = ['name', 'drinks', 'money']
@@ -174,7 +165,7 @@ def save_purchase(user: str, code: str):
 
 
 def transform_purchases():
-    purchases_df = get_purchases()
+    purchases_df = read_purchases()
     purchases_df['paid'] = False
     purchases_df['paid'] = purchases_df['paid'].astype(str)
     filePurchases_new = open('purchase_new.txt', 'w+')
