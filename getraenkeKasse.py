@@ -87,6 +87,22 @@ class GetraenkeKasse():
         dlg.SetFont(self.displaySettings.wxFont)
         dlg.ShowModal()
 
+    def show_info_dialog(self, info_message: str):
+        dlg = wx.MessageDialog(None, message=info_message, caption='INFO',
+                               style=wx.OK | wx.ICON_INFORMATION | wx.STAY_ON_TOP)
+        dlg.SetFont(self.displaySettings.wxFont)
+        dlg.ShowModal()
+
+    def show_confirm_dialog(self, confirm_message: str) -> bool:
+        dlg = wx.MessageDialog(None, message=confirm_message, caption='CONFIRM',
+                               style=wx.OK | wx.CANCEL | wx.ICON_QUESTION | wx.STAY_ON_TOP)
+        dlg.SetFont(self.displaySettings.wxFont)
+        choice = dlg.ShowModal()
+        if choice == wx.OK:
+            return True
+        else:
+            return False
+
     def get_users(self):
         self.fileContents.users = functions.read_users()
 
