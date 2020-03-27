@@ -42,19 +42,28 @@ class UserTab(wx.Panel):
         self.super_parent = super_parent
         wx.Panel.__init__(self, self.parent)
         with self.super_parent as sprt:
+            sprt.get_purchases()
+            sprt.get_products()
             self.Text = wx.StaticText(self, label='User:',
                                       pos=(50, sprt.displaySettings.screen_height*1/5), size=(150, 50))
-            users_list = functions.summarize_user_purchases()['name'].to_list()
-            self.userChoice = wx.ComboBox(self, choices=users_list,
-                                          pos=(200, sprt.displaySettings.screen_height*1/5), size=(150, 50))
             self.Text.SetFont(sprt.displaySettings.wxFont)
+            all_users_purchases = functions.summarize_user_purchases(purchases=sprt.fileContents.purchases,
+                                                                     products=sprt.fileContents.products)
+
+            users_list = all_users_purchases['name'].to_list()
+            self.userChoice = wx.Choice(self, choices=users_list,
+                                        pos=(200, sprt.displaySettings.screen_height*1/5), size=(150, 50))
             self.userChoice.SetFont(sprt.displaySettings.wxFont)
+            self.userChoice.Bind(wx.EVT_LEFT_UP, self._onChooseUser)
 
         # self.btnBack = wx.Button(self.panel, id=wx.ID_ANY, label='back', name='back',
         #                         size=wx.Size(prt.btnWidth, prt.btnHeight),
         #                         pos=(prt.screen_width - 1 * prt.btnWidth, prt.screen_height - prt.btnHeight))
         # self.btnBack.SetFont(wx.Font(prt.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
         # self.btnBack.Bind(wx.EVT_LEFT_UP, self._onClickBackButton)
+
+    def _onChooseUser(self):
+        pass
 
 
 class StockTab(wx.Panel):
