@@ -21,32 +21,32 @@ class ScanFrame(wx.Frame):
                                        size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
                                        pos=(prt.displaySettings.screen_width - 3*prt.displaySettings.btnWidth,
                                             prt.displaySettings.screen_height - prt.displaySettings.btnHeight))
-            self.btnNoCode.SetFont(wx.Font(prt.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+            self.btnNoCode.SetFont(prt.displaySettings.wxFont)
             self.btnNoCode.Bind(wx.EVT_LEFT_UP, self._onClickNoCodeButton)
             self.btnNoCode.Disable()
             self.btnBack = wx.Button(self.panel, id=wx.ID_ANY, label="back", name="back",
                                      size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
                                      pos=(prt.displaySettings.screen_width - 2*prt.displaySettings.btnWidth,
                                           prt.displaySettings.screen_height - prt.displaySettings.btnHeight))
-            self.btnBack.SetFont(wx.Font(prt.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+            self.btnBack.SetFont(prt.displaySettings.wxFont)
             self.btnBack.Bind(wx.EVT_LEFT_UP, self._onClickBackButton)
             self.btnConfirm = wx.Button(self.panel, id=wx.ID_ANY, label="confirm", name="confirm",
                                         size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
                                         pos=(prt.displaySettings.screen_width - 1*prt.displaySettings.btnWidth,
                                              prt.displaySettings.screen_height - prt.displaySettings.btnHeight))
-            self.btnConfirm.SetFont(wx.Font(prt.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+            self.btnConfirm.SetFont(prt.displaySettings.wxFont)
             self.btnConfirm.Bind(wx.EVT_LEFT_UP, self._onClickConfirmButton)
             self.btnConfirm.Disable()
 
             self.Text = wx.StaticText(self.panel, label=(prt.clicked_user + ", what can I get you?"),
                                       pos=(prt.displaySettings.screen_width/5, prt.displaySettings.screen_height*1/5),
                                       size=(150, 50))
-            self.Text.SetFont(wx.Font(prt.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+            self.Text.SetFont(prt.displaySettings.wxFont)
 
             self.Code = wx.TextCtrl(self.panel, pos=(prt.displaySettings.screen_width/5,
                                                      prt.displaySettings.screen_height*1/5 + 70),
                                     size=(320, 50))
-            self.Code.SetFont(wx.Font(prt.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+            self.Code.SetFont(prt.displaySettings.wxFont)
             self.Code.SetMaxLength(13)
             self.Code.SetFocus()
             self.Code.Bind(wx.EVT_TEXT, self._onChangeCode)
@@ -54,7 +54,7 @@ class ScanFrame(wx.Frame):
             self.Product = wx.StaticText(self.panel, label="", pos=(prt.displaySettings.screen_width/5,
                                                                     prt.displaySettings.screen_height*1/5 + 150),
                                          size=(150, 50))
-            self.Product.SetFont(wx.Font(prt.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+            self.Product.SetFont(prt.displaySettings.wxFont)
 
         self.ShowFullScreen(True)
 

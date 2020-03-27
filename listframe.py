@@ -33,28 +33,28 @@ class ListFrame(wx.Frame):
                                                       purchases=prt.fileContents.purchases,
                                                       products=prt.fileContents.products))
             tab2 = TabTwo(notebook)
-            notebook.SetFont(wx.Font(prt.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+            notebook.SetFont(prt.displaySettings.wxFont)
             notebook.AddPage(tab1, 'USER')
             notebook.AddPage(tab2, 'STOCK')
 
             self.btnClose = wx.Button(self.panel, id=wx.ID_ANY, label='close', name='close',
                                       size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
                                       pos=(prt.displaySettings.screen_width - prt.displaySettings.btnWidth, 0))
-            self.btnClose.SetFont(wx.Font(prt.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+            self.btnClose.SetFont(prt.displaySettings.wxFont)
             self.btnClose.Bind(wx.EVT_LEFT_UP, self._onClickCloseButton)
 
             self.btnRestart = wx.Button(self.panel, id=wx.ID_ANY, label='restart', name='restart',
                                         size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
                                         pos=(prt.displaySettings.screen_width - prt.displaySettings.btnWidth,
                                              prt.displaySettings.btnHeight))
-            self.btnRestart.SetFont(wx.Font(prt.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+            self.btnRestart.SetFont(prt.displaySettings.wxFont)
             self.btnRestart.Bind(wx.EVT_LEFT_UP, self._onClickRestartButton)
 
             self.btnBack = wx.Button(self.panel, id=wx.ID_ANY, label='back', name='back',
                                      size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
                                      pos=(prt.displaySettings.screen_width - 1*prt.displaySettings.btnWidth,
                                           prt.displaySettings.screen_height - prt.displaySettings.btnHeight))
-            self.btnBack.SetFont(wx.Font(prt.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+            self.btnBack.SetFont(prt.displaySettings.wxFont)
             self.btnBack.Bind(wx.EVT_LEFT_UP, self._onClickBackButton)
 
         self.ShowFullScreen(True)

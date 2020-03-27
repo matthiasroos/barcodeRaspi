@@ -32,6 +32,7 @@ class DisplaySettings:
     btnHeight = BUTTON_HEIGHT
     btnWidth = BUTTON_WIDTH
     fontSize = FONT_SIZE
+    wxFont = None
     screen_width: int = None
     screen_height: int = None
 
@@ -50,6 +51,8 @@ class GetraenkeKasse():
         else:
             self.displaySettings.screen_width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)
         self.displaySettings.screen_height = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y)
+
+        self.displaySettings.wxFont = wx.Font(self.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD)
 
     def __enter__(self):
         return self
@@ -79,8 +82,9 @@ class GetraenkeKasse():
         scanframe.ScanFrame(self)
 
     def show_error_dialog(self, error_message: str):
-        dlg = wx.MessageDialog(None, message=error_message, caption='ERROR', style=wx.OK | wx.ICON_WARNING)
-        dlg.SetFont(wx.Font(self.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+        dlg = wx.MessageDialog(None, message=error_message, caption='ERROR',
+                               style=wx.OK | wx.ICON_WARNING| wx.STAY_ON_TOP )
+        dlg.SetFont(self.displaySettings.wxFont)
         dlg.ShowModal()
 
     def get_users(self):

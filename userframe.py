@@ -22,7 +22,7 @@ class UserFrame(wx.Frame):
                                              name=prt.fileContents.users[i],
                                              size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
                                              pos=(posX, posY)))
-                self.button[i].SetFont(wx.Font(prt.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+                self.button[i].SetFont(prt.displaySettings.wxFont)
                 self.button[i].Bind(wx.EVT_LEFT_UP, self._onClickNameButton)
                 # self.buildButtons(button[i])
                 if (posY + 2 * prt.displaySettings.btnHeight + offset) < prt.displaySettings.screen_height:
@@ -36,7 +36,7 @@ class UserFrame(wx.Frame):
                                      size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
                                      pos=(prt.displaySettings.screen_width - 1*prt.displaySettings.btnWidth,
                                           prt.displaySettings.screen_height - prt.displaySettings.btnHeight))
-            self.btnList.SetFont(wx.Font(prt.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+            self.btnList.SetFont(prt.displaySettings.wxFont)
             self.btnList.Bind(wx.EVT_LEFT_UP, self._onClickListButton)
 
             # Admin button
@@ -44,14 +44,14 @@ class UserFrame(wx.Frame):
                                       size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
                                       pos=(prt.displaySettings.screen_width - 1 * prt.displaySettings.btnWidth,
                                            prt.displaySettings.screen_height - 2*prt.displaySettings.btnHeight))
-            self.btnAdmin.SetFont(wx.Font(prt.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+            self.btnAdmin.SetFont(prt.displaySettings.wxFont)
             self.btnAdmin.Bind(wx.EVT_LEFT_UP, self._onClickAdminButton)
 
             self.textVersion = wx.StaticText(self.panel, label='ver. ' + prt.version,
                                              size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
                                              pos=(prt.displaySettings.screen_width - 1*prt.displaySettings.btnWidth,
                                                   prt.displaySettings.screen_height - 2.7*prt.displaySettings.btnHeight))
-            self.textVersion.SetFont(wx.Font(prt.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+            self.textVersion.SetFont(prt.displaySettings.wxFont)
             self.SetBackgroundColour("Gray")
 
         self.ShowFullScreen(True)

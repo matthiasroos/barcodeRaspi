@@ -17,7 +17,7 @@ class AdminFrame(wx.Frame):
 
             tab1 = UserTab(parent=notebook, super_parent=prt)
             tab2 = StockTab(parent=notebook, super_parent=prt)
-            notebook.SetFont(wx.Font(prt.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+            notebook.SetFont(prt.displaySettings.wxFont)
             notebook.AddPage(tab1, 'USER')
             notebook.AddPage(tab2, 'STOCK')
 
@@ -25,7 +25,7 @@ class AdminFrame(wx.Frame):
                                      size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
                                      pos=(prt.displaySettings.screen_width - 1*prt.displaySettings.btnWidth,
                                           prt.displaySettings.screen_height - prt.displaySettings.btnHeight))
-            self.btnBack.SetFont(wx.Font(prt.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+            self.btnBack.SetFont(prt.displaySettings.wxFont)
             self.btnBack.Bind(wx.EVT_LEFT_UP, self._onClickBackButton)
 
         self.ShowFullScreen(True)
@@ -44,11 +44,11 @@ class UserTab(wx.Panel):
         with self.super_parent as sprt:
             self.Text = wx.StaticText(self, label='User:',
                                       pos=(50, sprt.displaySettings.screen_height*1/5), size=(150, 50))
-            self.Text.SetFont(wx.Font(sprt.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
             users_list = functions.summarize_user_purchases()['name'].to_list()
             self.userChoice = wx.ComboBox(self, choices=users_list,
                                           pos=(200, sprt.displaySettings.screen_height*1/5), size=(150, 50))
-            self.userChoice.SetFont(wx.Font(sprt.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
+            self.Text.SetFont(sprt.displaySettings.wxFont)
+            self.userChoice.SetFont(sprt.displaySettings.wxFont)
 
         # self.btnBack = wx.Button(self.panel, id=wx.ID_ANY, label='back', name='back',
         #                         size=wx.Size(prt.btnWidth, prt.btnHeight),
