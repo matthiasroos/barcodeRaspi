@@ -18,6 +18,8 @@ class ListFrame(wx.Frame):
         self.parent = parent
         wx.Frame.__init__(self, None, title='ListFrame', style=wx.DEFAULT_FRAME_STYLE)
         with self.parent as prt:
+            prt.get_purchases()
+            prt.get_products()
             self.panel = wx.Panel(self)
             notebook = wx.Notebook(self.panel, pos=(0, 0),
                                    size=wx.Size(prt.displaySettings.screen_width-prt.displaySettings.btnWidth,
@@ -27,7 +29,9 @@ class ListFrame(wx.Frame):
                                                   columns={'names': ['name', 'drinks', 'money'],
                                                            'width': [180, 180, 180],
                                                            'type': [str, int, '{:,.2f}'.format]},
-                                                  data_frame=functions.summarize_user_purchases())
+                                                  data_frame=functions.summarize_user_purchases(
+                                                      purchases=prt.fileContents.purchases,
+                                                      products=prt.fileContents.products))
             tab2 = TabTwo(notebook)
             notebook.SetFont(wx.Font(prt.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
             notebook.AddPage(tab1, 'USER')
