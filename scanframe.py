@@ -92,7 +92,6 @@ class ScanFrame(wx.Frame):
             if not functions.git_push("./."):
                 self.parent.show_error_dialog(error_message='Problem with git (local repo).')
 
-        self.parent.get_purchases()
         self.Close()
 
     def _onChangeCode(self, event):
