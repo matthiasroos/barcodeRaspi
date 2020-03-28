@@ -25,7 +25,7 @@ def test_read_users0_file_not_found():
             pytest.raises(Exception) as exc:
         functions.read_users()
     mocked_os.assert_called_once_with('user.txt')
-    assert 'USERS_FILE not found!' in str(exc.value)
+    assert f'{functions.USERS_FILE} not found!' in str(exc.value)
 
 
 def test_read_users1():
@@ -43,7 +43,7 @@ def test_read_products0_file_not_found():
             pytest.raises(Exception) as exc:
         functions.read_products()
     mocked_os.assert_called_once_with('produkt.txt')
-    assert 'PRODUCTS_FILE not found!' in str(exc.value)
+    assert f'{functions.PRODUCTS_FILE} not found!' in str(exc.value)
 
 
 def test_read_products1():
@@ -72,7 +72,7 @@ def test_read_purchases0_file_not_found():
             pytest.raises(Exception) as exc:
         functions.read_purchases()
     mocked_os.assert_called_once_with('purchase.txt')
-    assert 'PURCHASES_FILE not found!' in str(exc.value)
+    assert f'{functions.PURCHASES_FILE} not found!' in str(exc.value)
 
 
 def test_read_purchases1_empty_file():
@@ -146,7 +146,7 @@ def test_save_purchase0_file_not_found():
             pytest.raises(Exception) as exc:
         functions.save_purchase(user='test', code='1111111111111')
     mocked_os.assert_called_once_with('purchase.txt')
-    assert 'PURCHASES_FILE not found!' in str(exc.value)
+    assert f'{functions.PURCHASES_FILE} not found!' in str(exc.value)
 
 
 @freezegun.freeze_time('2020-02-29 12:00:00')
