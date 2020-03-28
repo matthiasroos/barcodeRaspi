@@ -62,6 +62,13 @@ class GetraenkeKasse():
 
     def run(self):
         self.get_users()
+        self.get_products()
+        # code for adding the paid column
+        if functions.check_column_nr_purchases() == 3:
+            functions.transform_purchases()
+            if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
+                functions.git_push(commit_message='upgrade via getraenkeKasse.py')
+        self.get_purchases()
         userframe.UserFrame(self)
         self.app.MainLoop()
 

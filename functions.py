@@ -71,11 +71,11 @@ def git_pull(path_repo: str) -> bool:
         return False
 
 
-def git_push(path_repo: str) -> bool:
+def git_push(path_repo: str, commit_message: str = 'purchase via getraenkeKasse.py') -> bool:
     try:
         repo_local = git.Repo(path_repo)
         repo_local.git.add(PURCHASES_FILE)
-        repo_local.index.commit("purchase via getraenkeKasse.py")
+        repo_local.index.commit(commit_message)
         origin = repo_local.remote(name='origin')
         origin.push()
         return True
@@ -133,14 +133,23 @@ def calc_length_code(products_df: pd.DataFrame) -> set:
     return length
 
 
+def check_column_nr_purchases():
+    check_for_file(PURCHASES_FILE)
+    purchases_df = pd.read_csv(PURCHASES_FILE, header=None)
+    nr = len(purchases_df.columns)
+    print(nr)
+    return nr
+
+
 def read_purchases() -> pd.DataFrame:
     check_for_file(PURCHASES_FILE)
     try:
         purchases_df = pd.read_csv(PURCHASES_FILE, header=None)
-        purchases_df.columns = ['timestamp', 'user', 'code']
+        purchases_df.columns = ['timestamp', 'user', 'code', 'paid']
         purchases_df['code'] = purchases_df['code'].astype(str)
+        purchases_df['paid'] = purchases_df['paid'].astype(bool)
     except pd.errors.EmptyDataError:
-        purchases_df = pd.DataFrame([], columns=['timestamp', 'user', 'code'])
+        purchases_df = pd.DataFrame([], columns=['timestamp', 'user', 'code', 'paid'])
     return purchases_df
 
 
@@ -160,22 +169,29 @@ def summarize_user_purchases(purchases: pd.DataFrame, products: pd.DataFrame) ->
 def save_purchase(user: str, code: str):
     check_for_file(PURCHASES_FILE)
     filePurchases = open(PURCHASES_FILE, 'a')
-    line = f'{datetime.datetime.now().isoformat()},{user},{code}\n'
+    line = f'{datetime.datetime.now().isoformat()},{user},{code},False\n'
     filePurchases.writelines(line)
     filePurchases.close()
 
 
 def transform_purchases():
-    purchases_df = read_purchases()
-    purchases_df['paid'] = False
-    purchases_df['paid'] = purchases_df['paid'].astype(str)
-    filePurchases_new = open('purchase_new.txt', 'w+')
-    for _, row in purchases_df.iterrows():
-        line = f"{row['timestamp']},{row['user']},{row['code']},{row['paid']}\n"
-        filePurchases_new.writelines(line)
-    filePurchases_new.close()
+    check_for_file(PURCHASES_FILE)
+    try:
+        purchases_df = pd.read_csv(PURCHASES_FILE, header=None)
+        purchases_df.columns = ['timestamp', 'user', 'code']
+        purchases_df['paid'] = False
+        purchases_df['paid'] = purchases_df['paid'].astype(str)
+        filePurchases_new = open('purchase.txt', 'w+')
+        for _, row in purchases_df.iterrows():
+            line = f"{row['timestamp']},{row['user']},{row['code']},{row['paid']}\n"
+            filePurchases_new.writelines(line)
+        filePurchases_new.close()
+    except pd.errors.EmptyDataError:
+        pass
 
 
+
+# TO DO: rewrite function
 def retransform_purchases():
     purchases_df = pd.DataFrame([], columns=['timestamp', 'user', 'code', 'paid'])
     if not os.path.isfile('purchase_new.txt'):

@@ -81,13 +81,13 @@ def test_read_purchases1_empty_file():
 
 
 def test_read_purchases2():
-    file_content = """2019-12-10T12:20:00,aaa,111111111111\n2019-12-10T16:30:00,bbb,222222222222\n
-2019-12-10T16:35:00,bbb,222222222222"""
+    file_content = """2019-12-10T12:20:00,aaa,111111111111,False\n2019-12-10T16:30:00,bbb,222222222222,False\n
+2019-12-10T16:35:00,bbb,222222222222,False"""
     df_from_file = pd.read_csv(io.StringIO(file_content), header=None)
-    expected_df = pd.DataFrame([['2019-12-10T12:20:00', 'aaa', '111111111111'],
-                                ['2019-12-10T16:30:00', 'bbb', '222222222222'],
-                                ['2019-12-10T16:35:00', 'bbb', '222222222222']],
-                               columns=['timestamp', 'user', 'code'])
+    expected_df = pd.DataFrame([['2019-12-10T12:20:00', 'aaa', '111111111111', False],
+                                ['2019-12-10T16:30:00', 'bbb', '222222222222', False],
+                                ['2019-12-10T16:35:00', 'bbb', '222222222222', False]],
+                               columns=['timestamp', 'user', 'code', 'paid'])
     with unittest.mock.patch('os.path.isfile', return_value=True) as mocked_os, \
             unittest.mock.patch('pandas.read_csv', return_value=df_from_file):
         purchases_df = functions.read_purchases()
@@ -96,17 +96,17 @@ def test_read_purchases2():
 
 
 def test_merge_purchases_products():
-    purchases_df = pd.DataFrame([['2019-12-10T12:20:00', 'aaa', '111111111111'],
-                                 ['2019-12-10T16:30:00', 'bbb', '222222222222'],
-                                 ['2019-12-10T16:35:00', 'bbb', '222222222222']],
-                                columns=['timestamp', 'user', 'code'])
+    purchases_df = pd.DataFrame([['2019-12-10T12:20:00', 'aaa', '111111111111', False],
+                                 ['2019-12-10T16:30:00', 'bbb', '222222222222', False],
+                                 ['2019-12-10T16:35:00', 'bbb', '222222222222', False]],
+                                columns=['timestamp', 'user', 'code', 'paid'])
     products_df = pd.DataFrame([[1, '111111111111', 'xxxx', 0.60, None],
                                 [2, '222222222222', 'yyyy', 1.20, None]],
                                columns=['nr', 'code', 'desc', 'price', 'alcohol'])
-    expected_df = pd.DataFrame([['2019-12-10T12:20:00', 'aaa', '111111111111', 1, 'xxxx', 0.60, None],
-                                ['2019-12-10T16:30:00', 'bbb', '222222222222', 2, 'yyyy', 1.20, None],
-                                ['2019-12-10T16:35:00', 'bbb', '222222222222', 2, 'yyyy', 1.20, None]],
-                               columns=['timestamp', 'user', 'code', 'nr', 'desc', 'price', 'alcohol'])
+    expected_df = pd.DataFrame([['2019-12-10T12:20:00', 'aaa', '111111111111', False, 1, 'xxxx', 0.60, None],
+                                ['2019-12-10T16:30:00', 'bbb', '222222222222', False, 2, 'yyyy', 1.20, None],
+                                ['2019-12-10T16:35:00', 'bbb', '222222222222', False, 2, 'yyyy', 1.20, None]],
+                               columns=['timestamp', 'user', 'code', 'paid', 'nr', 'desc', 'price', 'alcohol'])
     users_purchases_df = functions.merge_purchases_products(purchases=purchases_df, products=products_df)
     assert users_purchases_df.equals(expected_df)
 
@@ -155,7 +155,7 @@ def test_save_purchase1():
             unittest.mock.patch('builtins.open', unittest.mock.mock_open(), create=True) as mocked_open:
         functions.save_purchase(user='test', code='1111111111111')
     mocked_open.assert_called_once_with(functions.PURCHASES_FILE, 'a')
-    mocked_open.return_value.writelines.assert_called_once_with('2020-02-29T12:00:00,test,1111111111111\n')
+    mocked_open.return_value.writelines.assert_called_once_with('2020-02-29T12:00:00,test,1111111111111,False\n')
 
 
 def test_transform_purchases():
@@ -163,10 +163,11 @@ def test_transform_purchases():
                              ['2019-12-10T16:30:00', 'bbb', '222222222222'],
                              ['2019-12-10T16:35:00', 'bbb', '222222222222']],
                             columns=['timestamp', 'user', 'code'])
-    with unittest.mock.patch('functions.read_purchases', return_value=input_df), \
+    with unittest.mock.patch('os.path.isfile', return_value=True), \
+            unittest.mock.patch('pandas.read_csv', return_value=input_df), \
             unittest.mock.patch('builtins.open', unittest.mock.mock_open(), create=True) as mocked_open:
         functions.transform_purchases()
-        mocked_open.assert_called_once_with('purchase_new.txt', 'w+')
+        mocked_open.assert_called_once_with('purchase.txt', 'w+')
         mocked_open.mock_calls = [unittest.mock.call.writelines('2019-12-10T12:20:00,aaa,111111111111,False\n'),
                                   unittest.mock.call.writelines('2019-12-10T16:30:00,bbb,222222222222,False\n'),
                                   unittest.mock.call.writelines('2019-12-10T16:35:00,bbb,222222222222,False\n')]
