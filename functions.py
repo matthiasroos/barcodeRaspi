@@ -84,12 +84,16 @@ def git_push(path_repo: str) -> bool:
         return False
 
 
+def check_for_file(file):
+    if not os.path.isfile(file):
+        raise Exception(f'{file} not found!')
+
+
 def read_users() -> list:
     """"
     Read users from usersFile
     """
-    if not os.path.isfile(USERS_FILE):
-        raise Exception('USERS_FILE not found!')
+    check_for_file(USERS_FILE)
     file_users = open(USERS_FILE, "r")
     users = []
     for line in file_users:
@@ -102,8 +106,7 @@ def read_products() -> pd.DataFrame:
     """"
     Read products from productsFile
     """
-    if not os.path.isfile(PRODUCTS_FILE):
-        raise Exception('PRODUCTS_FILE not found!')
+    check_for_file(PRODUCTS_FILE)
     file_products = open(PRODUCTS_FILE, "r")
     prod_list = list()
     prod_dict = {}
@@ -131,8 +134,7 @@ def calc_length_code(products_df: pd.DataFrame) -> set:
 
 
 def read_purchases() -> pd.DataFrame:
-    if not os.path.isfile(PURCHASES_FILE):
-        raise Exception('PURCHASES_FILE not found!')
+    check_for_file(PURCHASES_FILE)
     try:
         purchases_df = pd.read_csv(PURCHASES_FILE, header=None)
         purchases_df.columns = ['timestamp', 'user', 'code']
@@ -156,8 +158,7 @@ def summarize_user_purchases(purchases: pd.DataFrame, products: pd.DataFrame) ->
 
 
 def save_purchase(user: str, code: str):
-    if not os.path.isfile(PURCHASES_FILE):
-        raise Exception('PURCHASES_FILE not found!')
+    check_for_file(PURCHASES_FILE)
     filePurchases = open(PURCHASES_FILE, 'a')
     line = f'{datetime.datetime.now().isoformat()},{user},{code}\n'
     filePurchases.writelines(line)
