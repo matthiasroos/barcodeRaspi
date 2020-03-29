@@ -19,7 +19,7 @@ class SortableListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         wx.Panel.__init__(self, parent, -1, style=wx.WANTS_CHARS)
 
         with self.super_parent as sprt:
-            offset = 5
+            offset = sprt.displaySettings.offSet
             self.sortable_list_ctrl = SortableListCtrl(parent=self,
                                                        size=((sprt.displaySettings.screen_width -
                                                               sprt.displaySettings.btnWidth - 2*offset),

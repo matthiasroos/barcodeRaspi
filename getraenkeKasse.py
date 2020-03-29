@@ -18,6 +18,7 @@ VERSION = '0.1.2'
 BUTTON_HEIGHT = 80
 BUTTON_WIDTH = 200
 FONT_SIZE = 25
+OFFSET = 5
 
 
 @dataclasses.dataclass()
@@ -32,6 +33,7 @@ class DisplaySettings:
     btnHeight = BUTTON_HEIGHT
     btnWidth = BUTTON_WIDTH
     fontSize = FONT_SIZE
+    offSet = OFFSET
     wxFont = None
     screen_width: int = None
     screen_height: int = None

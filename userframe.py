@@ -10,7 +10,7 @@ class UserFrame(wx.Frame):
         wx.Frame.__init__(self, None, title="UserFrame")
         self.panel = wx.Panel(self)
 
-        offset = 10
+        offset = self.parent.displaySettings.offSet
         posX = offset
         posY = offset
 
