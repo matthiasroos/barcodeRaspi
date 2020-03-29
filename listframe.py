@@ -1,14 +1,9 @@
 
 import wx
+import pandas as pd
 
 import functions
 import sortable
-
-
-class TabTwo(wx.Panel):
-    def __init__(self, parent):
-        wx.Panel.__init__(self, parent)
-        t = wx.StaticText(self, -1, "This is the second tab", (20, 20))
 
 
 class ListFrame(wx.Frame):
@@ -25,14 +20,18 @@ class ListFrame(wx.Frame):
                                    size=wx.Size(prt.displaySettings.screen_width-prt.displaySettings.btnWidth,
                                                 prt.displaySettings.screen_height))
 
-            tab1 = sortable.SortableListCtrlPanel(parent=notebook, super_parent=prt,
-                                                  columns={'names': ['name', 'drinks', 'money'],
-                                                           'width': [180, 180, 180],
-                                                           'type': [str, int, '{:,.2f}'.format]},
-                                                  data_frame=functions.summarize_user_purchases(
-                                                      purchases=prt.fileContents.purchases,
-                                                      products=prt.fileContents.products))
-            tab2 = TabTwo(notebook)
+            tab1 = UserTabPanel(parent=notebook, super_parent=prt,
+                                columns={'names': ['name', 'drinks', 'money'],
+                                         'width': [180, 180, 180],
+                                         'type': [str, int, '{:,.2f}'.format]},
+                                data_frame=functions.summarize_user_purchases(
+                                    purchases=prt.fileContents.purchases,
+                                    products=prt.fileContents.products))
+            tab2 = StockTabPanel(parent=notebook, super_parent=prt,
+                                 columns={'names': ['nr', 'desc', 'price'],
+                                          'width': [80, 300, 120],
+                                          'type': [int, str, '{:,.2f}'.format]},
+                                 data_frame=prt.fileContents.products[['nr', 'desc', 'price']])
             notebook.SetFont(prt.displaySettings.wxFont)
             notebook.AddPage(tab1, 'USER')
             notebook.AddPage(tab2, 'STOCK')
@@ -72,4 +71,21 @@ class ListFrame(wx.Frame):
         self.parent.restart()
 
 
+class UserTabPanel(sortable.SortableListCtrlPanel):
 
+    def __init__(self, parent, super_parent, columns: dict, data_frame: pd.DataFrame):
+        super().__init__(parent, super_parent, columns, data_frame)
+
+    def _OnItemClick(self, event):
+        focus = self.sortable_list_ctrl.GetFocusedItem()
+        clicked_user = self.sortable_list_ctrl.GetItem(focus).GetText()
+        self.super_parent.show_confirm_dialog(confirm_message='uuuu')
+
+
+class StockTabPanel(sortable.SortableListCtrlPanel):
+
+    def __init__(self, parent, super_parent, columns: dict, data_frame: pd.DataFrame):
+        super().__init__(parent, super_parent, columns, data_frame)
+
+    def _OnItemClick(self, event):
+        pass

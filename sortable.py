@@ -52,5 +52,4 @@ class SortableListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         event.Skip()
 
     def _OnItemClick(self, event):
-        focus = self.sortable_list_ctrl.GetFocusedItem()
-        clicked_user = self.sortable_list_ctrl.GetItem(focus).GetText()
+        pass
