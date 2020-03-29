@@ -38,3 +38,21 @@ class UserStatistics:
         pass
 
 
+@dataclasses.dataclass()
+class ProductInformation:
+    code: str = None
+    desc: str = None
+    price: int = 0
+
+
+class ProductStatistics:
+
+    def __init__(self, product_nr: str, purchases: pd.DataFrame, products: pd.DataFrame):
+        self.product_information = ProductInformation()
+        self._update_product_information(product_nr=product_nr, purchases=purchases, products=products)
+
+    def _update_product_information(self, product_nr: str, purchases: pd.DataFrame, products: pd.DataFrame):
+        all_purchases_df = functions.merge_purchases_products(purchases=purchases, products=products)
+        product_purchases_df = all_purchases_df[all_purchases_df['nr'] == product_nr]
+        self.product_information.code = product_purchases_df['code'][0]
+
