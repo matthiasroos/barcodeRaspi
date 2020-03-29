@@ -47,15 +47,15 @@ def test_read_products0_file_not_found():
 
 
 def test_read_products1():
-    file_content = """1,1111111111111,xxxx,0.60\n2,2222222222222,yyyy,0.80"""
-    expected_df = pd.DataFrame([['1', '1111111111111', 'xxxx', 0.60, 'N/A'],
-                                ['2', '2222222222222', 'yyyy', 0.80, 'N/A']],
-                               columns=['nr', 'code', 'desc', 'price', 'alcohol'])
-    with unittest.mock.patch('os.path.isfile', return_value=True) as mocked_os,\
-            unittest.mock.patch('builtins.open', unittest.mock.mock_open(read_data=file_content)) as mocked_open:
+    file_content = """1,1111111111111,xxxx,0.60,20\n2,2222222222222,yyyy,0.80,10"""
+    df_from_file = pd.read_csv(io.StringIO(file_content), header=None)
+    expected_df = pd.DataFrame([[1, '1111111111111', 'xxxx', 0.60, 20],
+                                [2, '2222222222222', 'yyyy', 0.80, 10]],
+                               columns=['nr', 'code', 'desc', 'price', 'stock'])
+    with unittest.mock.patch('os.path.isfile', return_value=True) as mocked_os, \
+            unittest.mock.patch('pandas.read_csv', return_value=df_from_file):
         prod_df = functions.read_products()
     mocked_os.assert_called_once_with('produkt.txt')
-    mocked_open.assert_called_once_with('produkt.txt', 'r')
     assert prod_df.equals(expected_df)
 
 

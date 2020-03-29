@@ -64,13 +64,21 @@ class GetraenkeKasse():
 
     def run(self):
         self.get_users()
-        self.get_products()
-        # code for adding the paid column
-        if functions.check_column_nr_purchases() == 3:
+
+        # code for adding the paid column to PURCHASES_FILE
+        if functions.check_column_nr_in_file(functions.PURCHASES_FILE) == 3:
             functions.transform_purchases()
             if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
-                functions.git_push(commit_message='upgrade via getraenkeKasse.py')
+                functions.git_push(commit_message='update PURCHASES_FILE via getraenkeKasse.py')
         self.get_purchases()
+
+        # code for adding the stock column to PRODUCTS_FILE
+        if functions.check_column_nr_in_file(functions.PRODUCTS_FILE) == 4:
+            functions.transform_products()
+            if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
+                functions.git_push(commit_message='update PRODUCTS_FILE via getraenkeKasse.py')
+        self.get_products()
+
         userframe.UserFrame(self)
         self.app.MainLoop()
 

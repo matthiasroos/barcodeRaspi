@@ -107,20 +107,11 @@ def read_products() -> pd.DataFrame:
     Read products from productsFile
     """
     check_for_file(PRODUCTS_FILE)
-    file_products = open(PRODUCTS_FILE, "r")
-    prod_list = list()
-    prod_dict = {}
-    for line in file_products:
-        ll = line.split(",")
-        ll[3] = ll[3][:-1]
-        ll.append('N/A')
-        prod_list.append(ll)
-        prod_dict[ll[1]] = float(ll[3])
-    file_products.close()
-    prod_df = pd.DataFrame(prod_list, columns=['nr', 'code', 'desc', 'price', 'alcohol'])
-    prod_df['code'] = prod_df['code'].astype(str)
-    prod_df['price'] = prod_df['price'].astype(float)
-    return prod_df
+    products_df = pd.read_csv(PRODUCTS_FILE, header=None)
+    products_df.columns = ['nr', 'code', 'desc', 'price', 'stock']
+    products_df['code'] = products_df['code'].astype(str)
+    products_df['price'] = products_df['price'].astype(float)
+    return products_df
 
 
 def calc_length_code(products_df: pd.DataFrame) -> set:
@@ -133,11 +124,10 @@ def calc_length_code(products_df: pd.DataFrame) -> set:
     return length
 
 
-def check_column_nr_purchases():
-    check_for_file(PURCHASES_FILE)
-    purchases_df = pd.read_csv(PURCHASES_FILE, header=None)
-    nr = len(purchases_df.columns)
-    print(nr)
+def check_column_nr_in_file(file):
+    check_for_file(file)
+    df = pd.read_csv(file, header=None)
+    nr = len(df.columns)
     return nr
 
 
@@ -181,14 +171,13 @@ def transform_purchases():
         purchases_df.columns = ['timestamp', 'user', 'code']
         purchases_df['paid'] = False
         purchases_df['paid'] = purchases_df['paid'].astype(str)
-        filePurchases_new = open('purchase.txt', 'w+')
+        filePurchases_new = open(PURCHASES_FILE, 'w+')
         for _, row in purchases_df.iterrows():
             line = f"{row['timestamp']},{row['user']},{row['code']},{row['paid']}\n"
             filePurchases_new.writelines(line)
         filePurchases_new.close()
     except pd.errors.EmptyDataError:
         pass
-
 
 
 # TO DO: rewrite function
@@ -208,3 +197,17 @@ def retransform_purchases():
         line = row['timestamp'] + ',' + row['user'] + ',' + row['code'] + '\n'
         filePurchases_old.writelines(line)
     filePurchases_old.close()
+
+
+def transform_products():
+    check_for_file(PRODUCTS_FILE)
+    try:
+        products_df = pd.read_csv(PRODUCTS_FILE, header=None)
+        products_df.columns = ['nr', 'code', 'desc', 'price']
+        filePurchases_new = open(PRODUCTS_FILE, 'w+')
+        for _, row in products_df.iterrows():
+            line = f"{row['nr']},{row['code']},{row['desc']},{row['price']},0\n"
+            filePurchases_new.writelines(line)
+        filePurchases_new.close()
+    except pd.errors.EmptyDataError:
+        pass
