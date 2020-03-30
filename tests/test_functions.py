@@ -112,13 +112,13 @@ def test_merge_purchases_products():
 
 
 def test_summarize_user_purchases_standalone():
-    input_df = pd.DataFrame([['2019-12-10T12:20:00', 'aaa', '111111111111', 1, 'xxxx', 0.60, None],
-                             ['2019-12-10T16:30:00', 'bbb', '222222222222', 2, 'yyyy', 1.20, None],
-                             ['2019-12-10T16:35:00', 'bbb', '222222222222', 2, 'yyyy', 1.20, None],
-                             ['2019-12-10T16:40:00', 'aaa', '222222222222', 2, 'yyyy', 1.20, None],
-                             ['2019-12-10T16:45:00', 'aaa', '333333333333', 3, 'yzzz', 1.50, None]],
-                            columns=['timestamp', 'user', 'code', 'nr', 'desc', 'price', 'alcohol'])
-    expected_df = pd.DataFrame([['aaa', 3, 3.30], ['bbb', 2, 2.40]], columns=['name', 'drinks', 'money'])
+    input_df = pd.DataFrame([['2019-12-10T12:20:00', 'aaa', '111111111111', True, 1, 'xxxx', 0.60, None],
+                             ['2019-12-10T16:30:00', 'bbb', '222222222222', False, 2, 'yyyy', 1.20, None],
+                             ['2019-12-10T16:35:00', 'bbb', '222222222222', False, 2, 'yyyy', 1.20, None],
+                             ['2019-12-10T16:40:00', 'aaa', '222222222222', False, 2, 'yyyy', 1.20, None],
+                             ['2019-12-10T16:45:00', 'aaa', '333333333333', False, 3, 'yzzz', 1.50, None]],
+                            columns=['timestamp', 'user', 'code', 'paid', 'nr', 'desc', 'price', 'alcohol'])
+    expected_df = pd.DataFrame([['aaa', 2, 2.70], ['bbb', 2, 2.40]], columns=['name', 'drinks', 'money'])
     with unittest.mock.patch('functions.merge_purchases_products') as mocked_purchases:
         mocked_purchases.return_value = input_df
         output_df = functions.summarize_user_purchases(purchases=None, products=None)
@@ -126,17 +126,17 @@ def test_summarize_user_purchases_standalone():
 
 
 def test_summarize_user_purchases_integration():
-    purchases_df = pd.DataFrame([['2019-12-10T12:20:00', 'aaa', '111111111111'],
-                                 ['2019-12-10T16:30:00', 'bbb', '222222222222'],
-                                 ['2019-12-10T16:35:00', 'bbb', '222222222222'],
-                                 ['2019-12-10T16:40:00', 'aaa', '222222222222'],
-                                 ['2019-12-10T16:45:00', 'aaa', '333333333333']],
-                                columns=['timestamp', 'user', 'code'])
+    purchases_df = pd.DataFrame([['2019-12-10T12:20:00', 'aaa', '111111111111', False],
+                                 ['2019-12-10T16:30:00', 'bbb', '222222222222', True],
+                                 ['2019-12-10T16:35:00', 'bbb', '222222222222', False],
+                                 ['2019-12-10T16:40:00', 'aaa', '222222222222', False],
+                                 ['2019-12-10T16:45:00', 'aaa', '333333333333', False]],
+                                columns=['timestamp', 'user', 'code', 'paid'])
     products_df = pd.DataFrame([[1, '111111111111', 'xxxx', 0.60, None],
                                 [2, '222222222222', 'yyyy', 1.20, None],
                                 [3, '333333333333', 'yzzz', 1.50, None]],
                                columns=['nr', 'code', 'desc', 'price', 'alcohol'])
-    expected_df = pd.DataFrame([['aaa', 3, 3.30], ['bbb', 2, 2.40]], columns=['name', 'drinks', 'money'])
+    expected_df = pd.DataFrame([['aaa', 3, 3.30], ['bbb', 1, 1.20]], columns=['name', 'drinks', 'money'])
     output_df = functions.summarize_user_purchases(purchases=purchases_df, products=products_df)
     assert output_df.equals(expected_df)
 
