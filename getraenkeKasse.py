@@ -115,7 +115,7 @@ class GetraenkeKasse():
                                style=wx.OK | wx.CANCEL | wx.ICON_QUESTION | wx.STAY_ON_TOP)
         dlg.SetFont(self.displaySettings.wxFont)
         choice = dlg.ShowModal()
-        if choice == wx.OK:
+        if choice == wx.ID_OK:
             return True
         else:
             return False

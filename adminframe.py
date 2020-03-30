@@ -11,27 +11,29 @@ class AdminFrame(wx.Frame):
     def __init__(self, parent):
         """Constructor"""
         self.parent = parent
+        self.changed = False
         wx.Frame.__init__(self, None, title='AdminFrame', style=wx.DEFAULT_FRAME_STYLE)
         with self.parent as prt:
             self.panel = wx.Panel(self)
             prt.get_purchases()
             prt.get_products()
 
-            notebook = wx.Notebook(self.panel, pos=(0, 0),
-                                   size=wx.Size(prt.displaySettings.screen_width-prt.displaySettings.btnWidth,
-                                                prt.displaySettings.screen_height))
 
-            tab1 = UserTabPanel(parent=notebook, super_parent=prt)
+            self.notebook = wx.Notebook(self.panel, pos=(0, 0),
+                                        size=wx.Size(prt.displaySettings.screen_width-prt.displaySettings.btnWidth,
+                                                     prt.displaySettings.screen_height))
+            self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._onNotebookChanged)
+            tab1 = UserTabPanel(parent=self.notebook, super_parent=prt)
             products_df = prt.fileContents.products
             products_df['new_st'] = products_df['stock']
-            tab2 = StockTabPanel(parent=notebook, super_parent=prt,
-                                 columns={'names': ['desc', 'stock', 'new_st'],
-                                          'width': [420, 130, 130],
-                                          'type': [str, int, int]},
-                                 data_frame=prt.fileContents.products[['desc', 'stock', 'new_st' ]])
-            notebook.SetFont(prt.displaySettings.wxFont)
-            notebook.AddPage(tab1, 'USER')
-            notebook.AddPage(tab2, 'STOCK')
+            tab2 = StockTabPanel(parent=self.notebook, super_parent=prt,
+                                 columns={'names': ['nr', 'desc', 'stock', 'new_st'],
+                                          'width': [80, 420, 130, 130],
+                                          'type': [int, str, int, int]},
+                                 data_frame=prt.fileContents.products[['nr', 'desc', 'stock', 'new_st']])
+            self.notebook.SetFont(prt.displaySettings.wxFont)
+            self.notebook.AddPage(tab1, 'USER')
+            self.notebook.AddPage(tab2, 'STOCK')
 
             self.btnBack = wx.Button(self.panel, id=wx.ID_ANY, label='back', name='back',
                                      size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
@@ -46,14 +48,27 @@ class AdminFrame(wx.Frame):
                                           prt.displaySettings.screen_height - 2*prt.displaySettings.btnHeight))
             self.btnSave.SetFont(prt.displaySettings.wxFont)
             self.btnSave.Bind(wx.EVT_LEFT_UP, self._onClickSaveButton)
+            self.btnSave.Hide()
 
         self.ShowFullScreen(True)
 
     def _onClickBackButton(self, event):
+        if self.changed:
+            if not self.parent.show_confirm_dialog(confirm_message='Do you want to discard '):
+                return None
         self.Close()
 
     def _onClickSaveButton(self, event):
         pass
+
+    def _onNotebookChanged(self, event):
+        try:
+            if self.notebook.GetSelection() == 1:
+                self.btnSave.Show()
+            else:
+                self.btnSave.Hide()
+        except AttributeError:
+            pass
 
 
 class UserTabPanel(wx.Panel):
@@ -66,27 +81,34 @@ class UserTabPanel(wx.Panel):
             self.Text = wx.StaticText(self, label='User:',
                                       pos=(50, sprt.displaySettings.screen_height*1/5), size=(150, 50))
             self.Text.SetFont(sprt.displaySettings.wxFont)
-            all_users_purchases = functions.summarize_user_purchases(purchases=sprt.fileContents.purchases,
+            self.all_users_purchases = functions.summarize_user_purchases(purchases=sprt.fileContents.purchases,
                                                                      products=sprt.fileContents.products)
 
-            users_list = all_users_purchases['name'].to_list()
+            users_list = self.all_users_purchases['name'].to_list()
             self.userChoice = wx.Choice(self, choices=users_list,
                                         pos=(200, sprt.displaySettings.screen_height*1/5), size=(150, 50))
             self.userChoice.SetFont(sprt.displaySettings.wxFont)
             self.userChoice.Bind(wx.EVT_CHOICE, self._onChooseUser)
 
             self.userSum = wx.StaticText(self, label="", pos=(sprt.displaySettings.screen_width / 5,
-                                                              sprt.displaySettings.screen_height * 1 / 5 + 150),
+                                                              sprt.displaySettings.screen_height * 1 / 5 + 120),
                                          size=(150, 50))
+            self.userSum.SetFont(sprt.displaySettings.wxFont)
 
-        # self.btnBack = wx.Button(self.panel, id=wx.ID_ANY, label='back', name='back',
-        #                         size=wx.Size(prt.btnWidth, prt.btnHeight),
-        #                         pos=(prt.screen_width - 1 * prt.btnWidth, prt.screen_height - prt.btnHeight))
-        # self.btnBack.SetFont(wx.Font(prt.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD))
-        # self.btnBack.Bind(wx.EVT_LEFT_UP, self._onClickBackButton)
+            self.btnPay = wx.Button(self, id=wx.ID_ANY, label='pay', name='pay',
+                                    size=wx.Size(sprt.displaySettings.btnWidth, sprt.displaySettings.btnHeight),
+                                    pos=(sprt.displaySettings.screen_width / 5,
+                                         sprt.displaySettings.screen_height * 1 / 5 + 180))
+            self.btnPay.SetFont(sprt.displaySettings.wxFont)
+            self.btnPay.Bind(wx.EVT_LEFT_UP, self._onClickPayButton)
 
     def _onChooseUser(self, event):
         chosen_user = self.userChoice.GetString(self.userChoice.GetSelection())
+        sum_user = self.all_users_purchases.loc[self.all_users_purchases['name'] == chosen_user, 'money'].item()
+        self.userSum.SetLabel(label=f"{chosen_user}:\t\t{'{:,.2f}'.format(sum_user)}")
+
+    def _onClickPayButton(self, event):
+        pass
 
 
 class StockTabPanel(sortable.SortableListCtrlPanel):

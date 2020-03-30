@@ -150,7 +150,8 @@ def merge_purchases_products(purchases: pd.DataFrame, products: pd.DataFrame) ->
 
 def summarize_user_purchases(purchases: pd.DataFrame, products: pd.DataFrame) -> pd.DataFrame:
     usersPurchases_df = merge_purchases_products(purchases=purchases, products=products)
-    summary_purchases_df = usersPurchases_df.groupby('user').agg({'code': 'count', 'price': 'sum'})
+    filtered_usersPurchases_df = usersPurchases_df[~usersPurchases_df['paid']]
+    summary_purchases_df = filtered_usersPurchases_df.groupby('user').agg({'code': 'count', 'price': 'sum'})
     summary_purchases_df.reset_index(inplace=True)
     summary_purchases_df.columns = ['name', 'drinks', 'money']
     return summary_purchases_df
