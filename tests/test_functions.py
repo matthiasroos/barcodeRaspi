@@ -144,7 +144,7 @@ def test_summarize_user_purchases_integration():
 def test_save_purchase0_file_not_found():
     with unittest.mock.patch('os.path.isfile', return_value=False) as mocked_os, \
             pytest.raises(Exception) as exc:
-        functions.save_purchase(user='test', code='1111111111111')
+        functions.save_single_purchase(user='test', code='1111111111111')
     mocked_os.assert_called_once_with('purchase.txt')
     assert f'{functions.PURCHASES_FILE} not found!' in str(exc.value)
 
@@ -153,7 +153,7 @@ def test_save_purchase0_file_not_found():
 def test_save_purchase1():
     with unittest.mock.patch('os.path.isfile', return_value=True), \
             unittest.mock.patch('builtins.open', unittest.mock.mock_open(), create=True) as mocked_open:
-        functions.save_purchase(user='test', code='1111111111111')
+        functions.save_single_purchase(user='test', code='1111111111111')
     mocked_open.assert_called_once_with(functions.PURCHASES_FILE, 'a')
     mocked_open.return_value.writelines.assert_called_once_with('2020-02-29T12:00:00,test,1111111111111,False\n')
 

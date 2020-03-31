@@ -85,7 +85,7 @@ class ScanFrame(wx.Frame):
             if not functions.git_pull("./."):
                 self.parent.show_error_dialog(error_message='Problem with git (local repo).')
 
-        functions.save_purchase(user=self.parent.clicked_user, code=self.Code.GetValue())
+        functions.save_single_purchase(user=self.parent.clicked_user, code=self.Code.GetValue())
 
         if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
             # commit & push purchase

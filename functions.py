@@ -157,12 +157,17 @@ def summarize_user_purchases(purchases: pd.DataFrame, products: pd.DataFrame) ->
     return summary_purchases_df
 
 
-def save_purchase(user: str, code: str):
+def save_single_purchase(user: str, code: str):
     check_for_file(PURCHASES_FILE)
     filePurchases = open(PURCHASES_FILE, 'a')
     line = f'{datetime.datetime.now().isoformat()},{user},{code},False\n'
     filePurchases.writelines(line)
     filePurchases.close()
+
+
+def save_purchases(purchases: pd.DataFrame):
+    check_for_file(PURCHASES_FILE)
+    purchases.to_csv(PURCHASES_FILE, header=False, index=False)
 
 
 def transform_purchases():

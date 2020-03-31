@@ -77,6 +77,7 @@ class UserTabPanel(wx.Panel):
         self.parent = parent
         self.super_parent = super_parent
         wx.Panel.__init__(self, self.parent)
+        self.chosen_user = ''
         with self.super_parent as sprt:
             self.Text = wx.StaticText(self, label='User:',
                                       pos=(50, sprt.displaySettings.screen_height*1/5), size=(150, 50))
@@ -103,12 +104,14 @@ class UserTabPanel(wx.Panel):
             self.btnPay.Bind(wx.EVT_LEFT_UP, self._onClickPayButton)
 
     def _onChooseUser(self, event):
-        chosen_user = self.userChoice.GetString(self.userChoice.GetSelection())
-        sum_user = self.all_users_purchases.loc[self.all_users_purchases['name'] == chosen_user, 'money'].item()
-        self.userSum.SetLabel(label=f"{chosen_user}:\t\t{'{:,.2f}'.format(sum_user)}")
+        self.chosen_user = self.userChoice.GetString(self.userChoice.GetSelection())
+        sum_user = self.all_users_purchases.loc[self.all_users_purchases['name'] == self.chosen_user, 'money'].item()
+        self.userSum.SetLabel(label=f"{self.chosen_user}:\t\t{'{:,.2f}'.format(sum_user)}")
 
     def _onClickPayButton(self, event):
-        pass
+        if self.chosen_user:
+            self.super_parent.set_paid_for_user(self.chosen_user)
+            functions.save_purchases(purchases=self.super_parent.fileContents.purchases)
 
 
 class StockTabPanel(sortable.SortableListCtrlPanel):

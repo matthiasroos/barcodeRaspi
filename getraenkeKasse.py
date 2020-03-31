@@ -129,6 +129,9 @@ class GetraenkeKasse():
     def get_purchases(self):
         self.fileContents.purchases = functions.read_purchases()
 
+    def set_paid_for_user(self, user):
+        self.fileContents.purchases.loc[self.fileContents.purchases['user'] == user, 'paid'] = True
+
     @property
     def clicked_user(self) -> str:
         return self._clicked_user
