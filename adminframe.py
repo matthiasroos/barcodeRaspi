@@ -23,17 +23,17 @@ class AdminFrame(wx.Frame):
                                         size=wx.Size(prt.displaySettings.screen_width-prt.displaySettings.btnWidth,
                                                      prt.displaySettings.screen_height))
             self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._onNotebookChanged)
-            tab1 = UserTabPanel(parent=self.notebook, super_parent=prt)
-            products_df = prt.fileContents.products
+            self.tab1 = UserTabPanel(parent=self.notebook, super_parent=prt)
+            products_df = prt.fileContents.products.copy()
             products_df['new_st'] = products_df['stock']
-            tab2 = StockTabPanel(parent=self.notebook, super_parent=prt,
-                                 columns={'names': ['nr', 'desc', 'stock', 'new_st'],
-                                          'width': [80, 420, 130, 130],
-                                          'type': [int, str, int, int]},
-                                 data_frame=prt.fileContents.products[['nr', 'desc', 'stock', 'new_st']])
+            self.tab2 = StockTabPanel(parent=self.notebook, super_parent=prt,
+                                      columns={'names': ['nr', 'desc', 'stock', 'new_st'],
+                                               'width': [80, 420, 130, 130],
+                                               'type': [int, str, int, int]},
+                                      data_frame=products_df[['nr', 'desc', 'stock', 'new_st']])
             self.notebook.SetFont(prt.displaySettings.wxFont)
-            self.notebook.AddPage(tab1, 'USER')
-            self.notebook.AddPage(tab2, 'STOCK')
+            self.notebook.AddPage(self.tab1, 'USER')
+            self.notebook.AddPage(self.tab2, 'STOCK')
 
             self.btnBack = wx.Button(self.panel, id=wx.ID_ANY, label='back', name='back',
                                      size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
@@ -59,7 +59,14 @@ class AdminFrame(wx.Frame):
         self.Close()
 
     def _onClickSaveButton(self, event):
-        pass
+        if self.changed:
+            for i in range(0, self.tab2.sortable_list_ctrl.GetItemCount()):
+                stock_old = self.tab2.sortable_list_ctrl.GetItem(i, col=2).GetText()
+                stock_new = self.tab2.sortable_list_ctrl.GetItem(i, col=3).GetText()
+                if stock_old != stock_new:
+                    self.parent.set_stock_for_product(nr=int(self.tab2.sortable_list_ctrl.GetItem(i, col=0).GetText()),
+                                                      stock=stock_new)
+            self.parent.save_products()
 
     def _onNotebookChanged(self, event):
         try:
@@ -83,7 +90,7 @@ class UserTabPanel(wx.Panel):
                                       pos=(50, sprt.displaySettings.screen_height*1/5), size=(150, 50))
             self.Text.SetFont(sprt.displaySettings.wxFont)
             self.all_users_purchases = functions.summarize_user_purchases(purchases=sprt.fileContents.purchases,
-                                                                     products=sprt.fileContents.products)
+                                                                          products=sprt.fileContents.products)
 
             users_list = self.all_users_purchases['name'].to_list()
             self.userChoice = wx.Choice(self, choices=users_list,

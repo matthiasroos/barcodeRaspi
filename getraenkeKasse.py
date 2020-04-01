@@ -138,8 +138,8 @@ class GetraenkeKasse():
     def set_paid_for_user(self, user):
         self.fileContents.purchases.loc[self.fileContents.purchases['user'] == user, 'paid'] = True
 
-    def set_stock_for_product(self, code: str, stock: int):
-        self.fileContents.products.loc[self.fileContents.products['code'] == code, 'stock'] = stock
+    def set_stock_for_product(self, nr: int, stock: int):
+        self.fileContents.products.loc[self.fileContents.products['nr'] == nr, 'stock'] = stock
 
     def decrease_stock_for_product(self, code: str) -> bool:
         if self.fileContents.products.loc[self.fileContents.products['code'] == code, 'stock'].values > 0:
