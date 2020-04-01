@@ -115,11 +115,6 @@ def read_products() -> pd.DataFrame:
     return products_df
 
 
-def write_products(products: pd.DataFrame):
-    check_for_file(PRODUCTS_FILE)
-    products.to_csv(PRODUCTS_FILE, header=False, index=False)
-
-
 def calc_length_code(products_df: pd.DataFrame) -> set:
     """"""
     length = set()
@@ -171,9 +166,9 @@ def save_single_purchase(user: str, code: str):
     filePurchases.close()
 
 
-def write_purchases(purchases: pd.DataFrame):
-    check_for_file(PURCHASES_FILE)
-    purchases.to_csv(PURCHASES_FILE, header=False, index=False)
+def write_csv_file(file, df: pd.DataFrame):
+    check_for_file(file)
+    df.to_csv(file, header=False, index=False)
 
 
 def transform_purchases():

@@ -127,13 +127,13 @@ class GetraenkeKasse():
         self.fileContents.products = functions.read_products()
 
     def save_products(self):
-        functions.write_products(self.fileContents.products)
+        functions.write_csv_file(file=functions.PRODUCTS_FILE, df=self.fileContents.products)
 
     def get_purchases(self):
         self.fileContents.purchases = functions.read_purchases()
 
     def save_purchases(self):
-        functions.write_purchases(self.fileContents.purchases)
+        functions.write_csv_file(file=functions.PURCHASES_FILE, df=self.fileContents.purchases)
 
     def set_paid_for_user(self, user):
         self.fileContents.purchases.loc[self.fileContents.purchases['user'] == user, 'paid'] = True
