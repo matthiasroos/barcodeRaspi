@@ -75,6 +75,7 @@ def git_push(path_repo: str, commit_message: str = 'purchase via getraenkeKasse.
     try:
         repo_local = git.Repo(path_repo)
         repo_local.git.add(PURCHASES_FILE)
+        repo_local.git.add(PRODUCTS_FILE)
         repo_local.index.commit(commit_message)
         origin = repo_local.remote(name='origin')
         origin.push()
@@ -112,6 +113,11 @@ def read_products() -> pd.DataFrame:
     products_df['code'] = products_df['code'].astype(str)
     products_df['price'] = products_df['price'].astype(float)
     return products_df
+
+
+def write_products(products: pd.DataFrame):
+    check_for_file(PRODUCTS_FILE)
+    products.to_csv(PRODUCTS_FILE, header=False, index=False)
 
 
 def calc_length_code(products_df: pd.DataFrame) -> set:
@@ -165,7 +171,7 @@ def save_single_purchase(user: str, code: str):
     filePurchases.close()
 
 
-def save_purchases(purchases: pd.DataFrame):
+def write_purchases(purchases: pd.DataFrame):
     check_for_file(PURCHASES_FILE)
     purchases.to_csv(PURCHASES_FILE, header=False, index=False)
 

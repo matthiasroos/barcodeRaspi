@@ -111,7 +111,8 @@ class UserTabPanel(wx.Panel):
     def _onClickPayButton(self, event):
         if self.chosen_user:
             self.super_parent.set_paid_for_user(self.chosen_user)
-            functions.save_purchases(purchases=self.super_parent.fileContents.purchases)
+            self.super_parent.save_purchases()
+            self.userSum.SetLabel(label=f"{self.chosen_user}:\t\t0.00")
 
 
 class StockTabPanel(sortable.SortableListCtrlPanel):

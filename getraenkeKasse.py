@@ -126,11 +126,26 @@ class GetraenkeKasse():
     def get_products(self):
         self.fileContents.products = functions.read_products()
 
+    def save_products(self):
+        functions.write_products(self.fileContents.products)
+
     def get_purchases(self):
         self.fileContents.purchases = functions.read_purchases()
 
+    def save_purchases(self):
+        functions.write_purchases(self.fileContents.purchases)
+
     def set_paid_for_user(self, user):
         self.fileContents.purchases.loc[self.fileContents.purchases['user'] == user, 'paid'] = True
+
+    def set_stock_for_product(self, code: str, stock: int):
+        self.fileContents.products.loc[self.fileContents.products['code'] == code, 'stock'] = stock
+
+    def decrease_stock_for_product(self, code: str) -> bool:
+        if self.fileContents.products.loc[self.fileContents.products['code'] == code, 'stock'].values > 0:
+            self.fileContents.products.loc[self.fileContents.products['code'] == code, 'stock'] -= 1
+            return True
+        return False
 
     @property
     def clicked_user(self) -> str:

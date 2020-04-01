@@ -85,7 +85,15 @@ class ScanFrame(wx.Frame):
             if not functions.git_pull("./."):
                 self.parent.show_error_dialog(error_message='Problem with git (local repo).')
 
+        # TODO implement wrapper function in getraenkeKasse
         functions.save_single_purchase(user=self.parent.clicked_user, code=self.Code.GetValue())
+        result = self.parent.decrease_stock_for_product(code=self.Code.GetValue())
+        if result:
+            self.parent.save_products()
+        else:
+            # TODO issue warning for selling without stock
+            pass
+
 
         if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
             # commit & push purchase
