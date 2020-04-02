@@ -126,6 +126,44 @@ class StockTabPanel(sortable.SortableListCtrlPanel):
 
     def __init__(self, parent, super_parent, columns: dict, data_frame: pd.DataFrame):
         super().__init__(parent, super_parent, columns, data_frame)
+        self.parent = parent
+        self.super_parent = super_parent
 
-    def _onChooseProduct(self, event):
-        chosen_product_nr = self.productChoice.GetSelection()
+    def _OnItemClick(self, event):
+        focus = self.sortable_list_ctrl.GetFocusedItem()
+        stock_old = self.sortable_list_ctrl.GetItem(focus, 2).GetText()
+        stock_new = self.sortable_list_ctrl.GetItem(focus, 3).GetText()
+        dlg = NewStockInputDialog(parent=self.parent, super_parent=self.super_parent, title='Stock',
+                                  size=(300, 250), style=wx.STAY_ON_TOP)
+        dlg.ShowModal()
+
+
+class NewStockInputDialog(wx.Dialog):
+
+    def __init__(self, parent, super_parent, title, size, style):
+        super().__init__(parent, title=title, size=size, style=style)
+        self.parent = parent
+        self.super_parent = super_parent
+        panel = wx.Panel(self)
+
+        self.btnOne = wx.Button(panel, id=wx.ID_ANY, label='+1', size=(50, 20), pos=(75, 50))
+        self.btnOne.SetFont(self.super_parent.displaySettings.wxFont)
+        #self.btnOne.Bind(wx.EVT_LEFT_UP, self._onClickPayButton)
+
+        self.btnFive = wx.Button(panel, id=wx.ID_ANY, label='+5', size=(50, 20), pos=(75, 50))
+        self.btnFive.SetFont(self.super_parent.displaySettings.wxFont)
+
+        self.btnTwelve = wx.Button(panel, id=wx.ID_ANY, label='+12', size=(50, 20), pos=(75, 50))
+        self.btnTwelve.SetFont(self.super_parent.displaySettings.wxFont)
+
+        self.btnTwenty = wx.Button(panel, id=wx.ID_ANY, label='+20', size=(50, 20), pos=(75, 50))
+        self.btnTwenty.SetFont(self.super_parent.displaySettings.wxFont)
+
+        self.btnOK = wx.Button(self, wx.ID_OK)
+
+        self.btnCancel = wx.Button(self, wx.ID_CANCEL)
+
+        sizer = self.CreateStdDialogButtonSizer(flags=wx.OK | wx.CANCEL)
+        sizer.Add(self.btnOK, 0, wx.BOTTOM | wx.RIGHT, 10)
+        sizer.Add(self.btnCancel, 0, wx.BOTTOM | wx.LEFT, 10)
+        self.SetSizer(sizer)

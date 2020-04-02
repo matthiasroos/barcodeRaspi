@@ -79,7 +79,7 @@ class UserTabPanel(sortable.SortableListCtrlPanel):
     def _OnItemClick(self, event):
         focus = self.sortable_list_ctrl.GetFocusedItem()
         clicked_user = self.sortable_list_ctrl.GetItem(focus).GetText()
-        self.super_parent.show_confirm_dialog(confirm_message='uuuu')
+        self.super_parent.show_confirm_dialog(confirm_message=clicked_user)
 
 
 class StockTabPanel(sortable.SortableListCtrlPanel):
