@@ -134,36 +134,69 @@ class StockTabPanel(sortable.SortableListCtrlPanel):
         stock_old = self.sortable_list_ctrl.GetItem(focus, 2).GetText()
         stock_new = self.sortable_list_ctrl.GetItem(focus, 3).GetText()
         dlg = NewStockInputDialog(parent=self.parent, super_parent=self.super_parent, title='Stock',
-                                  size=(300, 250), style=wx.STAY_ON_TOP)
+                                  size=(600, 300), style=wx.STAY_ON_TOP, stock_old=stock_old, stock_new=stock_new)
         dlg.ShowModal()
 
 
 class NewStockInputDialog(wx.Dialog):
 
-    def __init__(self, parent, super_parent, title, size, style):
+    def __init__(self, parent, super_parent, title, size, style, stock_old, stock_new):
         super().__init__(parent, title=title, size=size, style=style)
         self.parent = parent
         self.super_parent = super_parent
-        panel = wx.Panel(self)
+        self.smallbtnWidth = self.super_parent.displaySettings.btnWidth/2
+        self.btnHeight = self.super_parent.displaySettings.btnHeight
+        self.stock_old = stock_old
+        self.stock_new = stock_new
+        with self.super_parent as sprt:
 
-        self.btnOne = wx.Button(panel, id=wx.ID_ANY, label='+1', size=(50, 20), pos=(75, 50))
-        self.btnOne.SetFont(self.super_parent.displaySettings.wxFont)
-        #self.btnOne.Bind(wx.EVT_LEFT_UP, self._onClickPayButton)
+            vbox = wx.BoxSizer(wx.VERTICAL)
 
-        self.btnFive = wx.Button(panel, id=wx.ID_ANY, label='+5', size=(50, 20), pos=(75, 50))
-        self.btnFive.SetFont(self.super_parent.displaySettings.wxFont)
+            panel_top = wx.Panel(self)
+            vbox_panel_top = wx.BoxSizer(wx.VERTICAL)
 
-        self.btnTwelve = wx.Button(panel, id=wx.ID_ANY, label='+12', size=(50, 20), pos=(75, 50))
-        self.btnTwelve.SetFont(self.super_parent.displaySettings.wxFont)
+            stocktext = wx.StaticText(panel_top, id=wx.ID_ANY,
+                                      label=f'stock old: {self.stock_old} - stock new: {self.stock_new}')
+            stocktext.SetFont(self.super_parent.displaySettings.wxFont)
 
-        self.btnTwenty = wx.Button(panel, id=wx.ID_ANY, label='+20', size=(50, 20), pos=(75, 50))
-        self.btnTwenty.SetFont(self.super_parent.displaySettings.wxFont)
+            hbox_panel_top = wx.BoxSizer(wx.HORIZONTAL)
+            btnOne = wx.Button(panel_top, id=wx.ID_ANY, label='+1', size=(self.smallbtnWidth, self.btnHeight))
+            btnOne.SetFont(self.super_parent.displaySettings.wxFont)
+            #self.btnOne.Bind(wx.EVT_LEFT_UP, self._onClickPayButton)
 
-        self.btnOK = wx.Button(self, wx.ID_OK)
+            btnFive = wx.Button(panel_top, id=wx.ID_ANY, label='+5', size=(self.smallbtnWidth, self.btnHeight))
+            btnFive.SetFont(self.super_parent.displaySettings.wxFont)
 
-        self.btnCancel = wx.Button(self, wx.ID_CANCEL)
+            btnTwelve = wx.Button(panel_top, id=wx.ID_ANY, label='+12', size=(self.smallbtnWidth, self.btnHeight))
+            btnTwelve.SetFont(self.super_parent.displaySettings.wxFont)
 
-        sizer = self.CreateStdDialogButtonSizer(flags=wx.OK | wx.CANCEL)
-        sizer.Add(self.btnOK, 0, wx.BOTTOM | wx.RIGHT, 10)
-        sizer.Add(self.btnCancel, 0, wx.BOTTOM | wx.LEFT, 10)
-        self.SetSizer(sizer)
+            btnTwenty = wx.Button(panel_top, id=wx.ID_ANY, label='+20', size=(self.smallbtnWidth, self.btnHeight))
+            btnTwenty.SetFont(self.super_parent.displaySettings.wxFont)
+
+            btnReset = wx.Button(panel_top, id=wx.ID_ANY, label='RESET', size=(self.smallbtnWidth*2, self.btnHeight))
+            btnReset.SetFont(self.super_parent.displaySettings.wxFont)
+
+            hbox_panel_top.Add(btnOne)
+            hbox_panel_top.Add(btnFive)
+            hbox_panel_top.Add(btnTwelve)
+            hbox_panel_top.Add(btnTwenty)
+            hbox_panel_top.Add(btnReset)
+
+            vbox_panel_top.Add(stocktext, flag=wx.ALIGN_CENTER_HORIZONTAL | wx.TOP, border=20)
+            vbox_panel_top.Add(hbox_panel_top, flag=wx.ALIGN_CENTER_HORIZONTAL | wx.TOP, border=30)
+            panel_top.SetSizer(vbox_panel_top)
+
+            panel_bottom = wx.Panel(self)
+            hbox_panel_bottom = wx.BoxSizer(wx.HORIZONTAL)
+            btnOK = wx.Button(panel_bottom, id=wx.ID_OK, label='OK', size=(self.smallbtnWidth*2, self.btnHeight))
+            btnOK.SetFont(self.super_parent.displaySettings.wxFont)
+            btnCANCEL = wx.Button(panel_bottom, id=wx.ID_CANCEL, label='CANCEL', size=(self.smallbtnWidth * 2, self.btnHeight))
+            btnCANCEL.SetFont(self.super_parent.displaySettings.wxFont)
+
+            hbox_panel_bottom.Add(btnOK)
+            hbox_panel_bottom.Add(btnCANCEL)
+            panel_bottom.SetSizer(hbox_panel_bottom)
+
+            vbox.Add(panel_top, proportion=1, flag=wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL, border=5)
+            vbox.Add(panel_bottom, flag=wx.ALIGN_CENTER, border=10)
+            self.SetSizer(vbox)
