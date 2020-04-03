@@ -157,24 +157,24 @@ class NewStockInputDialog(wx.Dialog):
 
             stocktext = wx.StaticText(panel_top, id=wx.ID_ANY,
                                       label=f'stock old: {self.stock_old} - stock new: {self.stock_new}')
-            stocktext.SetFont(self.super_parent.displaySettings.wxFont)
+            stocktext.SetFont(sprt.displaySettings.wxFont)
 
             hbox_panel_top = wx.BoxSizer(wx.HORIZONTAL)
             btnOne = wx.Button(panel_top, id=wx.ID_ANY, label='+1', size=(self.smallbtnWidth, self.btnHeight))
-            btnOne.SetFont(self.super_parent.displaySettings.wxFont)
+            btnOne.SetFont(sprt.displaySettings.wxFont)
             #self.btnOne.Bind(wx.EVT_LEFT_UP, self._onClickPayButton)
 
             btnFive = wx.Button(panel_top, id=wx.ID_ANY, label='+5', size=(self.smallbtnWidth, self.btnHeight))
-            btnFive.SetFont(self.super_parent.displaySettings.wxFont)
+            btnFive.SetFont(sprt.displaySettings.wxFont)
 
             btnTwelve = wx.Button(panel_top, id=wx.ID_ANY, label='+12', size=(self.smallbtnWidth, self.btnHeight))
-            btnTwelve.SetFont(self.super_parent.displaySettings.wxFont)
+            btnTwelve.SetFont(sprt.displaySettings.wxFont)
 
             btnTwenty = wx.Button(panel_top, id=wx.ID_ANY, label='+20', size=(self.smallbtnWidth, self.btnHeight))
-            btnTwenty.SetFont(self.super_parent.displaySettings.wxFont)
+            btnTwenty.SetFont(sprt.displaySettings.wxFont)
 
             btnReset = wx.Button(panel_top, id=wx.ID_ANY, label='RESET', size=(self.smallbtnWidth*2, self.btnHeight))
-            btnReset.SetFont(self.super_parent.displaySettings.wxFont)
+            btnReset.SetFont(sprt.displaySettings.wxFont)
 
             hbox_panel_top.Add(btnOne)
             hbox_panel_top.Add(btnFive)
@@ -189,9 +189,9 @@ class NewStockInputDialog(wx.Dialog):
             panel_bottom = wx.Panel(self)
             hbox_panel_bottom = wx.BoxSizer(wx.HORIZONTAL)
             btnOK = wx.Button(panel_bottom, id=wx.ID_OK, label='OK', size=(self.smallbtnWidth*2, self.btnHeight))
-            btnOK.SetFont(self.super_parent.displaySettings.wxFont)
+            btnOK.SetFont(sprt.displaySettings.wxFont)
             btnCANCEL = wx.Button(panel_bottom, id=wx.ID_CANCEL, label='CANCEL', size=(self.smallbtnWidth * 2, self.btnHeight))
-            btnCANCEL.SetFont(self.super_parent.displaySettings.wxFont)
+            btnCANCEL.SetFont(sprt.displaySettings.wxFont)
 
             hbox_panel_bottom.Add(btnOK)
             hbox_panel_bottom.Add(btnCANCEL)
