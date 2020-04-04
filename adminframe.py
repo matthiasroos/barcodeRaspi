@@ -23,10 +23,10 @@ class AdminFrame(wx.Frame):
                                         size=wx.Size(prt.displaySettings.screen_width-prt.displaySettings.btnWidth,
                                                      prt.displaySettings.screen_height))
             self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._onNotebookChanged)
-            self.tab1 = UserTabPanel(parent=self.notebook, super_parent=prt)
+            self.tab1 = UserTabPanel(parent=self.notebook, super_parent=self, super_super_parent=prt)
             products_df = prt.fileContents.products.copy()
             products_df['new_st'] = products_df['stock']
-            self.tab2 = StockTabPanel(parent=self.notebook, super_parent=prt,
+            self.tab2 = StockTabPanel(parent=self.notebook, super_parent=self, super_super_parent=prt,
                                       columns={'names': ['nr', 'desc', 'stock', 'new_st'],
                                                'width': [80, 420, 130, 130],
                                                'type': [int, str, int, int]},
@@ -67,6 +67,7 @@ class AdminFrame(wx.Frame):
                     self.parent.set_stock_for_product(nr=int(self.tab2.sortable_list_ctrl.GetItem(i, col=0).GetText()),
                                                       stock=stock_new)
             self.parent.save_products()
+            self.changed = False
 
     def _onNotebookChanged(self, event):
         try:
@@ -80,34 +81,35 @@ class AdminFrame(wx.Frame):
 
 class UserTabPanel(wx.Panel):
 
-    def __init__(self, parent, super_parent):
+    def __init__(self, parent, super_parent, super_super_parent):
         self.parent = parent
         self.super_parent = super_parent
+        self.super_super_parent = super_super_parent
         wx.Panel.__init__(self, self.parent)
         self.chosen_user = ''
-        with self.super_parent as sprt:
+        with self.super_super_parent as ssprt:
             self.Text = wx.StaticText(self, label='User:',
-                                      pos=(50, sprt.displaySettings.screen_height*1/5), size=(150, 50))
-            self.Text.SetFont(sprt.displaySettings.wxFont)
-            self.all_users_purchases = functions.summarize_user_purchases(purchases=sprt.fileContents.purchases,
-                                                                          products=sprt.fileContents.products)
+                                      pos=(50, ssprt.displaySettings.screen_height*1/5), size=(150, 50))
+            self.Text.SetFont(ssprt.displaySettings.wxFont)
+            self.all_users_purchases = functions.summarize_user_purchases(purchases=ssprt.fileContents.purchases,
+                                                                          products=ssprt.fileContents.products)
 
             users_list = self.all_users_purchases['name'].to_list()
             self.userChoice = wx.Choice(self, choices=users_list,
-                                        pos=(200, sprt.displaySettings.screen_height*1/5), size=(150, 50))
-            self.userChoice.SetFont(sprt.displaySettings.wxFont)
+                                        pos=(200, ssprt.displaySettings.screen_height*1/5), size=(150, 50))
+            self.userChoice.SetFont(ssprt.displaySettings.wxFont)
             self.userChoice.Bind(wx.EVT_CHOICE, self._onChooseUser)
 
-            self.userSum = wx.StaticText(self, label="", pos=(sprt.displaySettings.screen_width / 5,
-                                                              sprt.displaySettings.screen_height * 1 / 5 + 120),
+            self.userSum = wx.StaticText(self, label="", pos=(ssprt.displaySettings.screen_width / 5,
+                                                              ssprt.displaySettings.screen_height * 1 / 5 + 120),
                                          size=(150, 50))
-            self.userSum.SetFont(sprt.displaySettings.wxFont)
+            self.userSum.SetFont(ssprt.displaySettings.wxFont)
 
             self.btnPay = wx.Button(self, id=wx.ID_ANY, label='pay', name='pay',
-                                    size=wx.Size(sprt.displaySettings.btnWidth, sprt.displaySettings.btnHeight),
-                                    pos=(sprt.displaySettings.screen_width / 5,
-                                         sprt.displaySettings.screen_height * 1 / 5 + 180))
-            self.btnPay.SetFont(sprt.displaySettings.wxFont)
+                                    size=wx.Size(ssprt.displaySettings.btnWidth, ssprt.displaySettings.btnHeight),
+                                    pos=(ssprt.displaySettings.screen_width / 5,
+                                         ssprt.displaySettings.screen_height * 1 / 5 + 180))
+            self.btnPay.SetFont(ssprt.displaySettings.wxFont)
             self.btnPay.Bind(wx.EVT_LEFT_UP, self._onClickPayButton)
 
     def _onChooseUser(self, event):
@@ -124,18 +126,23 @@ class UserTabPanel(wx.Panel):
 
 class StockTabPanel(sortable.SortableListCtrlPanel):
 
-    def __init__(self, parent, super_parent, columns: dict, data_frame: pd.DataFrame):
-        super().__init__(parent, super_parent, columns, data_frame)
+    def __init__(self, parent, super_parent, super_super_parent, columns: dict, data_frame: pd.DataFrame):
+        super().__init__(parent, super_super_parent, columns, data_frame)
         self.parent = parent
         self.super_parent = super_parent
+        self.super_super_parent = super_super_parent
 
     def _OnItemClick(self, event):
         focus = self.sortable_list_ctrl.GetFocusedItem()
-        stock_old = self.sortable_list_ctrl.GetItem(focus, 2).GetText()
-        stock_new = self.sortable_list_ctrl.GetItem(focus, 3).GetText()
-        dlg = NewStockInputDialog(parent=self.parent, super_parent=self.super_parent, title='Stock',
+        stock_old = int(self.sortable_list_ctrl.GetItem(focus, 2).GetText())
+        stock_new = int(self.sortable_list_ctrl.GetItem(focus, 3).GetText())
+        dlg = NewStockInputDialog(parent=self.parent, super_parent=self.super_super_parent, title='Stock',
                                   size=(600, 300), style=wx.STAY_ON_TOP, stock_old=stock_old, stock_new=stock_new)
-        dlg.ShowModal()
+        result = dlg.ShowModal()
+        if result == wx.ID_OK:
+            self.sortable_list_ctrl.SetItem(focus, 3, str(dlg.stock_new))
+            self.super_parent.changed = True
+        dlg.Destroy()
 
 
 class NewStockInputDialog(wx.Dialog):
@@ -155,26 +162,30 @@ class NewStockInputDialog(wx.Dialog):
             panel_top = wx.Panel(self)
             vbox_panel_top = wx.BoxSizer(wx.VERTICAL)
 
-            stocktext = wx.StaticText(panel_top, id=wx.ID_ANY,
-                                      label=f'stock old: {self.stock_old} - stock new: {self.stock_new}')
-            stocktext.SetFont(sprt.displaySettings.wxFont)
+            self.stocktext = wx.StaticText(panel_top, id=wx.ID_ANY,
+                                           label=f'stock old: {self.stock_old} - stock new: {self.stock_new}')
+            self.stocktext.SetFont(sprt.displaySettings.wxFont)
 
             hbox_panel_top = wx.BoxSizer(wx.HORIZONTAL)
-            btnOne = wx.Button(panel_top, id=wx.ID_ANY, label='+1', size=(self.smallbtnWidth, self.btnHeight))
+            btnOne = wx.Button(panel_top, id=6001, label='+1', size=(self.smallbtnWidth, self.btnHeight))
             btnOne.SetFont(sprt.displaySettings.wxFont)
-            #self.btnOne.Bind(wx.EVT_LEFT_UP, self._onClickPayButton)
+            btnOne.Bind(wx.EVT_LEFT_UP, self._onClickAddButton)
 
-            btnFive = wx.Button(panel_top, id=wx.ID_ANY, label='+5', size=(self.smallbtnWidth, self.btnHeight))
+            btnFive = wx.Button(panel_top, id=6005, label='+5', size=(self.smallbtnWidth, self.btnHeight))
             btnFive.SetFont(sprt.displaySettings.wxFont)
+            btnFive.Bind(wx.EVT_LEFT_UP, self._onClickAddButton)
 
-            btnTwelve = wx.Button(panel_top, id=wx.ID_ANY, label='+12', size=(self.smallbtnWidth, self.btnHeight))
+            btnTwelve = wx.Button(panel_top, id=6012, label='+12', size=(self.smallbtnWidth, self.btnHeight))
             btnTwelve.SetFont(sprt.displaySettings.wxFont)
+            btnTwelve.Bind(wx.EVT_LEFT_UP, self._onClickAddButton)
 
-            btnTwenty = wx.Button(panel_top, id=wx.ID_ANY, label='+20', size=(self.smallbtnWidth, self.btnHeight))
+            btnTwenty = wx.Button(panel_top, id=6020, label='+20', size=(self.smallbtnWidth, self.btnHeight))
             btnTwenty.SetFont(sprt.displaySettings.wxFont)
+            btnTwenty.Bind(wx.EVT_LEFT_UP, self._onClickAddButton)
 
             btnReset = wx.Button(panel_top, id=wx.ID_ANY, label='RESET', size=(self.smallbtnWidth*2, self.btnHeight))
             btnReset.SetFont(sprt.displaySettings.wxFont)
+            btnReset.Bind(wx.EVT_LEFT_UP, self._onClickResetButton)
 
             hbox_panel_top.Add(btnOne)
             hbox_panel_top.Add(btnFive)
@@ -182,7 +193,7 @@ class NewStockInputDialog(wx.Dialog):
             hbox_panel_top.Add(btnTwenty)
             hbox_panel_top.Add(btnReset)
 
-            vbox_panel_top.Add(stocktext, flag=wx.ALIGN_CENTER_HORIZONTAL | wx.TOP, border=20)
+            vbox_panel_top.Add(self.stocktext, flag=wx.ALIGN_CENTER_HORIZONTAL | wx.TOP, border=20)
             vbox_panel_top.Add(hbox_panel_top, flag=wx.ALIGN_CENTER_HORIZONTAL | wx.TOP, border=30)
             panel_top.SetSizer(vbox_panel_top)
 
@@ -200,3 +211,13 @@ class NewStockInputDialog(wx.Dialog):
             vbox.Add(panel_top, proportion=1, flag=wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL, border=5)
             vbox.Add(panel_bottom, flag=wx.ALIGN_CENTER, border=10)
             self.SetSizer(vbox)
+
+    def _onClickAddButton(self, event):
+        btnId = event.GetEventObject().GetId()
+        self.stock_new += (btnId - 6000)
+        self.stocktext.SetLabel(label=f'stock old: {self.stock_old} - stock new: {self.stock_new}')
+
+    def _onClickResetButton(self, event):
+        self.stock_new = self.stock_old
+        self.stocktext.SetLabel(label=f'stock old: {self.stock_old} - stock new: {self.stock_new}')
+
