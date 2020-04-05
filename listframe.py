@@ -28,10 +28,10 @@ class ListFrame(wx.Frame):
                                     purchases=prt.fileContents.purchases,
                                     products=prt.fileContents.products))
             tab2 = StockTabPanel(parent=notebook, super_parent=prt,
-                                 columns={'names': ['nr', 'desc', 'price'],
-                                          'width': [80, 300, 120],
-                                          'type': [int, str, '{:,.2f}'.format]},
-                                 data_frame=prt.fileContents.products[['nr', 'desc', 'price']])
+                                 columns={'names': ['nr', 'desc', 'price', 'stock'],
+                                          'width': [80, 300, 120, 120],
+                                          'type': [int, str, '{:,.2f}'.format, int]},
+                                 data_frame=prt.fileContents.products[['nr', 'desc', 'price', 'stock']])
             notebook.SetFont(prt.displaySettings.wxFont)
             notebook.AddPage(tab1, 'USER')
             notebook.AddPage(tab2, 'STOCK')
