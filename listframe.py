@@ -4,6 +4,7 @@ import pandas as pd
 
 import functions
 import sortable
+import statistics
 
 
 class ListFrame(wx.Frame):
@@ -79,7 +80,10 @@ class UserTabPanel(sortable.SortableListCtrlPanel):
     def _OnItemClick(self, event):
         focus = self.sortable_list_ctrl.GetFocusedItem()
         clicked_user = self.sortable_list_ctrl.GetItem(focus).GetText()
-        self.super_parent.show_confirm_dialog(confirm_message=clicked_user)
+        with self.super_parent as sprt:
+            user_statistics = statistics.UserStatistics(user=clicked_user, purchases=sprt.fileContents.purchases,
+                                                        products=sprt.fileContents.products)
+            sprt.show_confirm_dialog(confirm_message=user_statistics.user_information.favorite_drink)
 
 
 class StockTabPanel(sortable.SortableListCtrlPanel):
