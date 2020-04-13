@@ -92,4 +92,10 @@ class StockTabPanel(sortable.SortableListCtrlPanel):
         super().__init__(parent, super_parent, columns, data_frame)
 
     def _OnItemClick(self, event):
-        pass
+        focus = self.sortable_list_ctrl.GetFocusedItem()
+        clicked_product = int(self.sortable_list_ctrl.GetItem(focus).GetText())
+        with self.super_parent as sprt:
+            product_statistics = statistics.ProductStatistics(product_nr=clicked_product,
+                                                              purchases=sprt.fileContents.purchases,
+                                                              products=sprt.fileContents.products)
+            sprt.show_confirm_dialog(confirm_message=product_statistics.get_product_statistic())

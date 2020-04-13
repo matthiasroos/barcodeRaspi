@@ -21,20 +21,20 @@ class UserInformation:
 class UserStatistics:
 
     def __init__(self, user: str, purchases: pd.DataFrame, products: pd.DataFrame):
-        self.user_information = UserInformation()
         self.purchases = purchases
         self.products = products
-        self._update_user_information(user=user, purchases=self.purchases, products=self.products)
-
-    def _update_user_information(self, user: str, purchases: pd.DataFrame, products: pd.DataFrame):
-        all_users_purchases_df = functions.merge_purchases_products(purchases=purchases, products=products)
+        self.user_information = UserInformation()
+        all_users_purchases_df = functions.merge_purchases_products(purchases=self.purchases, products=self.products)
         user_purchases_df = all_users_purchases_df[all_users_purchases_df['user'] == user]
+        self._update_user_information(user=user, user_purchases=user_purchases_df)
+
+    def _update_user_information(self, user: str, user_purchases: pd.DataFrame):
         self.user_information.name = user
-        self.user_information.drinks = len(user_purchases_df)
-        self.user_information.money = user_purchases_df['price'].sum()
+        self.user_information.drinks = len(user_purchases)
+        self.user_information.money = user_purchases['price'].sum()
         self.user_information.favorite_drink, self.user_information.favorite_drink_ratio = \
-            self._determine_favorite_drink(user_purchases=user_purchases_df)
-        self.user_information.drinks_per_day = self._calculate_drinks_per_day(user_purchases=user_purchases_df)
+            self._determine_favorite_drink(user_purchases=user_purchases)
+        self.user_information.drinks_per_day = self._calculate_drinks_per_day(user_purchases=user_purchases)
 
     def _determine_favorite_drink(self, user_purchases: pd.DataFrame) -> typing.Tuple[str, float]:
         user_summary = user_purchases.groupby(by='code').agg({'timestamp': 'count'})
@@ -59,16 +59,38 @@ class ProductInformation:
     code: str = None
     desc: str = None
     price: int = 0
+    favored_by_user: str = None
+    ratio_by_user: float = 0.0
 
 
 class ProductStatistics:
 
-    def __init__(self, product_nr: str, purchases: pd.DataFrame, products: pd.DataFrame):
+    def __init__(self, product_nr: int, purchases: pd.DataFrame, products: pd.DataFrame):
+        self.purchases = purchases
+        self.products = products
         self.product_information = ProductInformation()
-        self._update_product_information(product_nr=product_nr, purchases=purchases, products=products)
-
-    def _update_product_information(self, product_nr: str, purchases: pd.DataFrame, products: pd.DataFrame):
-        all_purchases_df = functions.merge_purchases_products(purchases=purchases, products=products)
+        all_purchases_df = functions.merge_purchases_products(purchases=self.purchases, products=self.products)
         product_purchases_df = all_purchases_df[all_purchases_df['nr'] == product_nr]
-        self.product_information.code = product_purchases_df['code'][0]
+        self._update_product_information(product_nr=product_nr, product_purchases=product_purchases_df)
+
+    def _update_product_information(self, product_nr: int, product_purchases: pd.DataFrame):
+        self.product_information.code = self.products[self.products['nr'] == product_nr].reset_index().at[0, 'code']
+        self.product_information.desc = self.products[self.products['nr'] == product_nr].reset_index().at[0, 'desc']
+        self.product_information.price = self.products[self.products['nr'] == product_nr].reset_index().at[0, 'price']
+        if not product_purchases.empty:
+            self.product_information.favored_by_user, self.product_information.ratio_by_user = \
+                self._determine_favored_by_user(product_purchases=product_purchases)
+
+    def _determine_favored_by_user(self, product_purchases: pd.DataFrame) -> typing.Tuple[str, float]:
+        product_summary = product_purchases.groupby(by='user').agg({'timestamp': 'count'})
+        product_summary.reset_index(inplace=True)
+        product_summary.columns = ['user', 'drinks']
+        product_summary.sort_values(by='drinks', ascending=False, inplace=True, ignore_index=True)
+        favored_by_user_str = product_summary.at[0, 'user']
+        return favored_by_user_str, product_summary.at[0, 'drinks']/sum(product_summary['drinks'])
+
+    def get_product_statistic(self):
+        product_str = f'{self.product_information.desc}\nfavored by user: {self.product_information.favored_by_user}\n' \
+                      f'ratio of fav. user: {"{:4.3f}".format(self.product_information.ratio_by_user)}'
+        return product_str
 
