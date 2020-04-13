@@ -48,6 +48,10 @@ class UserStatistics:
     def _calculate_drinks_per_day(self, user_purchases: pd.DataFrame) -> float:
         pass
 
+    def get_user_statistic(self):
+        user_str = f'{self.user_information.name}\nfavorite drink: {self.user_information.favorite_drink}\n' \
+                   f'ratio of fav. drink: {"{:4.3f}".format(self.user_information.favorite_drink_ratio)}'
+        return user_str
 
 
 @dataclasses.dataclass()

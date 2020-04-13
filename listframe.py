@@ -83,7 +83,7 @@ class UserTabPanel(sortable.SortableListCtrlPanel):
         with self.super_parent as sprt:
             user_statistics = statistics.UserStatistics(user=clicked_user, purchases=sprt.fileContents.purchases,
                                                         products=sprt.fileContents.products)
-            sprt.show_confirm_dialog(confirm_message=user_statistics.user_information.favorite_drink)
+            sprt.show_confirm_dialog(confirm_message=user_statistics.get_user_statistic())
 
 
 class StockTabPanel(sortable.SortableListCtrlPanel):
