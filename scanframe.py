@@ -77,13 +77,12 @@ class ScanFrame(wx.Frame):
         self.Disable()
         self.Update()
 
-        if 'BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ:
-            time.sleep(7)
-
         if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
             # check local repo for changes
             if not functions.git_pull("./."):
                 self.parent.show_error_dialog(error_message='Problem with git (local repo).')
+        else:
+            time.sleep(7)
 
         # TODO implement wrapper function in getraenkeKasse
         functions.save_single_purchase(user=self.parent.clicked_user, code=self.Code.GetValue())
