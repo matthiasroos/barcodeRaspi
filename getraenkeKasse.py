@@ -133,7 +133,7 @@ class GetraenkeKasse():
     def _set_stock_for_product(self, nr: int, stock: int):
         self.fileContents.products.loc[self.fileContents.products['nr'] == nr, 'stock'] = stock
 
-    def replenish_stock(self, changed_stock: typing.List[typing.List[str, int, int]]):
+    def replenish_stock(self, changed_stock: typing.List[typing.List[int]]):
         for product in changed_stock:
             nr, stock_old, stock_new = product
             if stock_old != stock_new:

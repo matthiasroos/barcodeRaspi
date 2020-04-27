@@ -119,7 +119,7 @@ class UserTabPanel(wx.Panel):
 
     def _onClickPayButton(self, event):
         if self.chosen_user:
-            self.super_parent.pay_for_user(user=self.chosen_user)
+            self.super_super_parent.pay_for_user(user=self.chosen_user)
             self.userSum.SetLabel(label=f"{self.chosen_user}:\t\t0.00")
 
 
