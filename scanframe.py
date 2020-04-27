@@ -93,7 +93,6 @@ class ScanFrame(wx.Frame):
             # TODO issue warning for selling without stock
             pass
 
-
         if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
             # commit & push purchase
             if not functions.git_push("./."):
@@ -104,8 +103,8 @@ class ScanFrame(wx.Frame):
     def _onChangeCode(self, event):
         """"""
         code = self.Code.GetValue()
-        if len(code) in functions.calc_length_code(self.parent.fileContents.products):
-            prod_df = self.parent.fileContents.products
+        prod_df = self.parent.fileContents.products
+        if len(code) in functions.calc_length_code(products_df=prod_df):
             select_df = prod_df[prod_df['code'] == code]
             if not select_df.empty:
                 ind = select_df.first_valid_index()

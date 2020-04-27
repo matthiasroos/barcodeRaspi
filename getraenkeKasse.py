@@ -129,6 +129,15 @@ class GetraenkeKasse():
     def save_products(self):
         functions.write_csv_file(file=functions.PRODUCTS_FILE, df=self.fileContents.products)
 
+    def set_stock_for_product(self, nr: int, stock: int):
+        self.fileContents.products.loc[self.fileContents.products['nr'] == nr, 'stock'] = stock
+
+    def decrease_stock_for_product(self, code: str) -> bool:
+        if self.fileContents.products.loc[self.fileContents.products['code'] == code, 'stock'].values > 0:
+            self.fileContents.products.loc[self.fileContents.products['code'] == code, 'stock'] -= 1
+            return True
+        return False
+
     def get_purchases(self):
         self.fileContents.purchases = functions.read_purchases()
 
@@ -138,14 +147,9 @@ class GetraenkeKasse():
     def set_paid_for_user(self, user):
         self.fileContents.purchases.loc[self.fileContents.purchases['user'] == user, 'paid'] = True
 
-    def set_stock_for_product(self, nr: int, stock: int):
-        self.fileContents.products.loc[self.fileContents.products['nr'] == nr, 'stock'] = stock
+    
 
-    def decrease_stock_for_product(self, code: str) -> bool:
-        if self.fileContents.products.loc[self.fileContents.products['code'] == code, 'stock'].values > 0:
-            self.fileContents.products.loc[self.fileContents.products['code'] == code, 'stock'] -= 1
-            return True
-        return False
+
 
     @property
     def clicked_user(self) -> str:
