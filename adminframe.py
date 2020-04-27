@@ -60,13 +60,13 @@ class AdminFrame(wx.Frame):
 
     def _onClickSaveButton(self, event):
         if self.changed:
+            changed_stock = []
             for i in range(0, self.tab2.sortable_list_ctrl.GetItemCount()):
-                stock_old = self.tab2.sortable_list_ctrl.GetItem(i, col=2).GetText()
-                stock_new = self.tab2.sortable_list_ctrl.GetItem(i, col=3).GetText()
-                if stock_old != stock_new:
-                    self.parent.set_stock_for_product(nr=int(self.tab2.sortable_list_ctrl.GetItem(i, col=0).GetText()),
-                                                      stock=stock_new)
-            self.parent.save_products()
+                nr = int(self.tab2.sortable_list_ctrl.GetItem(i, col=0).GetText())
+                stock_old = int(self.tab2.sortable_list_ctrl.GetItem(i, col=2).GetText())
+                stock_new = int(self.tab2.sortable_list_ctrl.GetItem(i, col=3).GetText())
+                changed_stock.append([nr, stock_old, stock_new])
+            self.parent.replenish_stock(changed_stock=changed_stock)
             self.changed = False
 
     def _onNotebookChanged(self, event):
@@ -119,8 +119,7 @@ class UserTabPanel(wx.Panel):
 
     def _onClickPayButton(self, event):
         if self.chosen_user:
-            self.super_parent.set_paid_for_user(self.chosen_user)
-            self.super_parent.save_purchases()
+            self.super_parent.pay_for_user(user=self.chosen_user)
             self.userSum.SetLabel(label=f"{self.chosen_user}:\t\t0.00")
 
 

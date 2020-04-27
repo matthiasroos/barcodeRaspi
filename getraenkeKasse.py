@@ -4,6 +4,7 @@ import dataclasses
 import os
 import sys
 import time
+import typing
 
 import pandas as pd
 import wx
@@ -132,7 +133,14 @@ class GetraenkeKasse():
     def _set_stock_for_product(self, nr: int, stock: int):
         self.fileContents.products.loc[self.fileContents.products['nr'] == nr, 'stock'] = stock
 
-    def decrease_stock_for_product(self, code: str) -> bool:
+    def replenish_stock(self, changed_stock: typing.List[typing.List[str, int, int]]):
+        for product in changed_stock:
+            nr, stock_old, stock_new = product
+            if stock_old != stock_new:
+                self._set_stock_for_product(nr=nr, stock=stock_new)
+        self._save_products()
+
+    def _decrease_stock_for_product(self, code: str) -> bool:
         if self.fileContents.products.loc[self.fileContents.products['code'] == code, 'stock'].values > 0:
             self.fileContents.products.loc[self.fileContents.products['code'] == code, 'stock'] -= 1
             return True
@@ -146,6 +154,10 @@ class GetraenkeKasse():
 
     def _set_paid_for_user(self, user):
         self.fileContents.purchases.loc[self.fileContents.purchases['user'] == user, 'paid'] = True
+
+    def pay_for_user(self, user):
+        self._set_paid_for_user(user=user)
+        self._save_purchases()
 
     def make_purchase(self, user: str, code: str):
         self.fileContents.purchases = functions.add_purchase(purchases=self.fileContents.purchases,
