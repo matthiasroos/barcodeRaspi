@@ -56,7 +56,7 @@ def test_read_products1():
             unittest.mock.patch('pandas.read_csv', return_value=df_from_file):
         prod_df = functions.read_products()
     mocked_os.assert_called_once_with('produkt.txt')
-    assert prod_df.equals(expected_df)
+    pd.testing.assert_frame_equal(prod_df, expected_df)
 
 
 @pytest.mark.parametrize(['input_df', 'expected_set'],
@@ -92,7 +92,7 @@ def test_read_purchases2():
             unittest.mock.patch('pandas.read_csv', return_value=df_from_file):
         purchases_df = functions.read_purchases()
     mocked_os.assert_called_once_with('purchase.txt')
-    assert purchases_df.equals(expected_df)
+    pd.testing.assert_frame_equal(purchases_df, expected_df)
 
 
 def test_merge_purchases_products():
@@ -108,7 +108,7 @@ def test_merge_purchases_products():
                                 ['2019-12-10T16:35:00', 'bbb', '222222222222', False, 2, 'yyyy', 1.20, None]],
                                columns=['timestamp', 'user', 'code', 'paid', 'nr', 'desc', 'price', 'alcohol'])
     users_purchases_df = functions.merge_purchases_products(purchases=purchases_df, products=products_df)
-    assert users_purchases_df.equals(expected_df)
+    pd.testing.assert_frame_equal(users_purchases_df, expected_df)
 
 
 def test_summarize_user_purchases_standalone():
@@ -122,7 +122,7 @@ def test_summarize_user_purchases_standalone():
     with unittest.mock.patch('functions.merge_purchases_products') as mocked_purchases:
         mocked_purchases.return_value = input_df
         output_df = functions.summarize_user_purchases(purchases=None, products=None)
-    assert output_df.equals(expected_df)
+    pd.testing.assert_frame_equal(output_df, expected_df)
 
 
 def test_summarize_user_purchases_integration():
@@ -138,8 +138,7 @@ def test_summarize_user_purchases_integration():
                                columns=['nr', 'code', 'desc', 'price', 'alcohol'])
     expected_df = pd.DataFrame([['aaa', 3, 3.30], ['bbb', 1, 1.20]], columns=['name', 'drinks', 'money'])
     output_df = functions.summarize_user_purchases(purchases=purchases_df, products=products_df)
-    assert output_df.equals(expected_df)
-
+    pd.testing.assert_frame_equal(output_df, expected_df)
 
 def test_save_purchase0_file_not_found():
     with unittest.mock.patch('os.path.isfile', return_value=False) as mocked_os, \
