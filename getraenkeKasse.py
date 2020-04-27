@@ -147,9 +147,16 @@ class GetraenkeKasse():
     def set_paid_for_user(self, user):
         self.fileContents.purchases.loc[self.fileContents.purchases['user'] == user, 'paid'] = True
 
-    
-
-
+    def make_purchase(self, user: str, code: str):
+        self.fileContents.purchases = functions.add_purchase(purchases=self.fileContents.purchases,
+                                                             user=user, code=code)
+        self.save_purchases()
+        result = self.decrease_stock_for_product(code=code)
+        if result:
+            self.save_products()
+        else:
+            # TODO issue warning for selling without stock
+            pass
 
     @property
     def clicked_user(self) -> str:

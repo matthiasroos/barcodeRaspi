@@ -84,14 +84,7 @@ class ScanFrame(wx.Frame):
         else:
             time.sleep(7)
 
-        # TODO implement wrapper function in getraenkeKasse
-        functions.save_single_purchase(user=self.parent.clicked_user, code=self.Code.GetValue())
-        result = self.parent.decrease_stock_for_product(code=self.Code.GetValue())
-        if result:
-            self.parent.save_products()
-        else:
-            # TODO issue warning for selling without stock
-            pass
+        self.parent.make_purchase(user=self.parent.clicked_user, code=self.Code.GetValue())
 
         if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
             # commit & push purchase
