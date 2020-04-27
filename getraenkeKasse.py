@@ -139,6 +139,7 @@ class GetraenkeKasse():
             if stock_old != stock_new:
                 self._set_stock_for_product(nr=nr, stock=stock_new)
         self._save_products()
+        # TODO: add git
 
     def _decrease_stock_for_product(self, code: str) -> bool:
         if self.fileContents.products.loc[self.fileContents.products['code'] == code, 'stock'].values > 0:
@@ -158,6 +159,7 @@ class GetraenkeKasse():
     def pay_for_user(self, user):
         self._set_paid_for_user(user=user)
         self._save_purchases()
+        # TODO: add git
 
     def make_purchase(self, user: str, code: str):
         self.fileContents.purchases = functions.add_purchase(purchases=self.fileContents.purchases,
@@ -169,6 +171,7 @@ class GetraenkeKasse():
         else:
             # TODO issue warning for selling without stock
             pass
+        # TODO: add git
 
     @property
     def clicked_user(self) -> str:

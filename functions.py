@@ -16,6 +16,24 @@ PRODUCTS_FILE = "produkt.txt"
 PURCHASES_FILE = "purchase.txt"
 
 
+def check_environment_ONLY_PROD(func):
+    def wrapper():
+        if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
+            func()
+        else:
+            pass
+    return wrapper
+
+
+def check_environment_TEST_PROD(func):
+    def wrapper():
+        if 'BARCODE_DEV' not in os.environ:
+            func()
+        else:
+            pass
+    return wrapper
+
+
 def getMD5Hash(filename: str):
     hasher = hashlib.md5()
     with open(filename, 'rb') as afile:
@@ -77,8 +95,8 @@ def git_push(path_repo: str, commit_message: str = 'purchase via getraenkeKasse.
         repo_local.git.add(PURCHASES_FILE)
         repo_local.git.add(PRODUCTS_FILE)
         repo_local.index.commit(commit_message)
-        origin = repo_local.remote(name='origin')
-        origin.push()
+        #origin = repo_local.remote(name='origin')
+        #origin.push()
         return True
     except git.GitCommandError as exception:
         print(exception)
