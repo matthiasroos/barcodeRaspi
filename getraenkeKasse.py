@@ -126,10 +126,10 @@ class GetraenkeKasse():
     def get_products(self):
         self.fileContents.products = functions.read_products()
 
-    def save_products(self):
+    def _save_products(self):
         functions.write_csv_file(file=functions.PRODUCTS_FILE, df=self.fileContents.products)
 
-    def set_stock_for_product(self, nr: int, stock: int):
+    def _set_stock_for_product(self, nr: int, stock: int):
         self.fileContents.products.loc[self.fileContents.products['nr'] == nr, 'stock'] = stock
 
     def decrease_stock_for_product(self, code: str) -> bool:
@@ -141,19 +141,19 @@ class GetraenkeKasse():
     def get_purchases(self):
         self.fileContents.purchases = functions.read_purchases()
 
-    def save_purchases(self):
+    def _save_purchases(self):
         functions.write_csv_file(file=functions.PURCHASES_FILE, df=self.fileContents.purchases)
 
-    def set_paid_for_user(self, user):
+    def _set_paid_for_user(self, user):
         self.fileContents.purchases.loc[self.fileContents.purchases['user'] == user, 'paid'] = True
 
     def make_purchase(self, user: str, code: str):
         self.fileContents.purchases = functions.add_purchase(purchases=self.fileContents.purchases,
                                                              user=user, code=code)
-        self.save_purchases()
-        result = self.decrease_stock_for_product(code=code)
+        self._save_purchases()
+        result = self._decrease_stock_for_product(code=code)
         if result:
-            self.save_products()
+            self._save_products()
         else:
             # TODO issue warning for selling without stock
             pass

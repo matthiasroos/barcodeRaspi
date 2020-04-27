@@ -81,7 +81,8 @@ class UserTabPanel(sortable.SortableListCtrlPanel):
         focus = self.sortable_list_ctrl.GetFocusedItem()
         clicked_user = self.sortable_list_ctrl.GetItem(focus).GetText()
         with self.super_parent as sprt:
-            user_statistics = statistics.UserStatistics(user=clicked_user, purchases=sprt.fileContents.purchases,
+            user_statistics = statistics.UserStatistics(user=clicked_user,
+                                                        purchases=sprt.fileContents.purchases,
                                                         products=sprt.fileContents.products)
             sprt.show_confirm_dialog(confirm_message=user_statistics.get_user_statistic())
 
