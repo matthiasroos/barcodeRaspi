@@ -17,20 +17,20 @@ PURCHASES_FILE = "purchase.txt"
 
 
 def check_environment_ONLY_PROD(func):
-    def wrapper():
+    def wrapper(*args, **kwargs):
         if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
-            func()
+            return func(*args, **kwargs)
         else:
-            pass
+            return True
     return wrapper
 
 
 def check_environment_TEST_PROD(func):
-    def wrapper():
+    def wrapper(*args, **kwargs):
         if 'BARCODE_DEV' not in os.environ:
-            func()
+            return func(*args, **kwargs)
         else:
-            pass
+            return True
     return wrapper
 
 
@@ -42,6 +42,7 @@ def getMD5Hash(filename: str):
     return hasher
 
 
+@check_environment_TEST_PROD
 def checkNetwork(host="8.8.8.8", port=53, timeout=3):
     """
     Host: 8.8.8.8 (google-public-dns-a.google.com)
@@ -70,6 +71,7 @@ def getTimefromNTP():
     return time.ctime(t), t
 
 
+@check_environment_ONLY_PROD
 def git_pull(path_repo: str) -> bool:
     try:
         repo = git.Repo(path_repo)
@@ -89,14 +91,15 @@ def git_pull(path_repo: str) -> bool:
         return False
 
 
+@check_environment_ONLY_PROD
 def git_push(path_repo: str, commit_message: str = 'purchase via getraenkeKasse.py') -> bool:
     try:
         repo_local = git.Repo(path_repo)
         repo_local.git.add(PURCHASES_FILE)
         repo_local.git.add(PRODUCTS_FILE)
         repo_local.index.commit(commit_message)
-        #origin = repo_local.remote(name='origin')
-        #origin.push()
+        origin = repo_local.remote(name='origin')
+        origin.push()
         return True
     except git.GitCommandError as exception:
         print(exception)

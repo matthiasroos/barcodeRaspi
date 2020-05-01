@@ -77,19 +77,17 @@ class ScanFrame(wx.Frame):
         self.Disable()
         self.Update()
 
-        if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
-            # check local repo for changes
-            if not functions.git_pull("./."):
-                self.parent.show_error_dialog(error_message='Problem with git (local repo).')
-        else:
-            time.sleep(7)
+        # check local repo for changes
+        if not functions.git_pull("./."):
+            self.parent.show_error_dialog(error_message='Problem with git (local repo).')
+
+        functions.check_environment_ONLY_PROD(time.sleep(7))
 
         self.parent.make_purchase(user=self.parent.clicked_user, code=self.Code.GetValue())
 
-        if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
-            # commit & push purchase
-            if not functions.git_push("./."):
-                self.parent.show_error_dialog(error_message='Problem with git (local repo).')
+        # commit & push purchase
+        if not functions.git_push("./."):
+            self.parent.show_error_dialog(error_message='Problem with git (local repo).')
 
         self.Close()
 

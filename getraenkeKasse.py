@@ -69,15 +69,13 @@ class GetraenkeKasse():
         # code for adding the paid column to PURCHASES_FILE
         if functions.check_column_nr_in_file(functions.PURCHASES_FILE) == 3:
             functions.transform_purchases()
-            if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
-                functions.git_push(commit_message='update PURCHASES_FILE via getraenkeKasse.py')
+            functions.git_push(commit_message='update PURCHASES_FILE via getraenkeKasse.py')
         self.get_purchases()
 
         # code for adding the stock column to PRODUCTS_FILE
         if functions.check_column_nr_in_file(functions.PRODUCTS_FILE) == 4:
             functions.transform_products()
-            if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
-                functions.git_push(commit_message='update PRODUCTS_FILE via getraenkeKasse.py')
+            functions.git_push(commit_message='update PRODUCTS_FILE via getraenkeKasse.py')
         self.get_products()
 
         userframe.UserFrame(self)
@@ -185,34 +183,34 @@ class GetraenkeKasse():
 if __name__ == "__main__":
 
     gk = GetraenkeKasse()
-    if 'BARCODE_DEV' not in os.environ:
-        # check network
-        if not functions.checkNetwork():
-            gk.show_error_dialog(error_message='No network available. Exiting...')
-            sys.exit()
 
+    # check network
+    if not functions.checkNetwork():
+        gk.show_error_dialog(error_message='No network available. Exiting...')
+        gk.exit()
+
+    if 'BARCODE_DEV' not in os.environ:
         # test local time
         timeT = functions.getTimefromNTP()
         if timeT[0] != time.ctime():
             gk.show_error_dialog(error_message='Date/time not synchronized with NTP. Exiting...')
-            sys.exit()
+            gk.exit()
 
-    if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
-        # check for new commits in local repository
-        if not functions.git_pull("./."):
-            gk.show_error_dialog(error_message='Problem with git (local repo). Exiting...')
-            sys.exit()
+    # check for new commits in local repository
+    if not functions.git_pull("./."):
+        gk.show_error_dialog(error_message='Problem with git (local repo). Exiting...')
+        gk.exit()
 
-        # check for new version of getraenkeKasse.py script on github
-        hasher_old = functions.getMD5Hash("barcodeRaspi/getraenkeKasse.py")
-        if not functions.git_pull("barcodeRaspi"):
-            gk.show_error_dialog(error_message='Problem with git (GitHub). Exiting...')
-            sys.exit()
+    # check for new version of getraenkeKasse.py script on github
+    hash_old = functions.getMD5Hash("barcodeRaspi/getraenkeKasse.py")
+    if not functions.git_pull("barcodeRaspi"):
+        gk.show_error_dialog(error_message='Problem with git (GitHub). Exiting...')
+        gk.exit()
 
-        hasher_new = functions.getMD5Hash("barcodeRaspi/getraenkeKasse.py")
-        if hasher_new.hexdigest() != hasher_old.hexdigest():
-            # getraenkeKasse.py has changed, script is restarted
-            print("new version from gitHub, script is restarting...")
-            gk.restart()
+    hash_new = functions.getMD5Hash("barcodeRaspi/getraenkeKasse.py")
+    if hash_new.hexdigest() != hash_old.hexdigest():
+        # getraenkeKasse.py has changed, script is restarted
+        print("new version from gitHub, script is restarting...")
+        gk.restart()
 
     gk.run()
