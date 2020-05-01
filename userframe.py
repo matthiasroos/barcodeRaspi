@@ -1,4 +1,3 @@
-
 import wx
 
 
@@ -24,7 +23,6 @@ class UserFrame(wx.Frame):
                                              pos=(posX, posY)))
                 self.button[i].SetFont(prt.displaySettings.wxFont)
                 self.button[i].Bind(wx.EVT_LEFT_UP, self._onClickNameButton)
-                # self.buildButtons(button[i])
                 if (posY + 2 * prt.displaySettings.btnHeight + offset) < prt.displaySettings.screen_height:
                     posY = posY + prt.displaySettings.btnHeight + offset
                 else:
@@ -42,7 +40,7 @@ class UserFrame(wx.Frame):
             # Admin button
             self.btnAdmin = wx.Button(self.panel, id=wx.ID_ANY, label="Admin", name="admin",
                                       size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
-                                      pos=(prt.displaySettings.screen_width - 1 * prt.displaySettings.btnWidth,
+                                      pos=(prt.displaySettings.screen_width - 1*prt.displaySettings.btnWidth,
                                            prt.displaySettings.screen_height - 2*prt.displaySettings.btnHeight))
             self.btnAdmin.SetFont(prt.displaySettings.wxFont)
             self.btnAdmin.Bind(wx.EVT_LEFT_UP, self._onClickAdminButton)
@@ -70,4 +68,3 @@ class UserFrame(wx.Frame):
     def _onClickAdminButton(self, event):
         """"""
         self.parent.show_admin_frame()
-

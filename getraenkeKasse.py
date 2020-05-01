@@ -198,7 +198,6 @@ if __name__ == "__main__":
             sys.exit()
 
     if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
-        print('yes2')
         # check for new commits in local repository
         if not functions.git_pull("./."):
             gk.show_error_dialog(error_message='Problem with git (local repo). Exiting...')

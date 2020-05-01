@@ -30,14 +30,12 @@ class SortableListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
             nr_columns = len(columns.get('names'))
             for i in range(0, nr_columns):
                 self.sortable_list_ctrl.InsertColumn(i, columns.get('names')[i], width=columns.get('width')[i])
-            index = 0
             values_dict = {}
             for index, row in data_frame.iterrows():
                 values_list = [row[column] for column in columns.get('names')]
                 values_dict[index] = values_list
                 self.sortable_list_ctrl.Append([columns.get('type')[i](value) for i, value in enumerate(values_list)])
                 self.sortable_list_ctrl.SetItemData(index, index)
-                index += 1
 
             self.itemDataMap = values_dict  # used by ColumnSorterMixin
             listmix.ColumnSorterMixin.__init__(self, 3)
