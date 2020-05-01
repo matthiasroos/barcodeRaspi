@@ -92,7 +92,7 @@ def git_pull(path_repo: str) -> bool:
 
 
 @check_environment_ONLY_PROD
-def git_push(path_repo: str, commit_message: str = 'purchase via getraenkeKasse.py') -> bool:
+def git_push(path_repo: str, commit_message: str) -> bool:
     try:
         repo_local = git.Repo(path_repo)
         repo_local.git.add(PURCHASES_FILE)

@@ -76,19 +76,8 @@ class ScanFrame(wx.Frame):
         """"""
         self.Disable()
         self.Update()
-
-        # check local repo for changes
-        if not functions.git_pull("./."):
-            self.parent.show_error_dialog(error_message='Problem with git (local repo).')
-
         functions.check_environment_ONLY_PROD(time.sleep(7))
-
         self.parent.make_purchase(user=self.parent.clicked_user, code=self.Code.GetValue())
-
-        # commit & push purchase
-        if not functions.git_push("./."):
-            self.parent.show_error_dialog(error_message='Problem with git (local repo).')
-
         self.Close()
 
     def _onChangeCode(self, event):
