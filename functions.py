@@ -34,6 +34,15 @@ def check_environment_TEST_PROD(func):
     return wrapper
 
 
+def check_environment_ONLY_DEV(func):
+    def wrapper(*args, **kwargs):
+        if 'BARCODE_DEV' in os.environ:
+            return func(*args, **kwargs)
+        else:
+            return True
+    return wrapper
+
+
 def getMD5Hash(filename: str):
     hasher = hashlib.md5()
     with open(filename, 'rb') as afile:
