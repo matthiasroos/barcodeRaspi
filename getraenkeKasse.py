@@ -119,6 +119,15 @@ class GetraenkeKasse():
         else:
             return False
 
+    def show_password_dialog(self, password_message: str) -> bool:
+        dlg = wx.PasswordEntryDialog(parent=None, message=password_message,
+                                     defaultValue='', style=wx.OK | wx.CANCEL)
+        dlg.SetFont(self.displaySettings.wxFont)
+        dlg.ShowModal()
+        if dlg.GetValue() == os.getenv('ADMIN_PASSWORD'):
+            return True
+        return False
+
     def bring_git_repo_up_to_date(self, path_repo: str, error_message: str, should_exit: bool = False) -> None:
         if not functions.git_pull(path_repo):
             self.show_error_dialog(error_message=error_message)

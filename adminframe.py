@@ -18,6 +18,8 @@ class AdminFrame(wx.Frame):
             prt.get_purchases()
             prt.get_products()
 
+            if not prt.show_password_dialog(password_message='Please enter administrator PIN'):
+                self.Close()
 
             self.notebook = wx.Notebook(self.panel, pos=(0, 0),
                                         size=wx.Size(prt.displaySettings.screen_width-prt.displaySettings.btnWidth,
