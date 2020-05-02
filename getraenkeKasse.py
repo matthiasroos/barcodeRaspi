@@ -119,14 +119,14 @@ class GetraenkeKasse():
         else:
             return False
 
-    def _bring_git_repo_up_to_date(self, path_repo: str, error_message: str, should_exit: bool = False) -> None:
+    def bring_git_repo_up_to_date(self, path_repo: str, error_message: str, should_exit: bool = False) -> None:
         if not functions.git_pull(path_repo):
             self.show_error_dialog(error_message=error_message)
             if should_exit:
                 self.exit()
 
-    def _check_in_changes_into_git(self, path_repo: str, commit_message: str,
-                                   error_message: str = 'Problem with git (local repo).') -> None:
+    def check_in_changes_into_git(self, path_repo: str, commit_message: str,
+                                  error_message: str = 'Problem with git (local repo).') -> None:
         if not functions.git_push(path_repo=path_repo, commit_message=commit_message):
             self.show_error_dialog(error_message=error_message)
 
@@ -143,13 +143,13 @@ class GetraenkeKasse():
         self.fileContents.products.loc[self.fileContents.products['nr'] == nr, 'stock'] = stock
 
     def replenish_stock(self, changed_stock: typing.List[typing.List[int]]):
-        self._bring_git_repo_up_to_date(path_repo='./.', error_message='Problem with git (local repo).')
+        self.bring_git_repo_up_to_date(path_repo='./.', error_message='Problem with git (local repo).')
         for product in changed_stock:
             nr, stock_old, stock_new = product
             if stock_old != stock_new:
                 self._set_stock_for_product(nr=nr, stock=stock_new)
         self._save_products()
-        self._check_in_changes_into_git(path_repo='./.', commit_message='replenish stock via getraenkeKasse.py')
+        self.check_in_changes_into_git(path_repo='./.', commit_message='replenish stock via getraenkeKasse.py')
 
     def _decrease_stock_for_product(self, code: str) -> bool:
         if self.fileContents.products.loc[self.fileContents.products['code'] == code, 'stock'].values > 0:
@@ -167,20 +167,20 @@ class GetraenkeKasse():
         self.fileContents.purchases.loc[self.fileContents.purchases['user'] == user, 'paid'] = True
 
     def pay_for_user(self, user):
-        self._bring_git_repo_up_to_date(path_repo='./.', error_message='Problem with git (local repo).')
+        self.bring_git_repo_up_to_date(path_repo='./.', error_message='Problem with git (local repo).')
         self._set_paid_for_user(user=user)
         self._save_purchases()
-        self._check_in_changes_into_git(path_repo='./.', commit_message=f'pay for user {user} via getraenkeKasse.py')
+        self.check_in_changes_into_git(path_repo='./.', commit_message=f'pay for user {user} via getraenkeKasse.py')
 
     def make_purchase(self, user: str, code: str):
-        self._bring_git_repo_up_to_date(path_repo='./.', error_message='Problem with git (local repo).')
+        self.bring_git_repo_up_to_date(path_repo='./.', error_message='Problem with git (local repo).')
         self.fileContents.purchases = functions.add_purchase(purchases=self.fileContents.purchases,
                                                              user=user, code=code)
         self._save_purchases()
         result = self._decrease_stock_for_product(code=code)
         if result:
             self._save_products()
-            self._check_in_changes_into_git(path_repo='./.', commit_message='purchase via getraenkeKasse.py')
+            self.check_in_changes_into_git(path_repo='./.', commit_message='purchase via getraenkeKasse.py')
         else:
             # TODO issue warning for selling without stock
             pass
@@ -211,11 +211,11 @@ if __name__ == "__main__":
             gk.exit()
 
     # check for new commits in local repository
-    gk._bring_git_repo_up_to_date(path_repo='./.', error_message='Problem with git (local repo).', should_exit=True)
+    gk.bring_git_repo_up_to_date(path_repo='./.', error_message='Problem with git (local repo).', should_exit=True)
 
     # check for new version of getraenkeKasse.py script on github
     hash_old = functions.getMD5Hash('barcodeRaspi/getraenkeKasse.py')
-    gk._bring_git_repo_up_to_date(path_repo='barcodeRaspi', error_message='Problem with git (GitHub). Exiting...', should_exit=True)
+    gk.bring_git_repo_up_to_date(path_repo='barcodeRaspi', error_message='Problem with git (GitHub). Exiting...', should_exit=True)
 
     hash_new = functions.getMD5Hash('barcodeRaspi/getraenkeKasse.py')
     if hash_new.hexdigest() != hash_old.hexdigest():
