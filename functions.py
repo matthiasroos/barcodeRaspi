@@ -43,16 +43,16 @@ def check_environment_ONLY_DEV(func):
     return wrapper
 
 
-def getMD5Hash(filename: str):
-    hasher = hashlib.md5()
-    with open(filename, 'rb') as afile:
-        buf = afile.read()
-        hasher.update(buf)
-    return hasher
+def getMD5Hash(filename: str) -> hashlib:
+    hash_obj = hashlib.md5()
+    with open(filename, 'rb') as file:
+        buf = file.read()
+        hash_obj.update(buf)
+    return hash_obj
 
 
 @check_environment_TEST_PROD
-def checkNetwork(host="8.8.8.8", port=53, timeout=3):
+def checkNetwork(host="8.8.8.8", port=53, timeout=3) -> bool:
     """
     Host: 8.8.8.8 (google-public-dns-a.google.com)
     OpenPort: 53/tcp
@@ -115,7 +115,7 @@ def git_push(path_repo: str, commit_message: str) -> bool:
         return False
 
 
-def check_for_file(file):
+def check_for_file(file) -> None:
     if not os.path.isfile(file):
         raise Exception(f'{file} not found!')
 
@@ -155,7 +155,7 @@ def calc_length_code(products_df: pd.DataFrame) -> set:
     return length
 
 
-def check_column_nr_in_file(file):
+def check_column_nr_in_file(file) -> int:
     check_for_file(file)
     df = pd.read_csv(file, header=None)
     nr = len(df.columns)
@@ -188,19 +188,19 @@ def summarize_user_purchases(purchases: pd.DataFrame, products: pd.DataFrame) ->
     return summary_purchases_df
 
 
-def add_purchase(purchases: pd.DataFrame, user: str, code: str):
+def add_purchase(purchases: pd.DataFrame, user: str, code: str) -> pd.DataFrame:
     new_purchase = pd.DataFrame([[datetime.datetime.now().isoformat(), user, code, False]],
                                 columns=['timestamp', 'user', 'code', 'paid'])
     purchases = purchases.append(new_purchase, ignore_index=True)
     return purchases
 
 
-def write_csv_file(file, df: pd.DataFrame):
+def write_csv_file(file, df: pd.DataFrame) -> None:
     check_for_file(file)
     df.to_csv(file, header=False, index=False)
 
 
-def transform_purchases():
+def transform_purchases() -> None:
     check_for_file(PURCHASES_FILE)
     try:
         purchases_df = pd.read_csv(PURCHASES_FILE, header=None)
@@ -217,7 +217,7 @@ def transform_purchases():
 
 
 # TO DO: rewrite function
-def retransform_purchases():
+def retransform_purchases() -> None:
     purchases_df = pd.DataFrame([], columns=['timestamp', 'user', 'code', 'paid'])
     if not os.path.isfile('purchase_new.txt'):
         raise Exception("purchases_new.txt not found!")
@@ -235,7 +235,7 @@ def retransform_purchases():
     filePurchases_old.close()
 
 
-def transform_products():
+def transform_products() -> None:
     check_for_file(PRODUCTS_FILE)
     try:
         products_df = pd.read_csv(PRODUCTS_FILE, header=None)
