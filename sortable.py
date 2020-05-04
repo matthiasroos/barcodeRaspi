@@ -38,7 +38,7 @@ class SortableListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
                 self.sortable_list_ctrl.SetItemData(index, index)
 
             self.itemDataMap = values_dict  # used by ColumnSorterMixin
-            listmix.ColumnSorterMixin.__init__(self, 3)
+            listmix.ColumnSorterMixin.__init__(self, nr_columns)
             self.sortable_list_ctrl.Bind(wx.EVT_LIST_COL_CLICK, self._OnColumnClick)
             self.sortable_list_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self._OnItemClick)
 

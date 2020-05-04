@@ -96,7 +96,7 @@ class UserTabPanel(wx.Panel):
             self.all_users_purchases = functions.summarize_user_purchases(purchases=ssprt.fileContents.purchases,
                                                                           products=ssprt.fileContents.products)
 
-            users_list = self.all_users_purchases['name'].to_list()
+            users_list = self.all_users_purchases['name'].tolist()
             self.userChoice = wx.Choice(self, choices=users_list,
                                         pos=(200, ssprt.displaySettings.screen_height*1/5), size=(150, 50))
             self.userChoice.SetFont(ssprt.displaySettings.wxFont)
