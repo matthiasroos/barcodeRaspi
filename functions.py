@@ -5,10 +5,8 @@ import os
 import socket
 import struct
 import time
-import typing
 
 import git
-import numpy as np
 import pandas as pd
 
 USERS_FILE = "user.txt"
@@ -74,6 +72,7 @@ def getTimefromNTP():
     data = b'\x1b' + 47 * b'\0'
     client.sendto(data, (addrNTP, 123))
     data, address = client.recvfrom(1024)
+    t = 0
     if data:
         t = struct.unpack('!12I', data)[10]
         t -= REFERENCE_TIME_1970
@@ -95,7 +94,7 @@ def git_pull(path_repo: str) -> bool:
             print("!! stderr was:")
             print(exception.stderr)
         return False
-    except git.InvalidGitRepositoryError as exception:
+    except git.InvalidGitRepositoryError:
         print('Invalid Git Repository')
         return False
 

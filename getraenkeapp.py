@@ -2,7 +2,7 @@
 import dataclasses
 import os
 import sys
-import typing
+from typing import List
 
 import pandas as pd
 import wx
@@ -38,7 +38,7 @@ class DisplaySettings:
     screen_height: int = None
 
 
-class GetraenkeApp():
+class GetraenkeApp:
 
     def __init__(self):
         self.version = getraenkeKasse.VERSION
@@ -97,7 +97,7 @@ class GetraenkeApp():
 
     def show_error_dialog(self, error_message: str):
         dlg = wx.MessageDialog(None, message=error_message, caption='ERROR',
-                               style=wx.OK | wx.ICON_WARNING| wx.STAY_ON_TOP )
+                               style=wx.OK | wx.ICON_WARNING | wx.STAY_ON_TOP)
         dlg.SetFont(self.displaySettings.wxFont)
         dlg.ShowModal()
 
@@ -149,7 +149,7 @@ class GetraenkeApp():
     def _set_stock_for_product(self, nr: int, stock: int):
         self.fileContents.products.loc[self.fileContents.products['nr'] == nr, 'stock'] = stock
 
-    def replenish_stock(self, changed_stock: typing.List[typing.List[int]]):
+    def replenish_stock(self, changed_stock: List[List[int]]):
         self.bring_git_repo_up_to_date(path_repo='./.', error_message='Problem with git (local repo).')
         for product in changed_stock:
             nr, stock_old, stock_new = product

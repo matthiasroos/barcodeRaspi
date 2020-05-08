@@ -90,7 +90,6 @@ class ProductStatistics:
         return favored_by_user_str, product_summary.at[0, 'drinks']/sum(product_summary['drinks'])
 
     def get_product_statistic(self):
-        product_str = f'{self.product_information.desc}\nfavored by user: {self.product_information.favored_by_user}\n' \
-                      f'ratio of fav. user: {"{:4.3f}".format(self.product_information.ratio_by_user)}'
+        product_str = f'{self.product_information.desc}\nfavored by user: {self.product_information.favored_by_user}' \
+                      f'\nratio of fav. user: {"{:4.3f}".format(self.product_information.ratio_by_user)}'
         return product_str
-
