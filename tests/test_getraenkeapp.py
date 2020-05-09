@@ -11,6 +11,7 @@ import getraenkeapp
 
 @pytest.fixture
 def mock_getraenkekasse():
+    unittest.mock.patch('wx.App', autospec=True)
     gk = getraenkeapp.GetraenkeApp()
     products = [[1, '1111111111111', 'xxxx', 0.60, 20], [2, '2222222222222', 'yyyy', 0.80, 0]]
     gk.fileContents.products = pd.DataFrame(products, columns=['nr', 'code', 'desc', 'price', 'stock'])
