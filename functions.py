@@ -124,11 +124,10 @@ def read_users() -> list:
     Read users from usersFile
     """
     check_for_file(USERS_FILE)
-    file_users = open(USERS_FILE, "r")
-    users = []
-    for line in file_users:
-        users.append(line.rstrip())
-    file_users.close()
+    with open(USERS_FILE, "r") as file_users:
+        users = []
+        for line in file_users:
+            users.append(line.rstrip())
     return users
 
 
@@ -206,11 +205,10 @@ def transform_purchases() -> None:
         purchases_df.columns = ['timestamp', 'user', 'code']
         purchases_df['paid'] = False
         purchases_df['paid'] = purchases_df['paid'].astype(str)
-        filePurchases_new = open(PURCHASES_FILE, 'w+')
-        for _, row in purchases_df.iterrows():
-            line = f"{row['timestamp']},{row['user']},{row['code']},{row['paid']}\n"
-            filePurchases_new.writelines(line)
-        filePurchases_new.close()
+        with open(PURCHASES_FILE, 'w+') as filePurchases_new:
+            for _, row in purchases_df.iterrows():
+                line = f"{row['timestamp']},{row['user']},{row['code']},{row['paid']}\n"
+                filePurchases_new.writelines(line)
     except pd.errors.EmptyDataError:
         pass
 
@@ -227,11 +225,10 @@ def retransform_purchases() -> None:
         purchases_df['paid'] = purchases_df['paid'].astype(bool)
     except pd.errors.EmptyDataError:
         pass
-    filePurchases_old = open('purchase_old.txt', 'w+')
-    for index, row in purchases_df.iterrows():
-        line = row['timestamp'] + ',' + row['user'] + ',' + row['code'] + '\n'
-        filePurchases_old.writelines(line)
-    filePurchases_old.close()
+    with open('purchase_old.txt', 'w+') as filePurchases_old:
+        for index, row in purchases_df.iterrows():
+            line = row['timestamp'] + ',' + row['user'] + ',' + row['code'] + '\n'
+            filePurchases_old.writelines(line)
 
 
 def transform_products() -> None:
@@ -239,10 +236,9 @@ def transform_products() -> None:
     try:
         products_df = pd.read_csv(PRODUCTS_FILE, header=None)
         products_df.columns = ['nr', 'code', 'desc', 'price']
-        filePurchases_new = open(PRODUCTS_FILE, 'w+')
-        for _, row in products_df.iterrows():
-            line = f"{row['nr']},{row['code']},{row['desc']},{row['price']},0\n"
-            filePurchases_new.writelines(line)
-        filePurchases_new.close()
+        with open(PRODUCTS_FILE, 'w+') as filePurchases_new:
+            for _, row in products_df.iterrows():
+                line = f"{row['nr']},{row['code']},{row['desc']},{row['price']},0\n"
+                filePurchases_new.writelines(line)
     except pd.errors.EmptyDataError:
         pass
