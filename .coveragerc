@@ -1,2 +1,4 @@
 [report]
-include = functions.py
+include =
+            functions.py
+            getraenkeapp.py
