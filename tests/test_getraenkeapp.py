@@ -10,10 +10,12 @@ import getraenkeapp
 
 
 @pytest.fixture
-def mock_getraenkekasse():
+def mock_getraenkekasse(request):
     with unittest.mock.patch('wx.App', autospec=True), \
          unittest.mock.patch('wx.SystemSettings', autospec=True), \
-         unittest.mock.patch('wx.Font', autospec=True):
+         unittest.mock.patch('wx.Font', autospec=True), \
+         unittest.mock.patch('functions.git_pull', autospec=True) as mock_git_pull:
+        mock_git_pull.return_value = request.param['status_git_pull']
         gk = getraenkeapp.GetraenkeApp()
         products = [[1, '1111111111111', 'xxxx', 0.60, 20], [2, '2222222222222', 'yyyy', 0.80, 0]]
         gk.fileContents.products = pd.DataFrame(products, columns=['nr', 'code', 'desc', 'price', 'stock'])
@@ -25,6 +27,7 @@ def mock_getraenkekasse():
     return gk
 
 
+@pytest.mark.parametrize('mock_getraenkekasse', [dict(status_git_pull=True)], indirect=True)
 def test_decrease_stock_for_product(mock_getraenkekasse):
     status = mock_getraenkekasse._decrease_stock_for_product('1111111111111')
     new_value = mock_getraenkekasse.fileContents.products.loc[
@@ -39,6 +42,7 @@ def test_decrease_stock_for_product(mock_getraenkekasse):
     assert new_value == 0
 
 
+@pytest.mark.parametrize('mock_getraenkekasse', [dict(status_git_pull=True)], indirect=True)
 def test_set_paid_for_user(mock_getraenkekasse):
     mock_getraenkekasse._set_paid_for_user(user='bbb')
     assert mock_getraenkekasse.fileContents.purchases['paid'].tolist() == [False, True, True]
