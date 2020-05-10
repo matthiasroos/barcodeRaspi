@@ -9,7 +9,7 @@ import pytest
 import getraenkeapp
 
 
-@pytest.fixture
+@pytest.fixture(scope='function', autouse=False)
 def mock_getraenkekasse(request):
     with unittest.mock.patch('wx.App', autospec=True), \
          unittest.mock.patch('wx.SystemSettings', autospec=True), \
