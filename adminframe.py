@@ -28,11 +28,11 @@ class AdminFrame(wx.Frame):
             self.tab1 = UserTabPanel(parent=self.notebook, super_parent=self, super_super_parent=prt)
             products_df = prt.fileContents.products.copy()
             products_df['new_st'] = products_df['stock']
-            self.tab2 = StockTabPanel(parent=self.notebook, super_parent=self, super_super_parent=prt,
-                                      columns={'names': ['nr', 'desc', 'stock', 'new_st'],
-                                               'width': [80, 320, 105, 105],
-                                               'type': [int, str, int, int]},
-                                      data_frame=products_df[['nr', 'desc', 'stock', 'new_st']])
+            self.tab2 = sortable.SortableListCtrlPanel(parent=self.notebook, super_parent=prt,
+                                                       columns={'names': ['nr', 'desc', 'stock', 'new_st'],
+                                                                'width': [80, 320, 100, 100],
+                                                                'type': [int, str, int, int]},
+                                                       data_frame=products_df[['nr', 'desc', 'stock', 'new_st']])
             self.notebook.SetFont(prt.displaySettings.wxFont)
             self.notebook.AddPage(self.tab1, 'USER')
             self.notebook.AddPage(self.tab2, 'STOCK')
@@ -51,6 +51,14 @@ class AdminFrame(wx.Frame):
             self.btnSave.SetFont(prt.displaySettings.wxFont)
             self.btnSave.Bind(wx.EVT_LEFT_UP, self._onClickSaveButton)
             self.btnSave.Hide()
+
+            self.btnEdit = wx.Button(self.panel, id=wx.ID_ANY, label='edit', name='edit',
+                                     size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
+                                     pos=(prt.displaySettings.screen_width - 1 * prt.displaySettings.btnWidth,
+                                          prt.displaySettings.screen_height - 3 * prt.displaySettings.btnHeight))
+            self.btnEdit.SetFont(prt.displaySettings.wxFont)
+            self.btnEdit.Bind(wx.EVT_LEFT_UP, self._onClickEditButton)
+            self.btnEdit.Hide()
 
         self.ShowFullScreen(True)
 
@@ -71,12 +79,26 @@ class AdminFrame(wx.Frame):
             self.parent.replenish_stock(changed_stock=changed_stock)
             self.changed = False
 
+    def _onClickEditButton(self, event):
+        focus = self.tab2.sortable_list_ctrl.GetFocusedItem()
+        stock_old = int(self.tab2.sortable_list_ctrl.GetItem(focus, 2).GetText())
+        stock_new = int(self.tab2.sortable_list_ctrl.GetItem(focus, 3).GetText())
+        dlg = NewStockInputDialog(parent=self.tab2, super_parent=self.parent, title='Stock',
+                                  size=(600, 300), style=wx.STAY_ON_TOP, stock_old=stock_old, stock_new=stock_new)
+        result = dlg.ShowModal()
+        if result == wx.ID_OK:
+            self.tab2.sortable_list_ctrl.SetItem(focus, 3, str(dlg.stock_new))
+            self.changed = True
+        dlg.Destroy()
+
     def _onNotebookChanged(self, event):
         try:
             if self.notebook.GetSelection() == 1:
                 self.btnSave.Show()
+                self.btnEdit.Show()
             else:
                 self.btnSave.Hide()
+                self.btnEdit.Hide()
         except AttributeError or RuntimeError:
             pass
 
@@ -123,27 +145,6 @@ class UserTabPanel(wx.Panel):
         if self.chosen_user:
             self.super_super_parent.pay_for_user(user=self.chosen_user)
             self.userSum.SetLabel(label=f"{self.chosen_user}:\t\t0.00")
-
-
-class StockTabPanel(sortable.SortableListCtrlPanel):
-
-    def __init__(self, parent, super_parent, super_super_parent, columns: dict, data_frame: pd.DataFrame):
-        super().__init__(parent, super_super_parent, columns, data_frame)
-        self.parent = parent
-        self.super_parent = super_parent
-        self.super_super_parent = super_super_parent
-
-    def _OnItemClick(self, event):
-        focus = self.sortable_list_ctrl.GetFocusedItem()
-        stock_old = int(self.sortable_list_ctrl.GetItem(focus, 2).GetText())
-        stock_new = int(self.sortable_list_ctrl.GetItem(focus, 3).GetText())
-        dlg = NewStockInputDialog(parent=self.parent, super_parent=self.super_super_parent, title='Stock',
-                                  size=(600, 300), style=wx.STAY_ON_TOP, stock_old=stock_old, stock_new=stock_new)
-        result = dlg.ShowModal()
-        if result == wx.ID_OK:
-            self.sortable_list_ctrl.SetItem(focus, 3, str(dlg.stock_new))
-            self.super_parent.changed = True
-        dlg.Destroy()
 
 
 class NewStockInputDialog(wx.Dialog):
