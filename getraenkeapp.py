@@ -127,7 +127,7 @@ class GetraenkeApp:
         return False
 
     def bring_git_repo_up_to_date(self, path_repo: str, error_message: str, should_exit: bool = False) -> None:
-        if not functions.git_pull(path_repo):
+        if not functions.git_pull(path_repo=path_repo):
             self.show_error_dialog(error_message=error_message)
             if should_exit:
                 self.exit()
@@ -170,10 +170,10 @@ class GetraenkeApp:
     def _save_purchases(self):
         functions.write_csv_file(file=functions.PURCHASES_FILE, df=self.fileContents.purchases)
 
-    def _set_paid_for_user(self, user):
+    def _set_paid_for_user(self, user: str):
         self.fileContents.purchases.loc[self.fileContents.purchases['user'] == user, 'paid'] = True
 
-    def pay_for_user(self, user):
+    def pay_for_user(self, user: str):
         self.bring_git_repo_up_to_date(path_repo='./.', error_message='Problem with git (local repo).')
         self._set_paid_for_user(user=user)
         self._save_purchases()
@@ -187,10 +187,10 @@ class GetraenkeApp:
         result = self._decrease_stock_for_product(code=code)
         if result:
             self._save_products()
-            self.check_in_changes_into_git(path_repo='./.', commit_message='purchase via getraenkeKasse.py')
         else:
             # TODO issue warning for selling without stock
             pass
+        self.check_in_changes_into_git(path_repo='./.', commit_message='purchase via getraenkeKasse.py')
 
     @property
     def clicked_user(self) -> str:
