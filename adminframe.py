@@ -56,7 +56,7 @@ class AdminFrame(wx.Frame):
 
     def _onClickBackButton(self, event):
         if self.changed:
-            if not self.parent.show_confirm_dialog(confirm_message='Do you want to discard '):
+            if not self.parent.show_confirm_dialog(confirm_message='Do you want to discard?'):
                 return None
         self.Close()
 
@@ -77,7 +77,7 @@ class AdminFrame(wx.Frame):
                 self.btnSave.Show()
             else:
                 self.btnSave.Hide()
-        except AttributeError:
+        except AttributeError or RuntimeError:
             pass
 
 

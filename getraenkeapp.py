@@ -120,7 +120,7 @@ class GetraenkeApp:
     def show_password_dialog(self, password_message: str) -> bool:
         dlg = wx.PasswordEntryDialog(parent=None, message=password_message,
                                      defaultValue='', style=wx.OK | wx.CANCEL)
-        dlg.SetFont(self.displaySettings.wxFont)
+        # dlg.SetFont(self.displaySettings.wxFont)
         dlg.ShowModal()
         if dlg.GetValue() == os.getenv('ADMIN_PASSWORD'):
             return True
