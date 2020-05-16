@@ -30,7 +30,7 @@ class AdminFrame(wx.Frame):
             products_df['new_st'] = products_df['stock']
             self.tab2 = StockTabPanel(parent=self.notebook, super_parent=self, super_super_parent=prt,
                                       columns={'names': ['nr', 'desc', 'stock', 'new_st'],
-                                               'width': [80, 420, 130, 130],
+                                               'width': [80, 320, 105, 105],
                                                'type': [int, str, int, int]},
                                       data_frame=products_df[['nr', 'desc', 'stock', 'new_st']])
             self.notebook.SetFont(prt.displaySettings.wxFont)

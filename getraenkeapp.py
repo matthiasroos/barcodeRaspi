@@ -98,19 +98,19 @@ class GetraenkeApp:
     def show_error_dialog(self, error_message: str):
         dlg = wx.MessageDialog(None, message=error_message, caption='ERROR',
                                style=wx.OK | wx.ICON_WARNING | wx.STAY_ON_TOP)
-        dlg.SetFont(self.displaySettings.wxFont)
+        # dlg.SetFont(self.displaySettings.wxFont)
         dlg.ShowModal()
 
     def show_info_dialog(self, info_message: str):
         dlg = wx.MessageDialog(None, message=info_message, caption='INFO',
                                style=wx.OK | wx.ICON_INFORMATION | wx.STAY_ON_TOP)
-        dlg.SetFont(self.displaySettings.wxFont)
+        # dlg.SetFont(self.displaySettings.wxFont)
         dlg.ShowModal()
 
     def show_confirm_dialog(self, confirm_message: str) -> bool:
         dlg = wx.MessageDialog(None, message=confirm_message, caption='CONFIRM',
                                style=wx.OK | wx.CANCEL | wx.ICON_QUESTION | wx.STAY_ON_TOP)
-        dlg.SetFont(self.displaySettings.wxFont)
+        # dlg.SetFont(self.displaySettings.wxFont)
         choice = dlg.ShowModal()
         if choice == wx.ID_OK:
             return True

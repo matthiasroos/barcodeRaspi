@@ -77,7 +77,7 @@ def test_read_purchases0_file_not_found():
 
 
 def test_read_purchases1_empty_file():
-    # TO DO: write unit test if file is empty
+    # TODO: write unit test if file is empty
     pass
 
 
@@ -170,8 +170,8 @@ def test_transform_purchases():
 
 def test_transform_products():
     input_df = pd.DataFrame([[1, '1111111111111', 'xxxx', 0.60],
-                            [2, '2222222222222', 'yyyy', 0.80]],
-                           columns=['nr', 'code', 'desc', 'price'])
+                             [2, '2222222222222', 'yyyy', 0.80]],
+                            columns=['nr', 'code', 'desc', 'price'])
     with unittest.mock.patch('os.path.isfile', return_value=True), \
          unittest.mock.patch('pandas.read_csv', return_value=input_df), \
          unittest.mock.patch('builtins.open', unittest.mock.mock_open(), create=True) as mocked_open:
