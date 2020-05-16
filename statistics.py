@@ -49,7 +49,7 @@ class UserStatistics:
     def _calculate_drinks_per_day(self, user_purchases: pd.DataFrame) -> float:
         pass
 
-    def get_user_statistic(self):
+    def get_statistics(self):
         user_str = f'{self.user_information.name}\nfavorite drink: {self.user_information.favorite_drink}\n' \
                    f'ratio of fav. drink: {"{:4.3f}".format(self.user_information.favorite_drink_ratio)}'
         return user_str
@@ -91,7 +91,7 @@ class ProductStatistics:
         favored_by_user_str = product_summary.at[0, 'user']
         return favored_by_user_str, product_summary.at[0, 'drinks']/sum(product_summary['drinks'])
 
-    def get_product_statistic(self):
+    def get_statistics(self):
         product_str = f'{self.product_information.desc}\nfavored by user: {self.product_information.favored_by_user}' \
                       f'\nratio of fav. user: {"{:4.3f}".format(self.product_information.ratio_by_user)}'
         return product_str
