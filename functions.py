@@ -213,7 +213,7 @@ def transform_purchases() -> None:
         pass
 
 
-# TO DO: rewrite function
+# TODO: rewrite function
 def retransform_purchases() -> None:
     purchases_df = pd.DataFrame([], columns=['timestamp', 'user', 'code', 'paid'])
     if not os.path.isfile('purchase_new.txt'):

@@ -162,7 +162,20 @@ def test_transform_purchases():
          unittest.mock.patch('pandas.read_csv', return_value=input_df), \
          unittest.mock.patch('builtins.open', unittest.mock.mock_open(), create=True) as mocked_open:
         functions.transform_purchases()
-        mocked_open.assert_called_once_with('purchase.txt', 'w+')
+        mocked_open.assert_called_once_with(functions.PURCHASES_FILE, 'w+')
         mocked_open.mock_calls = [unittest.mock.call.writelines('2019-12-10T12:20:00,aaa,111111111111,False\n'),
                                   unittest.mock.call.writelines('2019-12-10T16:30:00,bbb,222222222222,False\n'),
                                   unittest.mock.call.writelines('2019-12-10T16:35:00,bbb,222222222222,False\n')]
+
+
+def test_transform_products():
+    input_df = pd.DataFrame([[1, '1111111111111', 'xxxx', 0.60],
+                            [2, '2222222222222', 'yyyy', 0.80]],
+                           columns=['nr', 'code', 'desc', 'price'])
+    with unittest.mock.patch('os.path.isfile', return_value=True), \
+         unittest.mock.patch('pandas.read_csv', return_value=input_df), \
+         unittest.mock.patch('builtins.open', unittest.mock.mock_open(), create=True) as mocked_open:
+        functions.transform_products()
+        mocked_open.assert_called_once_with(functions.PRODUCTS_FILE, 'w+')
+        mocked_open.mock_calls = [unittest.mock.call.writelines('1,1111111111111,xxxx,0.60,0\n'),
+                                  unittest.mock.call.writelines('2,2222222222222,yyyy,0.80,0\n')]
