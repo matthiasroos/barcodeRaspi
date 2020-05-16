@@ -14,9 +14,9 @@ import listframe
 import scanframe
 import userframe
 
-BUTTON_HEIGHT = 80
-BUTTON_WIDTH = 200
-FONT_SIZE = 25
+BUTTON_HEIGHT = 70
+BUTTON_WIDTH = 180
+FONT_SIZE = 20
 OFFSET = 5
 
 
