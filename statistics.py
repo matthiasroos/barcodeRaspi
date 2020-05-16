@@ -40,7 +40,8 @@ class UserStatistics:
         user_summary = user_purchases.groupby(by='code').agg({'timestamp': 'count'})
         user_summary.reset_index(inplace=True)
         user_summary.columns = ['code', 'drinks']
-        user_summary.sort_values(by='drinks', ascending=False, inplace=True, ignore_index=True)
+        user_summary.sort_values(by='drinks', ascending=False, inplace=True)
+        user_summary.reset_index(drop=True, inplace=True)
         favorite_drink_code = user_summary.at[0, 'code']
         favorite_drink_str = self.products[self.products['code'] == favorite_drink_code].reset_index().at[0, 'desc']
         return favorite_drink_str, user_summary.at[0, 'drinks']/sum(user_summary['drinks'])
@@ -85,7 +86,8 @@ class ProductStatistics:
         product_summary = product_purchases.groupby(by='user').agg({'timestamp': 'count'})
         product_summary.reset_index(inplace=True)
         product_summary.columns = ['user', 'drinks']
-        product_summary.sort_values(by='drinks', ascending=False, inplace=True, ignore_index=True)
+        product_summary.sort_values(by='drinks', ascending=False, inplace=True)
+        product_summary.reset_index(drop=True, inplace=True)
         favored_by_user_str = product_summary.at[0, 'user']
         return favored_by_user_str, product_summary.at[0, 'drinks']/sum(product_summary['drinks'])
 
