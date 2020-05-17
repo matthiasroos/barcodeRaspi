@@ -1,6 +1,5 @@
 
 import wx
-import pandas as pd
 
 import functions
 import sortable

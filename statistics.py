@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import dataclasses
-import typing
+from typing import Tuple
 
 import pandas as pd
 
@@ -36,7 +36,7 @@ class UserStatistics:
             self._determine_favorite_drink(user_purchases=user_purchases)
         self.user_information.drinks_per_day = self._calculate_drinks_per_day(user_purchases=user_purchases)
 
-    def _determine_favorite_drink(self, user_purchases: pd.DataFrame) -> typing.Tuple[str, float]:
+    def _determine_favorite_drink(self, user_purchases: pd.DataFrame) -> Tuple[str, float]:
         user_summary = user_purchases.groupby(by='code').agg({'timestamp': 'count'})
         user_summary.reset_index(inplace=True)
         user_summary.columns = ['code', 'drinks']
@@ -82,7 +82,7 @@ class ProductStatistics:
             self.product_information.favored_by_user, self.product_information.ratio_by_user = \
                 self._determine_favored_by_user(product_purchases=product_purchases)
 
-    def _determine_favored_by_user(self, product_purchases: pd.DataFrame) -> typing.Tuple[str, float]:
+    def _determine_favored_by_user(self, product_purchases: pd.DataFrame) -> Tuple[str, float]:
         product_summary = product_purchases.groupby(by='user').agg({'timestamp': 'count'})
         product_summary.reset_index(inplace=True)
         product_summary.columns = ['user', 'drinks']
