@@ -27,18 +27,17 @@ class SortableListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
                                                        pos=(offset, offset),
                                                        style=wx.LC_REPORT | wx.LC_HRULES | wx.LC_SORT_DESCENDING)
             self.sortable_list_ctrl.SetFont(sprt.displaySettings.wxFont)
-            nr_columns = len(columns.get('names'))
-            for i in range(0, nr_columns):
-                self.sortable_list_ctrl.InsertColumn(i, columns.get('names')[i], width=columns.get('width')[i])
+            for i, (name, width) in enumerate(zip(columns.get('names'), columns.get('width'))):
+                self.sortable_list_ctrl.InsertColumn(i, name, width=width)
             values_dict = {}
             for index, row in data_frame.iterrows():
                 values_list = [row[column] for column in columns.get('names')]
                 values_dict[index] = values_list
-                self.sortable_list_ctrl.Append([columns.get('type')[i](value) for i, value in enumerate(values_list)])
+                self.sortable_list_ctrl.Append([type_(value) for value, type_ in zip(values_list, columns.get('type'))])
                 self.sortable_list_ctrl.SetItemData(index, index)
 
             self.itemDataMap = values_dict  # used by ColumnSorterMixin
-            listmix.ColumnSorterMixin.__init__(self, nr_columns)
+            listmix.ColumnSorterMixin.__init__(self, len(columns.get('names')))
             self.sortable_list_ctrl.Bind(wx.EVT_LIST_COL_CLICK, self._OnColumnClick)
             self.sortable_list_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self._OnItemClick)
 

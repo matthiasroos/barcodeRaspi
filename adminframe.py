@@ -70,10 +70,11 @@ class AdminFrame(wx.Frame):
     def _onClickSaveButton(self, event):
         if self.changed:
             changed_stock = []
-            for i in range(0, self.tab2.sortable_list_ctrl.GetItemCount()):
-                nr = int(self.tab2.sortable_list_ctrl.GetItem(i, col=0).GetText())
-                stock_old = int(self.tab2.sortable_list_ctrl.GetItem(i, col=2).GetText())
-                stock_new = int(self.tab2.sortable_list_ctrl.GetItem(i, col=3).GetText())
+            count = self.tab2.sortable_list_ctrl.GetItemCount()
+            for row in range(0, count):
+                nr = int(self.tab2.sortable_list_ctrl.GetItem(row, col=0).GetText())
+                stock_old = int(self.tab2.sortable_list_ctrl.GetItem(row, col=2).GetText())
+                stock_new = int(self.tab2.sortable_list_ctrl.GetItem(row, col=3).GetText())
                 changed_stock.append([nr, stock_old, stock_new])
             self.parent.replenish_stock(changed_stock=changed_stock)
             self.changed = False

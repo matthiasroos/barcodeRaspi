@@ -17,9 +17,8 @@ class UserFrame(wx.Frame):
         with self.parent as prt:
             # User buttons
             self.button = []
-            for i in range(0, len(prt.fileContents.users)):
-                self.button.append(wx.Button(self.panel, id=wx.ID_ANY, label=prt.fileContents.users[i],
-                                             name=prt.fileContents.users[i],
+            for i, user in enumerate(prt.fileContents.users):
+                self.button.append(wx.Button(self.panel, id=wx.ID_ANY, label=user, name=user,
                                              size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
                                              pos=(posX, posY)))
                 self.button[i].SetFont(prt.displaySettings.wxFont)
@@ -48,7 +47,7 @@ class UserFrame(wx.Frame):
 
             self.textVersion = wx.StaticText(self.panel, label='ver. ' + prt.version,
                                              size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
-                                             pos=(prt.displaySettings.screen_width - 1*prt.displaySettings.btnWidth,
+                                             pos=(prt.displaySettings.screen_width - 0.9*prt.displaySettings.btnWidth,
                                                   prt.displaySettings.screen_height - 2.7*prt.displaySettings.btnHeight))
             self.textVersion.SetFont(prt.displaySettings.wxFont)
             self.SetBackgroundColour("Gray")
