@@ -119,16 +119,14 @@ def check_for_file(file) -> None:
         raise Exception(f'{file} not found!')
 
 
-def read_users() -> list:
+def read_users():
     """"
     Read users from usersFile
     """
     check_for_file(USERS_FILE)
     with open(USERS_FILE, "r") as file_users:
-        users = []
         for line in file_users:
-            users.append(line.rstrip())
-    return users
+            yield line.rstrip()
 
 
 def read_products() -> pd.DataFrame:
