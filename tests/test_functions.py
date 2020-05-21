@@ -24,18 +24,20 @@ def test_git_pull1():
 def test_read_users0_file_not_found():
     with unittest.mock.patch('os.path.isfile', return_value=False) as mocked_os:
         with pytest.raises(Exception) as exc:
-            functions.read_users()
-    mocked_os.assert_called_once_with('user.txt')
-    assert f'{functions.USERS_FILE} not found!' in str(exc.value)
+            users = functions.read_users(users_file='test_file')
+            next(users)
+    mocked_os.assert_called_once_with('test_file')
+    assert 'test_file not found!' in str(exc.value)
 
 
 def test_read_users1():
     expected_users_list = ['aaa', 'bbb', 'ccc']
     with unittest.mock.patch('os.path.isfile', return_value=True) as mocked_os:
         with unittest.mock.patch('builtins.open', unittest.mock.mock_open(read_data='aaa\nbbb\nccc')) as mocked_open:
-            users_list = functions.read_users()
-    mocked_os.assert_called_once_with('user.txt')
-    mocked_open.assert_called_once_with('user.txt', 'r')
+            gen_users_list = functions.read_users(users_file='test_file')
+            users_list = [user for user in gen_users_list]
+    mocked_os.assert_called_once_with('test_file')
+    mocked_open.assert_called_once_with('test_file', 'r')
     assert users_list == expected_users_list
 
 
