@@ -61,8 +61,8 @@ def test_read_products1():
 
 
 @pytest.mark.parametrize(['input_df', 'expected_set'],
-                         [(pd.DataFrame([1, 22, '', 4444], columns=['code']), {1, 2, 4}),
-                          (pd.DataFrame(['1', '22', '', '4444'], columns=['code']), {1, 2, 4})])
+                         [(pd.DataFrame(['1', '22', '', '4444'], columns=['code']), {1, 2, 4}),
+                          (pd.DataFrame(['1', '22', '', '4444', '0000'], columns=['code']), {1, 2, 4})])
 def test_calc_length_code(input_df, expected_set):
     output_set = functions.calc_length_code(input_df)
     assert output_set == expected_set
@@ -122,7 +122,7 @@ def test_summarize_user_purchases_standalone():
     expected_df = pd.DataFrame([['aaa', 2, 2.70], ['bbb', 2, 2.40]], columns=['name', 'drinks', 'money'])
     with unittest.mock.patch('functions.merge_purchases_products') as mocked_purchases:
         mocked_purchases.return_value = input_df
-        output_df = functions.summarize_user_purchases(purchases=None, products=None)
+        output_df = functions.summarize_user_purchases(purchases=pd.DataFrame(), products=pd.DataFrame())
     pd.testing.assert_frame_equal(output_df, expected_df)
 
 

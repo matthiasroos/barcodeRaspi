@@ -142,13 +142,10 @@ def read_products() -> pd.DataFrame:
 
 
 def calc_length_code(products_df: pd.DataFrame) -> set:
-    """"""
-    length = set()
-    for index, row in products_df.iterrows():
-        tmpLen = len(str(row['code']))
-        if tmpLen > 0:
-            length.add(tmpLen)
-    return length
+    """
+    Create set containing the length of the product codes
+    """
+    return {len(row['code']) for _, row in products_df.iterrows() if len(row['code']) > 0}
 
 
 def check_column_nr_in_file(file) -> int:
