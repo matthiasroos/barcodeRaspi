@@ -198,6 +198,7 @@ def transform_purchases() -> None:
     try:
         purchases_df = pd.read_csv(PURCHASES_FILE, header=None)
         purchases_df.columns = ['timestamp', 'user', 'code']
+        purchases_df['code'] = purchases_df['code'].astype(str)
         purchases_df['paid'] = False
         purchases_df['paid'] = purchases_df['paid'].astype(str)
         with open(PURCHASES_FILE, 'w+') as filePurchases_new:
@@ -208,22 +209,19 @@ def transform_purchases() -> None:
         pass
 
 
-# TODO: rewrite function
 def retransform_purchases() -> None:
-    purchases_df = pd.DataFrame([], columns=['timestamp', 'user', 'code', 'paid'])
-    if not os.path.isfile('purchase_new.txt'):
-        raise Exception("purchases_new.txt not found!")
+    check_for_file(PURCHASES_FILE)
     try:
-        purchases_df = pd.read_csv('purchase_new.txt', header=None)
+        purchases_df = pd.read_csv(PURCHASES_FILE, header=None)
         purchases_df.columns = ['timestamp', 'user', 'code', 'paid']
         purchases_df['code'] = purchases_df['code'].astype(str)
         purchases_df['paid'] = purchases_df['paid'].astype(bool)
+        with open('purchase_old.txt', 'w+') as filePurchases_old:
+            for _, row in purchases_df.iterrows():
+                line = f"{row['timestamp']},{row['user']},{row['code']}\n"
+                filePurchases_old.writelines(line)
     except pd.errors.EmptyDataError:
         pass
-    with open('purchase_old.txt', 'w+') as filePurchases_old:
-        for index, row in purchases_df.iterrows():
-            line = row['timestamp'] + ',' + row['user'] + ',' + row['code'] + '\n'
-            filePurchases_old.writelines(line)
 
 
 def transform_products() -> None:

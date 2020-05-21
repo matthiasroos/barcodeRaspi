@@ -168,6 +168,20 @@ def test_transform_purchases():
                                   unittest.mock.call.writelines('2019-12-10T16:35:00,bbb,222222222222,False\n')]
 
 
+def test_retransform_purchases():
+    file_content = """2019-12-10T12:20:00,aaa,111111111111,False\n2019-12-10T16:30:00,bbb,222222222222,False\n
+2019-12-10T16:35:00,bbb,222222222222,False"""
+    df_from_file = pd.read_csv(io.StringIO(file_content), header=None)
+    with unittest.mock.patch('os.path.isfile', return_value=True), \
+         unittest.mock.patch('pandas.read_csv', return_value=df_from_file), \
+         unittest.mock.patch('builtins.open', unittest.mock.mock_open(), create=True) as mocked_open:
+        functions.retransform_purchases()
+        mocked_open.assert_called_once_with('purchase_old.txt', 'w+')
+        mocked_open.mock_calls = [unittest.mock.call.writelines('2019-12-10T12:20:00,aaa,111111111111\n'),
+                                  unittest.mock.call.writelines('2019-12-10T16:30:00,bbb,222222222222\n'),
+                                  unittest.mock.call.writelines('2019-12-10T16:35:00,bbb,222222222222\n')]
+
+
 def test_transform_products():
     input_df = pd.DataFrame([[1, '1111111111111', 'xxxx', 0.60],
                              [2, '2222222222222', 'yyyy', 0.80]],
