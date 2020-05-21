@@ -3,7 +3,7 @@
 import os
 import time
 
-import getraenkeapp
+import src.getraenkeKasse.getraenkeapp
 import functions
 
 VERSION = '0.1.2'
@@ -11,7 +11,7 @@ VERSION = '0.1.2'
 
 if __name__ == "__main__":
 
-    gk = getraenkeapp.GetraenkeApp()
+    gk = src.getraenkeKasse.getraenkeapp.GetraenkeApp()
 
     # check network
     if not functions.checkNetwork():
@@ -30,7 +30,8 @@ if __name__ == "__main__":
 
     # check for new version of getraenkeKasse.py script on github
     hash_old = functions.getMD5Hash('barcodeRaspi/getraenkeKasse.py')
-    gk.bring_git_repo_up_to_date(path_repo='barcodeRaspi', error_message='Problem with git (GitHub). Exiting...', should_exit=True)
+    gk.bring_git_repo_up_to_date(path_repo='barcodeRaspi', error_message='Problem with git (GitHub). Exiting...',
+                                 should_exit=True)
 
     hash_new = functions.getMD5Hash('barcodeRaspi/getraenkeKasse.py')
     if hash_new.hexdigest() != hash_old.hexdigest():

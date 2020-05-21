@@ -2,8 +2,8 @@
 import wx
 
 import functions
-import sortable
-import statistics
+import src.getraenkeKasse.sortable
+import src.getraenkeKasse.statistics
 
 
 class ListFrame(wx.Frame):
@@ -20,18 +20,20 @@ class ListFrame(wx.Frame):
                                         size=wx.Size(prt.displaySettings.screen_width-prt.displaySettings.btnWidth,
                                                      prt.displaySettings.screen_height))
 
-            tab1 = sortable.SortableListCtrlPanel(parent=self.notebook, super_parent=prt,
-                                                  columns={'names': ['name', 'drinks', 'money'],
-                                                           'width': [180, 180, 180],
-                                                           'type': [str, int, '{:,.2f}'.format]},
-                                                  data_frame=functions.summarize_user_purchases(
-                                                      purchases=prt.fileContents.purchases,
-                                                      products=prt.fileContents.products))
-            tab2 = sortable.SortableListCtrlPanel(parent=self.notebook, super_parent=prt,
-                                                  columns={'names': ['nr', 'desc', 'price', 'stock'],
-                                                           'width': [80, 300, 120, 120],
-                                                           'type': [int, str, '{:,.2f}'.format, int]},
-                                                  data_frame=prt.fileContents.products[['nr', 'desc', 'price', 'stock']])
+            tab1 = src.getraenkeKasse.sortable.SortableListCtrlPanel(parent=self.notebook, super_parent=prt,
+                                                                     columns={'names': ['name', 'drinks', 'money'],
+                                                                              'width': [180, 180, 180],
+                                                                              'type': [str, int, '{:,.2f}'.format]},
+                                                                     data_frame=functions.summarize_user_purchases(
+                                                                         purchases=prt.fileContents.purchases,
+                                                                         products=prt.fileContents.products))
+            tab2 = src.getraenkeKasse.sortable.SortableListCtrlPanel(parent=self.notebook, super_parent=prt,
+                                                                     columns={'names': ['nr', 'desc', 'price', 'stock'],
+                                                                              'width': [80, 300, 120, 120],
+                                                                              'type': [int, str, '{:,.2f}'.format,
+                                                                                       int]},
+                                                                     data_frame=prt.fileContents.products[
+                                                                         ['nr', 'desc', 'price', 'stock']])
             self.notebook.SetFont(prt.displaySettings.wxFont)
             self.notebook.AddPage(tab1, 'USER')
             self.notebook.AddPage(tab2, 'STOCK')
@@ -83,13 +85,13 @@ class ListFrame(wx.Frame):
         clicked_item = current_page.sortable_list_ctrl.GetItem(focus).GetText()
         stat_obj = None
         if number_page == 0:
-            stat_obj = statistics.UserStatistics(user=clicked_item,
-                                                 purchases=self.parent.fileContents.purchases,
-                                                 products=self.parent.fileContents.products)
+            stat_obj = src.getraenkeKasse.statistics.UserStatistics(user=clicked_item,
+                                                                    purchases=self.parent.fileContents.purchases,
+                                                                    products=self.parent.fileContents.products)
         elif number_page == 1:
-            stat_obj = statistics.ProductStatistics(product_nr=int(clicked_item),
-                                                    purchases=self.parent.fileContents.purchases,
-                                                    products=self.parent.fileContents.products)
+            stat_obj = src.getraenkeKasse.statistics.ProductStatistics(product_nr=int(clicked_item),
+                                                                       purchases=self.parent.fileContents.purchases,
+                                                                       products=self.parent.fileContents.products)
         else:
             pass
         if stat_obj:

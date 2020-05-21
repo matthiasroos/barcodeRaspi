@@ -42,9 +42,9 @@ def test_read_users1():
 def test_read_products0_file_not_found():
     with unittest.mock.patch('os.path.isfile', return_value=False) as mocked_os:
         with pytest.raises(Exception) as exc:
-            functions.read_products()
-    mocked_os.assert_called_once_with('produkt.txt')
-    assert f'{functions.PRODUCTS_FILE} not found!' in str(exc.value)
+            functions.read_products(products_file='test_file')
+    mocked_os.assert_called_once_with('test_file')
+    assert 'test_file not found!' in str(exc.value)
 
 
 def test_read_products1():
@@ -55,8 +55,8 @@ def test_read_products1():
                                columns=['nr', 'code', 'desc', 'price', 'stock'])
     with unittest.mock.patch('os.path.isfile', return_value=True) as mocked_os:
         with unittest.mock.patch('pandas.read_csv', return_value=df_from_file):
-            prod_df = functions.read_products()
-    mocked_os.assert_called_once_with('produkt.txt')
+            prod_df = functions.read_products(products_file='test_file')
+    mocked_os.assert_called_once_with('test_file')
     pd.testing.assert_frame_equal(prod_df, expected_df)
 
 
@@ -71,9 +71,9 @@ def test_calc_length_code(input_df, expected_set):
 def test_read_purchases0_file_not_found():
     with unittest.mock.patch('os.path.isfile', return_value=False) as mocked_os:
         with pytest.raises(Exception) as exc:
-            functions.read_purchases()
-    mocked_os.assert_called_once_with('purchase.txt')
-    assert f'{functions.PURCHASES_FILE} not found!' in str(exc.value)
+            functions.read_purchases(purchases_file='test_file')
+    mocked_os.assert_called_once_with('test_file')
+    assert 'test_file not found!' in str(exc.value)
 
 
 def test_read_purchases1_empty_file():
@@ -91,8 +91,8 @@ def test_read_purchases2():
                                columns=['timestamp', 'user', 'code', 'paid'])
     with unittest.mock.patch('os.path.isfile', return_value=True) as mocked_os:
         with unittest.mock.patch('pandas.read_csv', return_value=df_from_file):
-            purchases_df = functions.read_purchases()
-    mocked_os.assert_called_once_with('purchase.txt')
+            purchases_df = functions.read_purchases(purchases_file='test_file')
+    mocked_os.assert_called_once_with('test_file')
     pd.testing.assert_frame_equal(purchases_df, expected_df)
 
 
@@ -161,8 +161,8 @@ def test_transform_purchases():
     with unittest.mock.patch('os.path.isfile', return_value=True), \
          unittest.mock.patch('pandas.read_csv', return_value=input_df), \
          unittest.mock.patch('builtins.open', unittest.mock.mock_open(), create=True) as mocked_open:
-        functions.transform_purchases()
-        mocked_open.assert_called_once_with(functions.PURCHASES_FILE, 'w+')
+        functions.transform_purchases(purchases_file='test_file')
+        mocked_open.assert_called_once_with('test_file', 'w+')
         mocked_open.mock_calls = [unittest.mock.call.writelines('2019-12-10T12:20:00,aaa,111111111111,False\n'),
                                   unittest.mock.call.writelines('2019-12-10T16:30:00,bbb,222222222222,False\n'),
                                   unittest.mock.call.writelines('2019-12-10T16:35:00,bbb,222222222222,False\n')]
@@ -175,7 +175,7 @@ def test_retransform_purchases():
     with unittest.mock.patch('os.path.isfile', return_value=True), \
          unittest.mock.patch('pandas.read_csv', return_value=df_from_file), \
          unittest.mock.patch('builtins.open', unittest.mock.mock_open(), create=True) as mocked_open:
-        functions.retransform_purchases()
+        functions.retransform_purchases(purchases_file='test_file')
         mocked_open.assert_called_once_with('purchase_old.txt', 'w+')
         mocked_open.mock_calls = [unittest.mock.call.writelines('2019-12-10T12:20:00,aaa,111111111111\n'),
                                   unittest.mock.call.writelines('2019-12-10T16:30:00,bbb,222222222222\n'),
@@ -189,7 +189,7 @@ def test_transform_products():
     with unittest.mock.patch('os.path.isfile', return_value=True), \
          unittest.mock.patch('pandas.read_csv', return_value=input_df), \
          unittest.mock.patch('builtins.open', unittest.mock.mock_open(), create=True) as mocked_open:
-        functions.transform_products()
-        mocked_open.assert_called_once_with(functions.PRODUCTS_FILE, 'w+')
+        functions.transform_products(products_file='test_file')
+        mocked_open.assert_called_once_with('test_file', 'w+')
         mocked_open.mock_calls = [unittest.mock.call.writelines('1,1111111111111,xxxx,0.60,0\n'),
                                   unittest.mock.call.writelines('2,2222222222222,yyyy,0.80,0\n')]

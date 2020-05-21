@@ -2,7 +2,7 @@
 import wx
 
 import functions
-import sortable
+import src.getraenkeKasse.sortable
 
 
 class AdminFrame(wx.Frame):
@@ -27,11 +27,13 @@ class AdminFrame(wx.Frame):
             self.tab1 = UserTabPanel(parent=self.notebook, super_parent=self, super_super_parent=prt)
             products_df = prt.fileContents.products.copy()
             products_df['new_st'] = products_df['stock']
-            self.tab2 = sortable.SortableListCtrlPanel(parent=self.notebook, super_parent=prt,
-                                                       columns={'names': ['nr', 'desc', 'stock', 'new_st'],
-                                                                'width': [80, 320, 100, 100],
-                                                                'type': [int, str, int, int]},
-                                                       data_frame=products_df[['nr', 'desc', 'stock', 'new_st']])
+            self.tab2 = src.getraenkeKasse.sortable.SortableListCtrlPanel(parent=self.notebook, super_parent=prt,
+                                                                          columns={'names': ['nr', 'desc', 'stock',
+                                                                                             'new_st'],
+                                                                                   'width': [80, 320, 100, 100],
+                                                                                   'type': [int, str, int, int]},
+                                                                          data_frame=products_df[
+                                                                              ['nr', 'desc', 'stock', 'new_st']])
             self.notebook.SetFont(prt.displaySettings.wxFont)
             self.notebook.AddPage(self.tab1, 'USER')
             self.notebook.AddPage(self.tab2, 'STOCK')

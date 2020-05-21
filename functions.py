@@ -5,13 +5,10 @@ import os
 import socket
 import struct
 import time
+from typing import List
 
 import git
 import pandas as pd
-
-USERS_FILE = "user.txt"
-PRODUCTS_FILE = "produkt.txt"
-PURCHASES_FILE = "purchase.txt"
 
 
 def check_environment_ONLY_PROD(func):
@@ -82,6 +79,8 @@ def getTimefromNTP():
 @check_environment_ONLY_PROD
 def git_pull(path_repo: str) -> bool:
     try:
+        # TODO remove following line
+        print(os.getcwd())
         repo = git.Repo(path_repo)
         repo.remotes.origin.pull()
         return True
@@ -100,14 +99,15 @@ def git_pull(path_repo: str) -> bool:
 
 
 @check_environment_ONLY_PROD
-def git_push(path_repo: str, commit_message: str) -> bool:
+def git_push(path_repo: str, files: List[str], commit_message: str) -> bool:
     try:
         repo_local = git.Repo(path_repo)
-        repo_local.git.add(PURCHASES_FILE)
-        repo_local.git.add(PRODUCTS_FILE)
+        for file in files:
+            repo_local.git.add(file)
         repo_local.index.commit(commit_message)
         origin = repo_local.remote(name='origin')
-        origin.push()
+        # TODO uncomment following line
+        #origin.push()
         return True
     except git.GitCommandError as exception:
         print(exception)
@@ -119,22 +119,22 @@ def check_for_file(file) -> None:
         raise Exception(f'{file} not found!')
 
 
-def read_users():
+def read_users(users_file: str):
     """"
     Read users from usersFile
     """
-    check_for_file(USERS_FILE)
-    with open(USERS_FILE, "r") as file_users:
+    check_for_file(users_file)
+    with open(users_file, "r") as file_users:
         for line in file_users:
             yield line.rstrip()
 
 
-def read_products() -> pd.DataFrame:
+def read_products(products_file: str) -> pd.DataFrame:
     """"
     Read products from productsFile
     """
-    check_for_file(PRODUCTS_FILE)
-    products_df = pd.read_csv(PRODUCTS_FILE, header=None)
+    check_for_file(products_file)
+    products_df = pd.read_csv(products_file, header=None)
     products_df.columns = ['nr', 'code', 'desc', 'price', 'stock']
     products_df['code'] = products_df['code'].astype(str)
     products_df['price'] = products_df['price'].astype(float)
@@ -155,10 +155,10 @@ def check_column_nr_in_file(file) -> int:
     return nr
 
 
-def read_purchases() -> pd.DataFrame:
-    check_for_file(PURCHASES_FILE)
+def read_purchases(purchases_file: str) -> pd.DataFrame:
+    check_for_file(purchases_file)
     try:
-        purchases_df = pd.read_csv(PURCHASES_FILE, header=None)
+        purchases_df = pd.read_csv(purchases_file, header=None)
         purchases_df.columns = ['timestamp', 'user', 'code', 'paid']
         purchases_df['code'] = purchases_df['code'].astype(str)
         purchases_df['paid'] = purchases_df['paid'].astype(bool)
@@ -193,15 +193,15 @@ def write_csv_file(file, df: pd.DataFrame) -> None:
     df.to_csv(file, header=False, index=False)
 
 
-def transform_purchases() -> None:
-    check_for_file(PURCHASES_FILE)
+def transform_purchases(purchases_file: str) -> None:
+    check_for_file(purchases_file)
     try:
-        purchases_df = pd.read_csv(PURCHASES_FILE, header=None)
+        purchases_df = pd.read_csv(purchases_file, header=None)
         purchases_df.columns = ['timestamp', 'user', 'code']
         purchases_df['code'] = purchases_df['code'].astype(str)
         purchases_df['paid'] = False
         purchases_df['paid'] = purchases_df['paid'].astype(str)
-        with open(PURCHASES_FILE, 'w+') as filePurchases_new:
+        with open(purchases_file, 'w+') as filePurchases_new:
             for _, row in purchases_df.iterrows():
                 line = f"{row['timestamp']},{row['user']},{row['code']},{row['paid']}\n"
                 filePurchases_new.writelines(line)
@@ -209,10 +209,10 @@ def transform_purchases() -> None:
         pass
 
 
-def retransform_purchases() -> None:
-    check_for_file(PURCHASES_FILE)
+def retransform_purchases(purchases_file: str) -> None:
+    check_for_file(purchases_file)
     try:
-        purchases_df = pd.read_csv(PURCHASES_FILE, header=None)
+        purchases_df = pd.read_csv(purchases_file, header=None)
         purchases_df.columns = ['timestamp', 'user', 'code', 'paid']
         purchases_df['code'] = purchases_df['code'].astype(str)
         purchases_df['paid'] = purchases_df['paid'].astype(bool)
@@ -224,12 +224,12 @@ def retransform_purchases() -> None:
         pass
 
 
-def transform_products() -> None:
-    check_for_file(PRODUCTS_FILE)
+def transform_products(products_file: str) -> None:
+    check_for_file(products_file)
     try:
-        products_df = pd.read_csv(PRODUCTS_FILE, header=None)
+        products_df = pd.read_csv(products_file, header=None)
         products_df.columns = ['nr', 'code', 'desc', 'price']
-        with open(PRODUCTS_FILE, 'w+') as filePurchases_new:
+        with open(products_file, 'w+') as filePurchases_new:
             for _, row in products_df.iterrows():
                 line = f"{row['nr']},{row['code']},{row['desc']},{row['price']},0\n"
                 filePurchases_new.writelines(line)

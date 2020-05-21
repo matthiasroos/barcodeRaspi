@@ -2,7 +2,7 @@
 import wx
 
 
-class UserFrame(wx.Frame):
+class MainFrame(wx.Frame):
 
     def __init__(self, parent):
         """Constructor"""
