@@ -38,19 +38,6 @@ class ListFrame(wx.Frame):
             self.notebook.AddPage(tab1, 'USER')
             self.notebook.AddPage(tab2, 'STOCK')
 
-            self.btnClose = wx.Button(self.panel, id=wx.ID_ANY, label='close', name='close',
-                                      size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
-                                      pos=(prt.displaySettings.screen_width - prt.displaySettings.btnWidth, 0))
-            self.btnClose.SetFont(prt.displaySettings.wxFont)
-            self.btnClose.Bind(wx.EVT_LEFT_UP, self._onClickCloseButton)
-
-            self.btnRestart = wx.Button(self.panel, id=wx.ID_ANY, label='restart', name='restart',
-                                        size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
-                                        pos=(prt.displaySettings.screen_width - prt.displaySettings.btnWidth,
-                                             prt.displaySettings.btnHeight))
-            self.btnRestart.SetFont(prt.displaySettings.wxFont)
-            self.btnRestart.Bind(wx.EVT_LEFT_UP, self._onClickRestartButton)
-
             self.btnStatistics = wx.Button(self.panel, id=wx.ID_ANY, label='statistics', name='statistics',
                                            size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
                                            pos=(prt.displaySettings.screen_width - prt.displaySettings.btnWidth,
@@ -66,10 +53,6 @@ class ListFrame(wx.Frame):
             self.btnBack.Bind(wx.EVT_LEFT_UP, self._onClickBackButton)
 
         self.ShowFullScreen(True)
-
-    def _onClickCloseButton(self, event):
-        """"""
-        self.parent.exit()
 
     def _onClickBackButton(self, event):
         """"""
@@ -97,6 +80,3 @@ class ListFrame(wx.Frame):
         if stat_obj:
             self.parent.show_confirm_dialog(confirm_message=stat_obj.get_statistics())
 
-    def _onClickRestartButton(self, event):
-        """"""
-        self.parent.restart()

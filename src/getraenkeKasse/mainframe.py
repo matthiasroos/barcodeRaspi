@@ -45,6 +45,21 @@ class MainFrame(wx.Frame):
             self.btnAdmin.SetFont(prt.displaySettings.wxFont)
             self.btnAdmin.Bind(wx.EVT_LEFT_UP, self._onClickAdminButton)
 
+            # Close Button
+            self.btnClose = wx.Button(self.panel, id=wx.ID_ANY, label='close', name='close',
+                                      size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
+                                      pos=(prt.displaySettings.screen_width - prt.displaySettings.btnWidth, 0))
+            self.btnClose.SetFont(prt.displaySettings.wxFont)
+            self.btnClose.Bind(wx.EVT_LEFT_UP, self._onClickCloseButton)
+
+            # Restart Button
+            self.btnRestart = wx.Button(self.panel, id=wx.ID_ANY, label='restart', name='restart',
+                                        size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
+                                        pos=(prt.displaySettings.screen_width - prt.displaySettings.btnWidth,
+                                             prt.displaySettings.btnHeight))
+            self.btnRestart.SetFont(prt.displaySettings.wxFont)
+            self.btnRestart.Bind(wx.EVT_LEFT_UP, self._onClickRestartButton)
+
             self.textVersion = wx.StaticText(self.panel, label='ver. ' + prt.version,
                                              size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
                                              pos=(prt.displaySettings.screen_width - 0.9*prt.displaySettings.btnWidth,
@@ -68,3 +83,13 @@ class MainFrame(wx.Frame):
     def _onClickAdminButton(self, event):
         """"""
         self.parent.show_admin_frame()
+
+    def _onClickCloseButton(self, event):
+        """"""
+        if self.parent.show_confirm_dialog(confirm_message='Do you want to exit?'):
+            self.parent.exit()
+
+    def _onClickRestartButton(self, event):
+        """"""
+        if self.parent.show_confirm_dialog(confirm_message='Do you want to restart?'):
+            self.parent.restart()
