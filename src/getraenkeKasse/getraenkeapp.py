@@ -8,11 +8,11 @@ import pandas as pd
 import wx
 
 import functions
+import getraenkeKasse
 import src.getraenkeKasse.adminframe
 import src.getraenkeKasse.listframe
 import src.getraenkeKasse.mainframe
 import src.getraenkeKasse.scanframe
-import getraenkeKasse
 
 PRODUCTS_FILE = 'produkt.txt'
 PURCHASES_FILE = 'purchase.txt'
@@ -145,7 +145,9 @@ class GetraenkeApp:
         self.fileContents.users = functions.read_users(users_file=USERS_FILE)
 
     def get_products(self):
-        self.fileContents.products = functions.read_products(products_file=PRODUCTS_FILE)
+        self.fileContents.products = functions.read_csv_file(file=PRODUCTS_FILE,
+                                                             columns=['nr', 'code', 'desc', 'price', 'stock'],
+                                                             column_type={'code': str, 'price': float})
 
     def _save_products(self):
         functions.write_csv_file(file=PRODUCTS_FILE, df=self.fileContents.products)
@@ -170,7 +172,9 @@ class GetraenkeApp:
         return False
 
     def get_purchases(self):
-        self.fileContents.purchases = functions.read_purchases(purchases_file=PURCHASES_FILE)
+        self.fileContents.purchases = functions.read_csv_file(file=PURCHASES_FILE,
+                                                              columns=['timestamp', 'user', 'code', 'paid'],
+                                                              column_type={'code': str, 'paid': bool})
 
     def _save_purchases(self):
         functions.write_csv_file(file=PURCHASES_FILE, df=self.fileContents.purchases)

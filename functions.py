@@ -129,16 +129,16 @@ def read_users(users_file: str):
             yield line.rstrip()
 
 
-def read_products(products_file: str) -> pd.DataFrame:
-    """"
-    Read products from productsFile
-    """
-    check_for_file(products_file)
-    products_df = pd.read_csv(products_file, header=None)
-    products_df.columns = ['nr', 'code', 'desc', 'price', 'stock']
-    products_df['code'] = products_df['code'].astype(str)
-    products_df['price'] = products_df['price'].astype(float)
-    return products_df
+def read_csv_file(file: str, columns: List[str], column_type: dict) -> pd.DataFrame:
+    check_for_file(file)
+    try:
+        data_df = pd.read_csv(file, header=None)
+        data_df.columns = columns
+        for key, value in column_type.items():
+            data_df[key] = data_df[key].astype(value)
+    except pd.errors.EmptyDataError:
+        data_df = pd.DataFrame([], columns=columns)
+    return data_df
 
 
 def calc_length_code(products_df: pd.DataFrame) -> set:
@@ -153,18 +153,6 @@ def check_column_nr_in_file(file) -> int:
     df = pd.read_csv(file, header=None)
     nr = len(df.columns)
     return nr
-
-
-def read_purchases(purchases_file: str) -> pd.DataFrame:
-    check_for_file(purchases_file)
-    try:
-        purchases_df = pd.read_csv(purchases_file, header=None)
-        purchases_df.columns = ['timestamp', 'user', 'code', 'paid']
-        purchases_df['code'] = purchases_df['code'].astype(str)
-        purchases_df['paid'] = purchases_df['paid'].astype(bool)
-    except pd.errors.EmptyDataError:
-        purchases_df = pd.DataFrame([], columns=['timestamp', 'user', 'code', 'paid'])
-    return purchases_df
 
 
 def merge_purchases_products(purchases: pd.DataFrame, products: pd.DataFrame) -> pd.DataFrame:

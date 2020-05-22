@@ -41,25 +41,34 @@ def test_read_users1():
     assert users_list == expected_users_list
 
 
-def test_read_products0_file_not_found():
+def test_csv_file0_file_not_found():
     with unittest.mock.patch('os.path.isfile', return_value=False) as mocked_os:
         with pytest.raises(Exception) as exc:
-            functions.read_products(products_file='test_file')
+            functions.read_csv_file(file='test_file', columns=[],
+                                    column_type={})
     mocked_os.assert_called_once_with('test_file')
     assert 'test_file not found!' in str(exc.value)
 
 
-def test_read_products1():
+def test_read_csv_file1():
     file_content = """1,1111111111111,xxxx,0.60,20\n2,2222222222222,yyyy,0.80,10"""
     df_from_file = pd.read_csv(io.StringIO(file_content), header=None)
+    columns = ['nr', 'code', 'desc', 'price', 'stock']
     expected_df = pd.DataFrame([[1, '1111111111111', 'xxxx', 0.60, 20],
                                 [2, '2222222222222', 'yyyy', 0.80, 10]],
-                               columns=['nr', 'code', 'desc', 'price', 'stock'])
+                               columns=columns)
     with unittest.mock.patch('os.path.isfile', return_value=True) as mocked_os:
         with unittest.mock.patch('pandas.read_csv', return_value=df_from_file):
-            prod_df = functions.read_products(products_file='test_file')
+            prod_df = functions.read_csv_file(file='test_file',
+                                              columns=columns,
+                                              column_type={'code': str, 'price': float})
     mocked_os.assert_called_once_with('test_file')
     pd.testing.assert_frame_equal(prod_df, expected_df)
+
+
+def test_csv_file2_empty_file():
+    # TODO: write unit test if file is empty
+    pass
 
 
 @pytest.mark.parametrize(['input_df', 'expected_set'],
@@ -70,32 +79,6 @@ def test_calc_length_code(input_df, expected_set):
     assert output_set == expected_set
 
 
-def test_read_purchases0_file_not_found():
-    with unittest.mock.patch('os.path.isfile', return_value=False) as mocked_os:
-        with pytest.raises(Exception) as exc:
-            functions.read_purchases(purchases_file='test_file')
-    mocked_os.assert_called_once_with('test_file')
-    assert 'test_file not found!' in str(exc.value)
-
-
-def test_read_purchases1_empty_file():
-    # TODO: write unit test if file is empty
-    pass
-
-
-def test_read_purchases2():
-    file_content = """2019-12-10T12:20:00,aaa,111111111111,False\n2019-12-10T16:30:00,bbb,222222222222,False\n
-2019-12-10T16:35:00,bbb,222222222222,False"""
-    df_from_file = pd.read_csv(io.StringIO(file_content), header=None)
-    expected_df = pd.DataFrame([['2019-12-10T12:20:00', 'aaa', '111111111111', False],
-                                ['2019-12-10T16:30:00', 'bbb', '222222222222', False],
-                                ['2019-12-10T16:35:00', 'bbb', '222222222222', False]],
-                               columns=['timestamp', 'user', 'code', 'paid'])
-    with unittest.mock.patch('os.path.isfile', return_value=True) as mocked_os:
-        with unittest.mock.patch('pandas.read_csv', return_value=df_from_file):
-            purchases_df = functions.read_purchases(purchases_file='test_file')
-    mocked_os.assert_called_once_with('test_file')
-    pd.testing.assert_frame_equal(purchases_df, expected_df)
 
 
 def test_merge_purchases_products():
