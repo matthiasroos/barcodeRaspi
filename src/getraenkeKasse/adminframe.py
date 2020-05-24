@@ -23,21 +23,31 @@ class AdminFrame(wx.Frame):
             self.notebook = wx.Notebook(self.panel, pos=(0, 0),
                                         size=wx.Size(prt.displaySettings.screen_width-prt.displaySettings.btnWidth,
                                                      prt.displaySettings.screen_height))
-            self.notebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self._onNotebookChanged)
-            self.tab1 = UserTabPanel(parent=self.notebook, super_parent=self, super_super_parent=prt)
-            products_df = prt.fileContents.products.copy()
-            products_df['new_st'] = products_df['stock']
+            user_purchases_df = functions.summarize_user_purchases(
+                purchases=prt.fileContents.purchases,
+                products=prt.fileContents.products)[
+                ['name', 'money']]
+            user_purchases_df['new_mo'] = user_purchases_df['money']
+            self.tab1 = src.getraenkeKasse.sortable.SortableListCtrlPanel(parent=self.notebook, super_parent=prt,
+                                                                          columns={'names': ['name', 'money', 'new_mo'],
+                                                                                   'width': [130, 130, 130],
+                                                                                   'type': [str, '{:,.2f}'.format,
+                                                                                            '{:,.2f}'.format]},
+                                                                          data_frame=user_purchases_df)
+            cp_products_df = prt.fileContents.products.copy()
+            cp_products_df['new_st'] = cp_products_df['stock']
             self.tab2 = src.getraenkeKasse.sortable.SortableListCtrlPanel(parent=self.notebook, super_parent=prt,
                                                                           columns={'names': ['nr', 'desc', 'stock',
                                                                                              'new_st'],
                                                                                    'width': [80, 320, 100, 100],
                                                                                    'type': [int, str, int, int]},
-                                                                          data_frame=products_df[
+                                                                          data_frame=cp_products_df[
                                                                               ['nr', 'desc', 'stock', 'new_st']])
             self.notebook.SetFont(prt.displaySettings.wxFont)
             self.notebook.AddPage(self.tab1, 'USER')
             self.notebook.AddPage(self.tab2, 'STOCK')
 
+            # Back button
             self.btnBack = wx.Button(self.panel, id=wx.ID_ANY, label='back', name='back',
                                      size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
                                      pos=(prt.displaySettings.screen_width - 1*prt.displaySettings.btnWidth,
@@ -45,21 +55,29 @@ class AdminFrame(wx.Frame):
             self.btnBack.SetFont(prt.displaySettings.wxFont)
             self.btnBack.Bind(wx.EVT_LEFT_UP, self._onClickBackButton)
 
+            # Save button
             self.btnSave = wx.Button(self.panel, id=wx.ID_ANY, label='save', name='save',
                                      size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
-                                     pos=(prt.displaySettings.screen_width - 1*prt.displaySettings.btnWidth,
-                                          prt.displaySettings.screen_height - 2*prt.displaySettings.btnHeight))
+                                     pos=(prt.displaySettings.screen_width - 1 * prt.displaySettings.btnWidth,
+                                          prt.displaySettings.screen_height - 2 * prt.displaySettings.btnHeight))
             self.btnSave.SetFont(prt.displaySettings.wxFont)
             self.btnSave.Bind(wx.EVT_LEFT_UP, self._onClickSaveButton)
-            self.btnSave.Hide()
 
-            self.btnEdit = wx.Button(self.panel, id=wx.ID_ANY, label='edit', name='edit',
+            # Edit button
+            self.btnEdit = wx.Button(self.panel, id=wx.ID_ANY, label='edit stock', name='edit',
                                      size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
                                      pos=(prt.displaySettings.screen_width - 1 * prt.displaySettings.btnWidth,
                                           prt.displaySettings.screen_height - 3 * prt.displaySettings.btnHeight))
             self.btnEdit.SetFont(prt.displaySettings.wxFont)
             self.btnEdit.Bind(wx.EVT_LEFT_UP, self._onClickEditButton)
-            self.btnEdit.Hide()
+
+            # Pay button
+            self.btnPay = wx.Button(self.panel, id=wx.ID_ANY, label='pay for user', name='pay',
+                                    size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
+                                    pos=(prt.displaySettings.screen_width - 1 * prt.displaySettings.btnWidth,
+                                         prt.displaySettings.screen_height - 4 * prt.displaySettings.btnHeight))
+            self.btnPay.SetFont(prt.displaySettings.wxFont)
+            self.btnPay.Bind(wx.EVT_LEFT_UP, self._onClickPayButton)
 
         self.ShowFullScreen(True)
 
@@ -71,6 +89,14 @@ class AdminFrame(wx.Frame):
 
     def _onClickSaveButton(self, event):
         if self.changed:
+            user_paid = []
+            count = self.tab1.sortable_list_ctrl.GetItemCount()
+            for row in range(0, count):
+                money_old = self.tab1.sortable_list_ctrl.GetItem(row, col=1).GetText()
+                money_new = self.tab1.sortable_list_ctrl.GetItem(row, col=2).GetText()
+                if money_old != money_new:
+                    user_paid.append(self.tab1.sortable_list_ctrl.GetItem(row, col=0).GetText())
+
             changed_stock = []
             count = self.tab2.sortable_list_ctrl.GetItemCount()
             for row in range(0, count):
@@ -78,8 +104,13 @@ class AdminFrame(wx.Frame):
                 stock_old = int(self.tab2.sortable_list_ctrl.GetItem(row, col=2).GetText())
                 stock_new = int(self.tab2.sortable_list_ctrl.GetItem(row, col=3).GetText())
                 changed_stock.append([nr, stock_old, stock_new])
-            self.parent.replenish_stock(changed_stock=changed_stock)
-            self.changed = False
+
+            result = self.parent.show_confirm_dialog('Do you want to save purchases/products?')
+            if result:
+                for user in user_paid:
+                    self.parent.pay_for_user(user=user)
+                self.parent.replenish_stock(changed_stock=changed_stock)
+                self.changed = False
 
     def _onClickEditButton(self, event):
         focus = self.tab2.sortable_list_ctrl.GetFocusedItem()
@@ -93,60 +124,13 @@ class AdminFrame(wx.Frame):
             self.changed = True
         dlg.Destroy()
 
-    def _onNotebookChanged(self, event):
-        try:
-            if self.notebook.GetSelection() == 1:
-                self.btnSave.Show()
-                self.btnEdit.Show()
-            else:
-                self.btnSave.Hide()
-                self.btnEdit.Hide()
-        except AttributeError or RuntimeError:
-            pass
-
-
-class UserTabPanel(wx.Panel):
-
-    def __init__(self, parent, super_parent, super_super_parent):
-        self.parent = parent
-        self.super_parent = super_parent
-        self.super_super_parent = super_super_parent
-        wx.Panel.__init__(self, self.parent)
-        self.chosen_user = ''
-        with self.super_super_parent as ssprt:
-            self.Text = wx.StaticText(self, label='User:',
-                                      pos=(50, ssprt.displaySettings.screen_height*1/5), size=(150, 50))
-            self.Text.SetFont(ssprt.displaySettings.wxFont)
-            self.all_users_purchases = functions.summarize_user_purchases(purchases=ssprt.fileContents.purchases,
-                                                                          products=ssprt.fileContents.products)
-
-            users_list = self.all_users_purchases['name'].tolist()
-            self.userChoice = wx.Choice(self, choices=users_list,
-                                        pos=(200, ssprt.displaySettings.screen_height*1/5), size=(150, 50))
-            self.userChoice.SetFont(ssprt.displaySettings.wxFont)
-            self.userChoice.Bind(wx.EVT_CHOICE, self._onChooseUser)
-
-            self.userSum = wx.StaticText(self, label="", pos=(ssprt.displaySettings.screen_width / 5,
-                                                              ssprt.displaySettings.screen_height * 1 / 5 + 120),
-                                         size=(150, 50))
-            self.userSum.SetFont(ssprt.displaySettings.wxFont)
-
-            self.btnPay = wx.Button(self, id=wx.ID_ANY, label='pay', name='pay',
-                                    size=wx.Size(ssprt.displaySettings.btnWidth, ssprt.displaySettings.btnHeight),
-                                    pos=(ssprt.displaySettings.screen_width / 5,
-                                         ssprt.displaySettings.screen_height * 1 / 5 + 180))
-            self.btnPay.SetFont(ssprt.displaySettings.wxFont)
-            self.btnPay.Bind(wx.EVT_LEFT_UP, self._onClickPayButton)
-
-    def _onChooseUser(self, event):
-        self.chosen_user = self.userChoice.GetString(self.userChoice.GetSelection())
-        sum_user = self.all_users_purchases.loc[self.all_users_purchases['name'] == self.chosen_user, 'money'].item()
-        self.userSum.SetLabel(label=f"{self.chosen_user}:\t\t{'{:,.2f}'.format(sum_user)}")
-
     def _onClickPayButton(self, event):
-        if self.chosen_user:
-            self.super_super_parent.pay_for_user(user=self.chosen_user)
-            self.userSum.SetLabel(label=f"{self.chosen_user}:\t\t0.00")
+        focus = self.tab1.sortable_list_ctrl.GetFocusedItem()
+        user = self.tab1.sortable_list_ctrl.GetItem(focus, 0).GetText()
+        result = self.parent.show_confirm_dialog(f'Do you want to set all purchases of user {user} as paid?')
+        if result:
+            self.tab1.sortable_list_ctrl.SetItem(focus, 2, '0.00')
+            self.changed = True
 
 
 class NewStockInputDialog(wx.Dialog):
