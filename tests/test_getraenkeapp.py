@@ -63,11 +63,13 @@ def test_replenish_stock(mock_getraenkekasse, mock_functions):
     mock_write_csv.assert_called_once_with(file=src.getraenkeKasse.getraenkeapp.PRODUCTS_FILE, df=mock_getraenkekasse.fileContents.products)
 
 
-def test_decrease_stock_for_product(mock_getraenkekasse):
+def test_decrease_stock_for_product0(mock_getraenkekasse):
     status = mock_getraenkekasse._decrease_stock_for_product('1111111111111')
     assert status is True
     assert get_stock_for_product(mock_getraenkekasse, '1111111111111') == 19
 
+
+def test_decrease_stock_for_product1(mock_getraenkekasse):
     status = mock_getraenkekasse._decrease_stock_for_product('2222222222222')
     assert status is False
     assert get_stock_for_product(mock_getraenkekasse, '2222222222222') == 0
