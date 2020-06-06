@@ -59,10 +59,11 @@ class GetraenkeApp:
 
         self.displaySettings.wxFont = wx.Font(self.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD)
 
+    # The magic methods __enter__ and __exit__ are necessary for using the class in context managers
     def __enter__(self):
         return self
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def __exit__(self, exc_type, exc_value, exc_traceback):
         pass
 
     def run(self):
