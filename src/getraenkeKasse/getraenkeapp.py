@@ -84,10 +84,12 @@ class GetraenkeApp:
         src.getraenkeKasse.mainframe.MainFrame(self)
         self.app.MainLoop()
 
-    def exit(self):
+    @staticmethod
+    def exit():
         sys.exit()
 
-    def restart(self):
+    @staticmethod
+    def restart():
         os.execl(sys.executable, sys.executable, *sys.argv)
         sys.exit()
 
@@ -100,19 +102,22 @@ class GetraenkeApp:
     def show_scan_frame(self):
         src.getraenkeKasse.scanframe.ScanFrame(self)
 
-    def show_error_dialog(self, error_message: str):
+    @staticmethod
+    def show_error_dialog(error_message: str):
         dlg = wx.MessageDialog(None, message=error_message, caption='ERROR',
                                style=wx.OK | wx.ICON_WARNING | wx.STAY_ON_TOP)
         # dlg.SetFont(self.displaySettings.wxFont)
         dlg.ShowModal()
 
-    def show_info_dialog(self, info_message: str):
+    @staticmethod
+    def show_info_dialog(info_message: str):
         dlg = wx.MessageDialog(None, message=info_message, caption='INFO',
                                style=wx.OK | wx.ICON_INFORMATION | wx.STAY_ON_TOP)
         # dlg.SetFont(self.displaySettings.wxFont)
         dlg.ShowModal()
 
-    def show_confirm_dialog(self, confirm_message: str) -> bool:
+    @staticmethod
+    def show_confirm_dialog(confirm_message: str) -> bool:
         dlg = wx.MessageDialog(None, message=confirm_message, caption='CONFIRM',
                                style=wx.OK | wx.CANCEL | wx.ICON_QUESTION | wx.STAY_ON_TOP)
         # dlg.SetFont(self.displaySettings.wxFont)
@@ -122,7 +127,8 @@ class GetraenkeApp:
         else:
             return False
 
-    def show_password_dialog(self, password_message: str) -> bool:
+    @staticmethod
+    def show_password_dialog(password_message: str) -> bool:
         dlg = wx.PasswordEntryDialog(parent=None, message=password_message,
                                      defaultValue='', style=wx.OK | wx.CANCEL)
         # dlg.SetFont(self.displaySettings.wxFont)
@@ -204,7 +210,6 @@ class GetraenkeApp:
             # TODO issue warning for selling without stock
             pass
         self.check_in_changes_into_git(path_repo='./.', files=files, commit_message='purchase via getraenkeKasse.py')
-
 
     @property
     def clicked_user(self) -> str:
