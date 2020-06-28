@@ -1,4 +1,3 @@
-
 import wx
 
 import functions
@@ -21,7 +20,7 @@ class AdminFrame(wx.Frame):
                 self.Close()
 
             self.notebook = wx.Notebook(self.panel, pos=(0, 0),
-                                        size=wx.Size(prt.displaySettings.screen_width-prt.displaySettings.btnWidth,
+                                        size=wx.Size(prt.displaySettings.screen_width - prt.displaySettings.btnWidth,
                                                      prt.displaySettings.screen_height))
             user_purchases_df = functions.summarize_user_purchases(
                 purchases=prt.fileContents.purchases,
@@ -50,7 +49,7 @@ class AdminFrame(wx.Frame):
             # Back button
             self.btnBack = wx.Button(self.panel, id=wx.ID_ANY, label='back', name='back',
                                      size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
-                                     pos=(prt.displaySettings.screen_width - 1*prt.displaySettings.btnWidth,
+                                     pos=(prt.displaySettings.screen_width - 1 * prt.displaySettings.btnWidth,
                                           prt.displaySettings.screen_height - prt.displaySettings.btnHeight))
             self.btnBack.SetFont(prt.displaySettings.wxFont)
             self.btnBack.Bind(wx.EVT_LEFT_UP, self._onClickBackButton)
@@ -63,19 +62,51 @@ class AdminFrame(wx.Frame):
             self.btnSave.SetFont(prt.displaySettings.wxFont)
             self.btnSave.Bind(wx.EVT_LEFT_UP, self._onClickSaveButton)
 
-            # Edit button
-            self.btnEdit = wx.Button(self.panel, id=wx.ID_ANY, label='edit stock', name='edit',
-                                     size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
-                                     pos=(prt.displaySettings.screen_width - 1 * prt.displaySettings.btnWidth,
-                                          prt.displaySettings.screen_height - 3 * prt.displaySettings.btnHeight))
-            self.btnEdit.SetFont(prt.displaySettings.wxFont)
-            self.btnEdit.Bind(wx.EVT_LEFT_UP, self._onClickEditButton)
+            # Reset button
+            self.btnReset = wx.Button(self.panel, id=wx.ID_ANY, label='reset stock', name='reset',
+                                      size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
+                                      pos=(prt.displaySettings.screen_width - 1 * prt.displaySettings.btnWidth,
+                                           prt.displaySettings.screen_height - 3 * prt.displaySettings.btnHeight))
+            self.btnReset.SetFont(prt.displaySettings.wxFont)
+            self.btnReset.Bind(wx.EVT_LEFT_UP, self._onClickResetButton)
+
+            # +12 button
+            self.btnTwelve = wx.Button(self.panel, id=6012, label='+12', name='twelve',
+                                       size=wx.Size(prt.displaySettings.btnWidth / 2, prt.displaySettings.btnHeight),
+                                       pos=(prt.displaySettings.screen_width - 1 * prt.displaySettings.btnWidth,
+                                            prt.displaySettings.screen_height - 4 * prt.displaySettings.btnHeight))
+            self.btnTwelve.SetFont(prt.displaySettings.wxFont)
+            self.btnTwelve.Bind(wx.EVT_LEFT_UP, self._onClickAddButton)
+
+            # + 20 button
+            self.btnTwenty = wx.Button(self.panel, id=6020, label='+20', name='twenty',
+                                       size=wx.Size(prt.displaySettings.btnWidth / 2, prt.displaySettings.btnHeight),
+                                       pos=(prt.displaySettings.screen_width - 1 * prt.displaySettings.btnWidth / 2,
+                                            prt.displaySettings.screen_height - 4 * prt.displaySettings.btnHeight))
+            self.btnTwenty.SetFont(prt.displaySettings.wxFont)
+            self.btnTwenty.Bind(wx.EVT_LEFT_UP, self._onClickAddButton)
+
+            # +1 button
+            self.btnOne = wx.Button(self.panel, id=6001, label='+1', name='one',
+                                    size=wx.Size(prt.displaySettings.btnWidth / 2, prt.displaySettings.btnHeight),
+                                    pos=(prt.displaySettings.screen_width - 1 * prt.displaySettings.btnWidth,
+                                         prt.displaySettings.screen_height - 5 * prt.displaySettings.btnHeight))
+            self.btnOne.SetFont(prt.displaySettings.wxFont)
+            self.btnOne.Bind(wx.EVT_LEFT_UP, self._onClickAddButton)
+
+            # +5 button
+            self.btnFive = wx.Button(self.panel, id=6005, label='+5', name='five',
+                                     size=wx.Size(prt.displaySettings.btnWidth / 2, prt.displaySettings.btnHeight),
+                                     pos=(prt.displaySettings.screen_width - 1 * prt.displaySettings.btnWidth / 2,
+                                          prt.displaySettings.screen_height - 5 * prt.displaySettings.btnHeight))
+            self.btnFive.SetFont(prt.displaySettings.wxFont)
+            self.btnFive.Bind(wx.EVT_LEFT_UP, self._onClickAddButton)
 
             # Pay button
             self.btnPay = wx.Button(self.panel, id=wx.ID_ANY, label='pay for user', name='pay',
                                     size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
                                     pos=(prt.displaySettings.screen_width - 1 * prt.displaySettings.btnWidth,
-                                         prt.displaySettings.screen_height - 4 * prt.displaySettings.btnHeight))
+                                         prt.displaySettings.screen_height - 6 * prt.displaySettings.btnHeight))
             self.btnPay.SetFont(prt.displaySettings.wxFont)
             self.btnPay.Bind(wx.EVT_LEFT_UP, self._onClickPayButton)
 
@@ -112,17 +143,22 @@ class AdminFrame(wx.Frame):
                 self.parent.replenish_stock(changed_stock=changed_stock)
                 self.changed = False
 
-    def _onClickEditButton(self, event):
+    def _onClickResetButton(self, event):
         focus = self.tab2.sortable_list_ctrl.GetFocusedItem()
-        stock_old = int(self.tab2.sortable_list_ctrl.GetItem(focus, 2).GetText())
+        product = self.tab2.sortable_list_ctrl.GetItem(focus, 0).GetText()
+        stock_old = self.tab2.sortable_list_ctrl.GetItem(focus, 2).GetText()
+        result = self.parent.show_confirm_dialog(f'Do you want to reset the new stock for {product}?')
+        if result:
+            self.tab2.sortable_list_ctrl.SetItem(focus, 3, stock_old)
+
+    def _onClickAddButton(self, event):
+        btnId = event.GetEventObject().GetId()
+        addition_to_stock = (btnId - 6000)
+        focus = self.tab2.sortable_list_ctrl.GetFocusedItem()
         stock_new = int(self.tab2.sortable_list_ctrl.GetItem(focus, 3).GetText())
-        dlg = NewStockInputDialog(parent=self.tab2, super_parent=self.parent, title='Stock',
-                                  size=(600, 300), style=wx.STAY_ON_TOP, stock_old=stock_old, stock_new=stock_new)
-        result = dlg.ShowModal()
-        if result == wx.ID_OK:
-            self.tab2.sortable_list_ctrl.SetItem(focus, 3, str(dlg.stock_new))
-            self.changed = True
-        dlg.Destroy()
+        stock_new = stock_new + addition_to_stock
+        self.tab2.sortable_list_ctrl.SetItem(focus, 3, str(stock_new))
+        self.changed = True
 
     def _onClickPayButton(self, event):
         focus = self.tab1.sortable_list_ctrl.GetFocusedItem()
@@ -131,81 +167,3 @@ class AdminFrame(wx.Frame):
         if result:
             self.tab1.sortable_list_ctrl.SetItem(focus, 2, '0.00')
             self.changed = True
-
-
-class NewStockInputDialog(wx.Dialog):
-
-    def __init__(self, parent, super_parent, title, size, style, stock_old, stock_new):
-        super().__init__(parent, title=title, size=size, style=style)
-        self.parent = parent
-        self.super_parent = super_parent
-        self.smallbtnWidth = self.super_parent.displaySettings.btnWidth/2
-        self.btnHeight = self.super_parent.displaySettings.btnHeight
-        self.stock_old = stock_old
-        self.stock_new = stock_new
-        with self.super_parent as sprt:
-
-            vbox = wx.BoxSizer(wx.VERTICAL)
-
-            panel_top = wx.Panel(self)
-            vbox_panel_top = wx.BoxSizer(wx.VERTICAL)
-
-            self.stocktext = wx.StaticText(panel_top, id=wx.ID_ANY,
-                                           label=f'stock old: {self.stock_old} - stock new: {self.stock_new}')
-            self.stocktext.SetFont(sprt.displaySettings.wxFont)
-
-            hbox_panel_top = wx.BoxSizer(wx.HORIZONTAL)
-            btnOne = wx.Button(panel_top, id=6001, label='+1', size=(self.smallbtnWidth, self.btnHeight))
-            btnOne.SetFont(sprt.displaySettings.wxFont)
-            btnOne.Bind(wx.EVT_LEFT_UP, self._onClickAddButton)
-
-            btnFive = wx.Button(panel_top, id=6005, label='+5', size=(self.smallbtnWidth, self.btnHeight))
-            btnFive.SetFont(sprt.displaySettings.wxFont)
-            btnFive.Bind(wx.EVT_LEFT_UP, self._onClickAddButton)
-
-            btnTwelve = wx.Button(panel_top, id=6012, label='+12', size=(self.smallbtnWidth, self.btnHeight))
-            btnTwelve.SetFont(sprt.displaySettings.wxFont)
-            btnTwelve.Bind(wx.EVT_LEFT_UP, self._onClickAddButton)
-
-            btnTwenty = wx.Button(panel_top, id=6020, label='+20', size=(self.smallbtnWidth, self.btnHeight))
-            btnTwenty.SetFont(sprt.displaySettings.wxFont)
-            btnTwenty.Bind(wx.EVT_LEFT_UP, self._onClickAddButton)
-
-            btnReset = wx.Button(panel_top, id=wx.ID_ANY, label='RESET', size=(self.smallbtnWidth*2, self.btnHeight))
-            btnReset.SetFont(sprt.displaySettings.wxFont)
-            btnReset.Bind(wx.EVT_LEFT_UP, self._onClickResetButton)
-
-            hbox_panel_top.Add(btnOne)
-            hbox_panel_top.Add(btnFive)
-            hbox_panel_top.Add(btnTwelve)
-            hbox_panel_top.Add(btnTwenty)
-            hbox_panel_top.Add(btnReset)
-
-            vbox_panel_top.Add(self.stocktext, flag=wx.ALIGN_CENTER_HORIZONTAL | wx.TOP, border=20)
-            vbox_panel_top.Add(hbox_panel_top, flag=wx.ALIGN_CENTER_HORIZONTAL | wx.TOP, border=30)
-            panel_top.SetSizer(vbox_panel_top)
-
-            panel_bottom = wx.Panel(self)
-            hbox_panel_bottom = wx.BoxSizer(wx.HORIZONTAL)
-            btnOK = wx.Button(panel_bottom, id=wx.ID_OK, label='OK', size=(self.smallbtnWidth*2, self.btnHeight))
-            btnOK.SetFont(sprt.displaySettings.wxFont)
-            btnCANCEL = wx.Button(panel_bottom, id=wx.ID_CANCEL, label='CANCEL', size=(self.smallbtnWidth * 2, self.btnHeight))
-            btnCANCEL.SetFont(sprt.displaySettings.wxFont)
-
-            hbox_panel_bottom.Add(btnOK)
-            hbox_panel_bottom.Add(btnCANCEL)
-            panel_bottom.SetSizer(hbox_panel_bottom)
-
-            vbox.Add(panel_top, proportion=1, flag=wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL, border=5)
-            vbox.Add(panel_bottom, flag=wx.ALIGN_CENTER, border=10)
-            self.SetSizer(vbox)
-
-    def _onClickAddButton(self, event):
-        btnId = event.GetEventObject().GetId()
-        self.stock_new += (btnId - 6000)
-        self.stocktext.SetLabel(label=f'stock old: {self.stock_old} - stock new: {self.stock_new}')
-
-    def _onClickResetButton(self, event):
-        self.stock_new = self.stock_old
-        self.stocktext.SetLabel(label=f'stock old: {self.stock_old} - stock new: {self.stock_new}')
-
