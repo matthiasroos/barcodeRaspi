@@ -79,8 +79,6 @@ def getTimefromNTP():
 @check_environment_ONLY_PROD
 def git_pull(path_repo: str) -> bool:
     try:
-        # TODO remove following line
-        print(os.getcwd())
         repo = git.Repo(path_repo)
         repo.remotes.origin.pull()
         return True
@@ -106,8 +104,7 @@ def git_push(path_repo: str, files: List[str], commit_message: str) -> bool:
             repo_local.git.add(file)
         repo_local.index.commit(commit_message)
         origin = repo_local.remote(name='origin')
-        # TODO uncomment following line
-        #origin.push()
+        origin.push()
         return True
     except git.GitCommandError as exception:
         print(exception)
