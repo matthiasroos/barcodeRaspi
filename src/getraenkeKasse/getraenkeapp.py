@@ -72,13 +72,17 @@ class GetraenkeApp:
         # code for adding the paid column to PURCHASES_FILE
         if functions.check_column_nr_in_file(PURCHASES_FILE) == 3:
             functions.transform_purchases(purchases_file=PURCHASES_FILE)
-            functions.git_push(commit_message='update PURCHASES_FILE via getraenkeKasse.py')
+            functions.git_push(path_repo='./.',
+                               files=[PURCHASES_FILE],
+                               commit_message='update PURCHASES_FILE via getraenkeKasse.py')
         self.get_purchases()
 
         # code for adding the stock column to PRODUCTS_FILE
         if functions.check_column_nr_in_file(PRODUCTS_FILE) == 4:
             functions.transform_products(products_file=PRODUCTS_FILE)
-            functions.git_push(commit_message='update PRODUCTS_FILE via getraenkeKasse.py')
+            functions.git_push(path_repo='./.',
+                               files=[PRODUCTS_FILE],
+                               commit_message='update PRODUCTS_FILE via getraenkeKasse.py')
         self.get_products()
 
         src.getraenkeKasse.mainframe.MainFrame(self)
