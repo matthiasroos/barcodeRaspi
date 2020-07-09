@@ -1,29 +1,53 @@
 
 import datetime
-import git
 import hashlib
-import numpy as np
 import os
-import pandas as pd
 import socket
 import struct
 import time
-import typing
+from typing import List
 
-usersFile = "user.txt"
-productsFile = "produkt.txt"
-purchasesFile = "purchase.txt"
-
-
-def getMD5Hash(filename: str):
-    hasher = hashlib.md5()
-    with open(filename, 'rb') as afile:
-        buf = afile.read()
-        hasher.update(buf)
-    return hasher
+import git
+import pandas as pd
 
 
-def checkNetwork(host="8.8.8.8", port=53, timeout=3):
+def check_environment_ONLY_PROD(func):
+    def wrapper(*args, **kwargs):
+        if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
+            return func(*args, **kwargs)
+        else:
+            return True
+    return wrapper
+
+
+def check_environment_TEST_PROD(func):
+    def wrapper(*args, **kwargs):
+        if 'BARCODE_DEV' not in os.environ:
+            return func(*args, **kwargs)
+        else:
+            return True
+    return wrapper
+
+
+def check_environment_ONLY_DEV(func):
+    def wrapper(*args, **kwargs):
+        if 'BARCODE_DEV' in os.environ:
+            return func(*args, **kwargs)
+        else:
+            return True
+    return wrapper
+
+
+def getMD5Hash(filename: str) -> hashlib:
+    hash_obj = hashlib.md5()
+    with open(filename, 'rb') as file:
+        buf = file.read()
+        hash_obj.update(buf)
+    return hash_obj
+
+
+@check_environment_TEST_PROD
+def checkNetwork(host="8.8.8.8", port=53, timeout=3) -> bool:
     """
     Host: 8.8.8.8 (google-public-dns-a.google.com)
     OpenPort: 53/tcp
@@ -45,13 +69,15 @@ def getTimefromNTP():
     data = b'\x1b' + 47 * b'\0'
     client.sendto(data, (addrNTP, 123))
     data, address = client.recvfrom(1024)
+    t = 0
     if data:
         t = struct.unpack('!12I', data)[10]
         t -= REFERENCE_TIME_1970
     return time.ctime(t), t
 
 
-def gitPull(path_repo: str) -> bool:
+@check_environment_ONLY_PROD
+def git_pull(path_repo: str) -> bool:
     try:
         repo = git.Repo(path_repo)
         repo.remotes.origin.pull()
@@ -65,90 +91,132 @@ def gitPull(path_repo: str) -> bool:
             print("!! stderr was:")
             print(exception.stderr)
         return False
-    except git.InvalidGitRepositoryError as exception:
+    except git.InvalidGitRepositoryError:
         print('Invalid Git Repository')
         return False
 
 
-def gitPush(path_repo: str):
+@check_environment_ONLY_PROD
+def git_push(path_repo: str, files: List[str], commit_message: str) -> bool:
     try:
-        repoLocal = git.Repo(path_repo)
-        repoLocal.git.add(purchasesFile)
-        repoLocal.index.commit("purchase via getraenkeKasse.py")
-        origin = repoLocal.remote(name='origin')
+        repo_local = git.Repo(path_repo)
+        for file in files:
+            repo_local.git.add(file)
+        repo_local.index.commit(commit_message)
+        origin = repo_local.remote(name='origin')
         origin.push()
+        return True
     except git.GitCommandError as exception:
         print(exception)
+        return False
 
 
-def readUsers() -> list:
+def check_for_file(file) -> None:
+    if not os.path.isfile(file):
+        raise Exception(f'{file} not found!')
+
+
+def read_users(users_file: str):
     """"
     Read users from usersFile
     """
-    if not os.path.isfile(usersFile):
-        raise Exception("usersFile not found!")
-    fileUsers = open(usersFile, "r")
-    users = []
-    for line in fileUsers:
-        users.append(line.rstrip())
-    fileUsers.close()
-    return users
+    check_for_file(users_file)
+    with open(users_file, "r") as file_users:
+        for line in file_users:
+            yield line.rstrip()
 
 
-def readProducts() -> typing.Tuple[pd.DataFrame, dict]:
-    """"
-    Read products from productsFile
+def read_csv_file(file: str, columns: List[str], column_type: dict) -> pd.DataFrame:
+    check_for_file(file)
+    try:
+        data_df = pd.read_csv(file, header=None)
+        data_df.columns = columns
+        for key, value in column_type.items():
+            data_df[key] = data_df[key].astype(value)
+    except pd.errors.EmptyDataError:
+        data_df = pd.DataFrame([], columns=columns)
+    return data_df
+
+
+def calc_length_code(products_df: pd.DataFrame) -> set:
     """
-    if not os.path.isfile(productsFile):
-        raise Exception("productsFile not found!")
-    fileProducts = open(productsFile, "r")
-    prod_list = list()
-    prod_dict = {}
-    for line in fileProducts:
-        ll = line.split(",")
-        ll[3] = ll[3][:-1]
-        ll.append('N/A')
-        prod_list.append(ll)
-        prod_dict[ll[1]] = float(ll[3])
-    fileProducts.close()
-    prod_df = pd.DataFrame(prod_list, columns=['nr', 'code', 'desc', 'price', 'alcohol'])
-    prod_df['code'] = prod_df['code'].astype(str)
-    prod_df['price'] = prod_df['price'].astype(float)
-    return prod_df, prod_dict
+    Create set containing the length of the product codes
+    """
+    return {len(row['code']) for _, row in products_df.iterrows() if len(row['code']) > 0}
 
 
-def calcLengthCode(products_df: pd.DataFrame) -> set:
-    """"""
-    length = set()
-    for index, row in products_df.iterrows():
-        tmpLen = len(str(row['code']))
-        if tmpLen > 0:
-            length.add(tmpLen)
-    return length
+def check_column_nr_in_file(file) -> int:
+    check_for_file(file)
+    df = pd.read_csv(file, header=None)
+    nr = len(df.columns)
+    return nr
 
 
-def getPurchases() -> pd.DataFrame:
-    if not os.path.isfile(purchasesFile):
-        raise Exception("purchasesFile not found!")
-    usersPurchases_df = pd.read_csv(purchasesFile, header=None)
-    usersPurchases_df.columns = ['timestamp', 'user', 'code']
-    usersPurchases_df['code'] = usersPurchases_df['code'].astype(str)
-    products_df, _ = readProducts()
-    usersPurchases_df = usersPurchases_df.merge(products_df, on='code', how='left', sort=False)
+def merge_purchases_products(purchases: pd.DataFrame, products: pd.DataFrame) -> pd.DataFrame:
+    usersPurchases_df = purchases.merge(products, on='code', how='left', sort=False)
     return usersPurchases_df
 
 
-def getUserPurchases(users_purchases_df: pd.DataFrame, user: str) -> typing.Tuple[np.int64, np.float64]:
-    user_df = users_purchases_df[users_purchases_df['user'] == user]
-    nr = user_df['timestamp'].count()
-    money = user_df['price'].sum()
-    return nr, money
+def summarize_user_purchases(purchases: pd.DataFrame, products: pd.DataFrame) -> pd.DataFrame:
+    usersPurchases_df = merge_purchases_products(purchases=purchases, products=products)
+    filtered_usersPurchases_df = usersPurchases_df[~usersPurchases_df['paid']]
+    summary_purchases_df = filtered_usersPurchases_df.groupby('user').agg({'code': 'count', 'price': 'sum'})
+    summary_purchases_df.reset_index(inplace=True)
+    summary_purchases_df.columns = ['name', 'drinks', 'money']
+    return summary_purchases_df
 
 
-def savePurchase(user: str, code: str):
-    if not os.path.isfile(purchasesFile):
-        raise Exception("purchasesFile not found!")
-    filePurchases = open(purchasesFile, "a")
-    line = datetime.datetime.now().isoformat() + "," + user + "," + code + "\n"
-    filePurchases.writelines(line)
-    filePurchases.close()
+def add_purchase(purchases: pd.DataFrame, user: str, code: str) -> pd.DataFrame:
+    new_purchase = pd.DataFrame([[datetime.datetime.now().isoformat(), user, code, False]],
+                                columns=['timestamp', 'user', 'code', 'paid'])
+    purchases = purchases.append(new_purchase, ignore_index=True)
+    return purchases
+
+
+def write_csv_file(file, df: pd.DataFrame) -> None:
+    check_for_file(file)
+    df.to_csv(file, header=False, index=False)
+
+
+def transform_purchases(purchases_file: str) -> None:
+    check_for_file(purchases_file)
+    try:
+        purchases_df = pd.read_csv(purchases_file, header=None)
+        purchases_df.columns = ['timestamp', 'user', 'code']
+        purchases_df['code'] = purchases_df['code'].astype(str)
+        purchases_df['paid'] = False
+        purchases_df['paid'] = purchases_df['paid'].astype(str)
+        with open(purchases_file, 'w+') as filePurchases_new:
+            for _, row in purchases_df.iterrows():
+                line = f"{row['timestamp']},{row['user']},{row['code']},{row['paid']}\n"
+                filePurchases_new.writelines(line)
+    except pd.errors.EmptyDataError:
+        pass
+
+
+def retransform_purchases(purchases_file: str) -> None:
+    check_for_file(purchases_file)
+    try:
+        purchases_df = pd.read_csv(purchases_file, header=None)
+        purchases_df.columns = ['timestamp', 'user', 'code', 'paid']
+        purchases_df['code'] = purchases_df['code'].astype(str)
+        purchases_df['paid'] = purchases_df['paid'].astype(bool)
+        with open('purchase_old.txt', 'w+') as filePurchases_old:
+            for _, row in purchases_df.iterrows():
+                line = f"{row['timestamp']},{row['user']},{row['code']}\n"
+                filePurchases_old.writelines(line)
+    except pd.errors.EmptyDataError:
+        pass
+
+
+def transform_products(products_file: str) -> None:
+    check_for_file(products_file)
+    try:
+        products_df = pd.read_csv(products_file, header=None)
+        products_df.columns = ['nr', 'code', 'desc', 'price']
+        with open(products_file, 'w+') as filePurchases_new:
+            for _, row in products_df.iterrows():
+                line = f"{row['nr']},{row['code']},{row['desc']},{row['price']},0\n"
+                filePurchases_new.writelines(line)
+    except pd.errors.EmptyDataError:
+        pass
