@@ -47,7 +47,6 @@ class ListFrame(wx.Frame):
             self.btnLoad.SetFont(prt.displaySettings.wxFont)
             self.btnLoad.Bind(wx.EVT_LEFT_UP, self._onClickLoadButton)
 
-            # TODO
             if not os.path.isfile(prt.productsFile):
                 self.btnLoad.Disable()
 
@@ -72,55 +71,51 @@ class ListFrame(wx.Frame):
             self.SetBackgroundColour("Gray")
             self.ShowFullScreen(True)
 
+    def update_prodList(self):
+        """"""
+        self.prodList.DeleteAllItems()
+        for index, row in self.parent.fileContents.products[['nr', 'code', 'desc', 'price']].iterrows():
+            self.prodList.Append([value for value in row])
+
     def _onClickCloseButton(self, event):
         """"""
         self.parent.exit()
 
     def _onClickAddButton(self, event):
         """"""
-        self.parent.show_edit_frame()
+        number = self.parent.fileContents.products['nr'].max() + 1
+        self.parent.show_edit_frame(number=number)
 
     def _onClickEditButton(self, event):
         """"""
-        # TODO
         fi = self.prodList.GetFirstSelected()
         if fi != -1:
-            edit = EditFrame()
-            edit.initValuesEdit(self.prodList.GetItemText(fi, 0), self.prodList.GetItemText(fi, 1),
-                                self.prodList.GetItemText(fi, 2), self.prodList.GetItemText(fi, 3))
+            number = int(self.prodList.GetItemText(fi, 0))
+            code = self.prodList.GetItemText(fi, 1)
+            desc = self.prodList.GetItemText(fi, 2)
+            price = self.prodList.GetItemText(fi, 3)
+            self.parent.show_edit_frame(number=number, old_values=(code, desc, price))
 
     def _onClickDelButton(self, event):
         """"""
         fi = self.prodList.GetFirstSelected()
         if fi != -1:
-            if not self.parent.show_confirm_dialog(confirm_message=f'Are your sure to delete #{fi +1}?'):
+            product_nr = self.prodList.GetItemText(item=fi, col=0)
+            if not self.parent.show_confirm_dialog(confirm_message=f'Are your sure to delete #{product_nr}?'):
                 return None
-            self.prodList.DeleteItem(fi)
-            for i in range(fi, self.prodList.GetItemCount()):
-                self.prodList.SetStringItem(i, 0, str(i + 1))
+            self.parent.delete_item(product_nr=int(product_nr))
+            self.update_prodList()
 
     def _onClickLoadButton(self, event):
         """"""
         if self.parent.show_confirm_dialog(confirm_message=f'Do you want to load {self.parent.productsFile}?'):
             self.prodList.DeleteAllItems()
             self.parent.get_products()
-            for index, row in self.parent.fileContents.products[['nr', 'code', 'desc', 'price']].iterrows():
-                self.prodList.Append([value for value in row])
+            self.update_prodList()
 
     def _onClickSaveButton(self, event):
         """"""
-        # TODO
         if self.parent.show_confirm_dialog(confirm_message=f'Do you want to save to {self.parent.productsFile}?'):
-            fileProdukte = open(productsFile, "w")
-        for i in range(self.prodList.GetItemCount()):
-            line = ""
-            for j in range(4):
-                line = line + self.prodList.GetItemText(i, j)
-                if j < 3:
-                    line = line + ","
-                else:
-                    line = line + "\n"
-            fileProdukte.writelines(line)
-        fileProdukte.close()
-        self.btnLoad.Enable()
+            self.parent.save_products()
+            self.btnLoad.Enable()
 
