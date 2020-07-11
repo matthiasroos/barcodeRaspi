@@ -83,5 +83,7 @@ class EditFrame(wx.Frame):
             if self.mode == 'edit':
                 self.parent.edit_item(number=self.number, code=code, desc=desc, price=price)
             self.Close()
+        else:
+            self.parent.show_error_dialog(error_message='Code already exists in product list')
 
 

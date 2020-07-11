@@ -83,7 +83,7 @@ class ListFrame(wx.Frame):
 
     def _onClickAddButton(self, event):
         """"""
-        number = self.parent.fileContents.products['nr'].max() + 1
+        number = self.parent.get_new_number()
         self.parent.show_edit_frame(number=number)
 
     def _onClickEditButton(self, event):
@@ -109,7 +109,6 @@ class ListFrame(wx.Frame):
     def _onClickLoadButton(self, event):
         """"""
         if self.parent.show_confirm_dialog(confirm_message=f'Do you want to load {self.parent.productsFile}?'):
-            self.prodList.DeleteAllItems()
             self.parent.get_products()
             self.update_prodList()
 

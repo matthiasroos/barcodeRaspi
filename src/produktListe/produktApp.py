@@ -43,7 +43,30 @@ class ProduktApp(src.app.App):
     def show_list_frame(self) -> None:
         self.listFrame = src.produktListe.listframe.ListFrame(self)
 
+    def get_new_number(self) -> int:
+        """
+        Get a product number for a new item
+
+        :return: product number
+        """
+        if self.fileContents.products is None:
+            return 1
+        number = self.fileContents.products['nr'].max() + 1
+        return number
+
     def check_item(self, number: int, code: str, mode: str) -> bool:
+        """
+        Check if the entered code is already in the product list
+
+        :param number: product number of the item
+        :param code: entered barcode of the item
+        :param mode: process mode 'add' or 'edit'
+        :return: True: code is unique, False: already existent code
+        """
+        # check if there are already entries
+        if self.fileContents.products is None:
+            return True
+        # look up the code
         prd_code = self.fileContents.products[self.fileContents.products['code'] == code]
         if prd_code.empty and mode == 'add':
             # new code, add mode
@@ -56,7 +79,10 @@ class ProduktApp(src.app.App):
 
     def add_item(self, number: int, code: str, desc: str, price: str):
         new_item = pd.DataFrame([[number, code, desc, price, 0]], columns=['nr', 'code', 'desc', 'price', 'stock'])
-        self.fileContents.products = pd.concat([self.fileContents.products, new_item])
+        if self.fileContents.products is None:
+            self.fileContents.products = new_item
+        else:
+            self.fileContents.products = pd.concat([self.fileContents.products, new_item])
         self.listFrame.update_prodList()
 
     def edit_item(self, number: int, code: str, desc: str, price: str):
