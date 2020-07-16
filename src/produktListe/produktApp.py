@@ -16,6 +16,9 @@ OFFSET = 5
 
 
 class ProduktApp(src.app.App):
+    """
+    App for the creation and editing of a product list
+    """
 
     def __init__(self):
         super().__init__()
