@@ -114,11 +114,10 @@ class ProduktApp(src.app.App):
 
     def add_item(self, values: Dict[str, str]) -> bool:
         """
-        Add item to the products dataframe
+        Add item to the products dataframe, input sanity is checked by create_new_product()
 
         :param values: number, code, desc, price
-        :return: True: item successfully created, False: an exception occurred
-                                                            (error dialog shown by create_new_product()
+        :return: True: item successfully created, False: an exception occurred (error dialog by create_new_product())
         """
         new_item_df = self.create_new_product(values=values)
         if new_item_df is None:
@@ -135,7 +134,7 @@ class ProduktApp(src.app.App):
 
         :param values: number, code, desc, price
         :return:
-        # TODO Bug: no type checking is done here
+        # TODO Bug: no input sanity check is done here
         """
         for key, value in values.items():
             if key != 'nr':

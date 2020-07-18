@@ -82,13 +82,16 @@ class EditFrame(wx.Frame):
         values = {name: Input.GetValue() if isinstance(Input, wx.TextCtrl) else Input
                   for name, Input in zip(self.input_names, self.input_list)}
 
+        # check if code is unique
         if self.parent.check_item(number=self.number, code=values['code'], mode=self.mode):
             if self.mode == 'add':
+                # add new item, if input is sane
                 if self.parent.add_item(values=values):
                     self.parent.update_product_listctrl()
                 else:
                     return None
             if self.mode == 'edit':
+                # change item, if input is sane
                 if self.parent.edit_item(values=values):
                     self.parent.update_product_listctrl()
                 else:

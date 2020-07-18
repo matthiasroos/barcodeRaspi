@@ -126,8 +126,8 @@ class App:
 
     def create_new_product(self, values: Dict[str, str]) -> Optional[pd.DataFrame]:
         """
+        Create dataframe for new item, if possible (input sanity check)
 
-        :param number: product number of the new product
         :param values: code, desc, price, stock
         :return: dataframe containing the new product
         """
