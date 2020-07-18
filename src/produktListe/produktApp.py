@@ -1,5 +1,5 @@
 
-from typing import Optional, Tuple
+from typing import Dict, Optional, Tuple
 
 import pandas as pd
 import wx
@@ -30,6 +30,11 @@ class ProduktApp(src.app.App):
         self.displaySettings.offSet = OFFSET
         self._productsFile = PRODUCTS_FILE
 
+        self.shown_columns = [{'column': 'nr', 'text': '#', 'width': 50},
+                              {'column': 'code', 'text': 'code', 'width': 250},
+                              {'column': 'desc', 'text': 'description', 'width': 250},
+                              {'column': 'price', 'text': 'price', 'width': 70}]
+
         self.listFrame = None
 
     def run(self) -> None:
@@ -42,7 +47,7 @@ class ProduktApp(src.app.App):
         self.app.MainLoop()
 
     @property
-    def productsFile(self):
+    def productsFile(self) -> str:
         """
         Implementation of the abstract property to return the products file
 
@@ -62,7 +67,7 @@ class ProduktApp(src.app.App):
         src.produktListe.editframe.EditFrame(self, number=number, old_values=old_values)
 
     def show_list_frame(self) -> None:
-        self.listFrame = src.produktListe.listframe.ListFrame(self)
+        self.listFrame = src.produktListe.listframe.ListFrame(self, columns=self.shown_columns)
 
     def update_product_listctrl(self) -> None:
         """
@@ -70,7 +75,8 @@ class ProduktApp(src.app.App):
 
         :return:
         """
-        self.listFrame.update_prodList()
+        columns = [entry['column'] for entry in self.shown_columns]
+        self.listFrame.update_prodList(products_df=self.fileContents.products[columns])
 
     def get_new_number(self) -> int:
         """
@@ -106,35 +112,35 @@ class ProduktApp(src.app.App):
                 return True
         return False
 
-    def add_item(self, number: int, code: str, desc: str, price: str) -> None:
+    def add_item(self, values: Dict[str, str]) -> bool:
         """
         Add item to the products dataframe
 
-        :param number: product number
-        :param code: product code
-        :param desc: product description
-        :param price: product price
-        :return:
+        :param values: number, code, desc, price
+        :return: True: item successfully created, False: an exception occurred
+                                                            (error dialog shown by create_new_product()
         """
-        new_item = pd.DataFrame([[number, code, desc, price, 0]], columns=['nr', 'code', 'desc', 'price', 'stock'])
+        new_item_df = self.create_new_product(values=values)
+        if new_item_df is None:
+            return False
         if self.fileContents.products is None:
-            self.fileContents.products = new_item
+            self.fileContents.products = new_item_df
         else:
-            self.fileContents.products = pd.concat([self.fileContents.products, new_item])
+            self.fileContents.products = pd.concat([self.fileContents.products, new_item_df])
+        return True
 
-    def edit_item(self, number: int, code: str, desc: str, price: str) -> None:
+    def edit_item(self, values: Dict[str, str]) -> bool:
         """
         Edit item in the products dataframe
 
-        :param number: product number
-        :param code: product code
-        :param desc: product description
-        :param price: product price
+        :param values: number, code, desc, price
         :return:
+        # TODO Bug: no type checking is done here
         """
-        self.fileContents.products.loc[self.fileContents.products['nr'] == number, 'code'] = code
-        self.fileContents.products.loc[self.fileContents.products['nr'] == number, 'desc'] = desc
-        self.fileContents.products.loc[self.fileContents.products['nr'] == number, 'price'] = price
+        for key, value in values.items():
+            if key != 'nr':
+                self.fileContents.products.loc[self.fileContents.products['nr'] == values['nr'], key] = value
+        return True
 
     def delete_item(self, number: int) -> None:
         """

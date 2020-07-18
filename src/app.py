@@ -3,7 +3,7 @@ import abc
 import dataclasses
 import os
 import sys
-from typing import Optional
+from typing import Dict, List, Optional
 
 import pandas as pd
 import wx
@@ -35,6 +35,8 @@ class App:
         self.displaySettings = DisplaySettings()
         self.fileContents = FileContents()
         self._productsFile: Optional[str] = None
+        self.product_columns = ['nr', 'code', 'desc', 'price', 'stock']
+        self.product_columns_type = {'nr': int, 'code': str, 'desc': str, 'price': float, 'stock': int}
 
         self.app = wx.App(False)
         if 'BARCODE_DEV' in os.environ:
@@ -107,22 +109,36 @@ class App:
     # handling of products
     @property
     @abc.abstractmethod
-    def productsFile(self):
+    def productsFile(self) -> str:
         """
         Abstract property to return the products file
-
-        :return:
         """
         raise NotImplementedError
 
     @productsFile.setter
-    def productsFile(self, value):
+    def productsFile(self, value) -> None:
         self._productsFile = value
 
-    def get_products(self) -> None:
+    def load_products(self) -> None:
         self.fileContents.products = functions.read_csv_file(file=self.productsFile,
-                                                             columns=['nr', 'code', 'desc', 'price', 'stock'],
-                                                             column_type={'code': str, 'price': float})
+                                                             columns=self.product_columns,
+                                                             column_types=self.product_columns_type)
+
+    def create_new_product(self, values: Dict[str, str]) -> Optional[pd.DataFrame]:
+        """
+
+        :param number: product number of the new product
+        :param values: code, desc, price, stock
+        :return: dataframe containing the new product
+        """
+        new_item_list = [values[column] if values.get(column) else 0 for column in self.product_columns]
+        new_item_df = pd.DataFrame([new_item_list], columns=self.product_columns)
+        try:
+            new_item_df = functions.format_dataframe(data_df=new_item_df, types=self.product_columns_type)
+        except ValueError as exc:
+            self.show_error_dialog(error_message=f'Error: {str(exc)}')
+            return None
+        return new_item_df
 
     def _save_products(self) -> None:
         functions.write_csv_file(file=self.productsFile, df=self.fileContents.products)

@@ -126,13 +126,18 @@ def read_users(users_file: str):
             yield line.rstrip()
 
 
-def read_csv_file(file: str, columns: List[str], column_type: dict) -> pd.DataFrame:
+def format_dataframe(data_df: pd.DataFrame, types: dict) -> pd.DataFrame:
+    for key, value in types.items():
+        data_df[key] = data_df[key].astype(value)
+    return data_df
+
+
+def read_csv_file(file: str, columns: List[str], column_types: dict) -> pd.DataFrame:
     check_for_file(file)
     try:
         data_df = pd.read_csv(file, header=None)
         data_df.columns = columns
-        for key, value in column_type.items():
-            data_df[key] = data_df[key].astype(value)
+        data_df = format_dataframe(data_df=data_df, types=column_types)
     except pd.errors.EmptyDataError:
         data_df = pd.DataFrame([], columns=columns)
     return data_df

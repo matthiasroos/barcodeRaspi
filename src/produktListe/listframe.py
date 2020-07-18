@@ -1,16 +1,19 @@
 
 import os.path
+from typing import Dict, List
 
+import pandas as pd
 import wx
 import wx.grid
 
 
 class ListFrame(wx.Frame):
 
-    def __init__(self, parent):
+    def __init__(self, parent, columns: List[Dict[str, int]]):
         """Constructor"""
         wx.Frame.__init__(self, None, title="ListFrame")
         self.parent = parent
+        self.columns = columns
         panel = wx.Panel(self)
 
         self._width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)
@@ -64,18 +67,16 @@ class ListFrame(wx.Frame):
                                         pos=(prt.displaySettings.offSet, prt.displaySettings.offSet),
                                         style=wx.LC_REPORT | wx.LC_HRULES)
             self.prodList.SetFont(prt.displaySettings.wxFont)
-            self.prodList.InsertColumn(0, '#', width=50)
-            self.prodList.InsertColumn(1, 'code', width=250)
-            self.prodList.InsertColumn(2, 'description', width=250)
-            self.prodList.InsertColumn(3, 'price', width=70)
+            for index, entry in enumerate(self.columns):
+                self.prodList.InsertColumn(index, entry['text'], width=entry['width'])
 
             self.SetBackgroundColour("Gray")
             self.ShowFullScreen(True)
 
-    def update_prodList(self):
+    def update_prodList(self, products_df: pd.DataFrame):
         """"""
         self.prodList.DeleteAllItems()
-        for index, row in self.parent.fileContents.products[['nr', 'code', 'desc', 'price']].iterrows():
+        for index, row in products_df.iterrows():
             self.prodList.Append([value for value in row])
 
     def _onClickCloseButton(self, event):
@@ -92,10 +93,8 @@ class ListFrame(wx.Frame):
         fi = self.prodList.GetFirstSelected()
         if fi != -1:
             number = int(self.prodList.GetItemText(fi, 0))
-            code = self.prodList.GetItemText(fi, 1)
-            desc = self.prodList.GetItemText(fi, 2)
-            price = self.prodList.GetItemText(fi, 3)
-            self.parent.show_edit_frame(number=number, old_values=(code, desc, price))
+            old_values = (self.prodList.GetItemText(fi, i) for i in range(1, self.prodList.GetColumnCount()))
+            self.parent.show_edit_frame(number=number, old_values=old_values)
 
     def _onClickDelButton(self, event):
         """"""
@@ -110,8 +109,8 @@ class ListFrame(wx.Frame):
     def _onClickLoadButton(self, event):
         """"""
         if self.parent.show_confirm_dialog(confirm_message=f'Do you want to load {self.parent.productsFile}?'):
-            self.parent.get_products()
-            self.update_prodList()
+            self.parent.load_products()
+            self.parent.update_product_listctrl()
 
     def _onClickSaveButton(self, event):
         """"""
