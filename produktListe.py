@@ -9,4 +9,3 @@ if __name__ == "__main__":
 
     pl = src.produktListe.produktApp.ProduktApp()
     pl.run()
-

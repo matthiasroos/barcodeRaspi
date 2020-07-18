@@ -1,8 +1,8 @@
+
+from typing import Optional, Tuple
+
 import wx
 import wx.grid
-import time
-import os.path
-from typing import Optional, Tuple
 
 
 class EditFrame(wx.Frame):
@@ -80,10 +80,10 @@ class EditFrame(wx.Frame):
         if self.parent.check_item(number=self.number, code=code, mode=self.mode):
             if self.mode == 'add':
                 self.parent.add_item(number=self.number, code=code, desc=desc, price=price)
+                self.parent.update_product_listctrl()
             if self.mode == 'edit':
                 self.parent.edit_item(number=self.number, code=code, desc=desc, price=price)
+                self.parent.update_product_listctrl()
             self.Close()
         else:
             self.parent.show_error_dialog(error_message='Code already exists in product list')
-
-

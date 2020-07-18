@@ -52,6 +52,11 @@ class App:
 
     @abc.abstractmethod
     def run(self) -> None:
+        """
+        Abstract method to run the app (load data if necessary, show the first frame and start the main loop)
+
+        :return:
+        """
         pass
 
     @staticmethod
@@ -63,6 +68,7 @@ class App:
         os.execl(sys.executable, sys.executable, *sys.argv)
         sys.exit()
 
+    # dialogs
     @staticmethod
     def show_error_dialog(error_message: str) -> None:
         dlg = wx.MessageDialog(None, message=error_message, caption='ERROR',
@@ -98,9 +104,15 @@ class App:
             return True
         return False
 
+    # handling of products
     @property
     @abc.abstractmethod
     def productsFile(self):
+        """
+        Abstract property to return the products file
+
+        :return:
+        """
         raise NotImplementedError
 
     @productsFile.setter

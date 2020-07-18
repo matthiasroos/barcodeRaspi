@@ -1,7 +1,8 @@
+
+import os.path
+
 import wx
 import wx.grid
-import time
-import os.path
 
 
 class ListFrame(wx.Frame):
@@ -103,8 +104,8 @@ class ListFrame(wx.Frame):
             product_nr = self.prodList.GetItemText(item=fi, col=0)
             if not self.parent.show_confirm_dialog(confirm_message=f'Are your sure to delete #{product_nr}?'):
                 return None
-            self.parent.delete_item(product_nr=int(product_nr))
-            self.update_prodList()
+            self.parent.delete_item(number=int(product_nr))
+            self.parent.update_product_listctrl()
 
     def _onClickLoadButton(self, event):
         """"""
@@ -117,4 +118,3 @@ class ListFrame(wx.Frame):
         if self.parent.show_confirm_dialog(confirm_message=f'Do you want to save to {self.parent.productsFile}?'):
             self.parent.save_products()
             self.btnLoad.Enable()
-
