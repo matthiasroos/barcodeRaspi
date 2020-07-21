@@ -20,100 +20,110 @@ class ListFrame(wx.Frame):
         self._height = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y)
 
         with self.parent as prt:
-            btnClose = wx.Button(panel, id=wx.ID_ANY, label='close', name='close',
-                                 size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
-                                 pos=(self._width - prt.displaySettings.btnWidth, 0))
-            btnClose.SetFont(prt.displaySettings.wxFont)
-            btnClose.Bind(wx.EVT_LEFT_UP, self._onClickCloseButton)
+            btn_close = wx.Button(panel, id=wx.ID_ANY, label='close', name='close',
+                                  size=wx.Size(prt.display_settings.btn_width, prt.display_settings.btn_height),
+                                  pos=(self._width - prt.display_settings.btn_width, 0))
+            btn_close.SetFont(prt.display_settings.wx_font)
+            btn_close.Bind(wx.EVT_LEFT_UP, self._onClickCloseButton)
 
-            btnAdd = wx.Button(panel, id=wx.ID_ANY, label='add', name='add',
-                               size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
-                               pos=(self._width - prt.displaySettings.btnWidth, 2 * prt.displaySettings.btnHeight))
-            btnAdd.SetFont(prt.displaySettings.wxFont)
-            btnAdd.Bind(wx.EVT_LEFT_UP, self._onClickAddButton)
+            btn_add = wx.Button(panel, id=wx.ID_ANY, label='add', name='add',
+                                size=wx.Size(prt.display_settings.btn_width, prt.display_settings.btn_height),
+                                pos=(self._width - prt.display_settings.btn_width, 2 * prt.display_settings.btn_height))
+            btn_add.SetFont(prt.display_settings.wx_font)
+            btn_add.Bind(wx.EVT_LEFT_UP, self._onClickAddButton)
 
-            btnEdit = wx.Button(panel, id=wx.ID_ANY, label='edit', name='edit',
-                                size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
-                                pos=(self._width - prt.displaySettings.btnWidth, 3 * prt.displaySettings.btnHeight))
-            btnEdit.SetFont(prt.displaySettings.wxFont)
-            btnEdit.Bind(wx.EVT_LEFT_UP, self._onClickEditButton)
+            btn_edit = wx.Button(panel, id=wx.ID_ANY, label='edit', name='edit',
+                                 size=wx.Size(prt.display_settings.btn_width, prt.display_settings.btn_height),
+                                 pos=(self._width - prt.display_settings.btn_width,
+                                      3 * prt.display_settings.btn_height))
+            btn_edit.SetFont(prt.display_settings.wx_font)
+            btn_edit.Bind(wx.EVT_LEFT_UP, self._onClickEditButton)
 
-            btnDel = wx.Button(panel, id=wx.ID_ANY, label='delete', name='delete',
-                               size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
-                               pos=(self._width - prt.displaySettings.btnWidth, 4 * prt.displaySettings.btnHeight))
-            btnDel.SetFont(prt.displaySettings.wxFont)
-            btnDel.Bind(wx.EVT_LEFT_UP, self._onClickDelButton)
+            btn_del = wx.Button(panel, id=wx.ID_ANY, label='delete', name='delete',
+                                size=wx.Size(prt.display_settings.btn_width, prt.display_settings.btn_height),
+                                pos=(self._width - prt.display_settings.btn_width,
+                                     4 * prt.display_settings.btn_height))
+            btn_del.SetFont(prt.display_settings.wx_font)
+            btn_del.Bind(wx.EVT_LEFT_UP, self._onClickDelButton)
 
-            self.btnLoad = wx.Button(panel, id=wx.ID_ANY, label='load', name='load',
-                                     size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
-                                     pos=(
-                                         self._width - prt.displaySettings.btnWidth, 5 * prt.displaySettings.btnHeight))
-            self.btnLoad.SetFont(prt.displaySettings.wxFont)
-            self.btnLoad.Bind(wx.EVT_LEFT_UP, self._onClickLoadButton)
+            self.btn_load = wx.Button(panel, id=wx.ID_ANY, label='load', name='load',
+                                      size=wx.Size(prt.display_settings.btn_width, prt.display_settings.btn_height),
+                                      pos=(self._width - prt.display_settings.btn_width,
+                                           5 * prt.display_settings.btn_height))
+            self.btn_load.SetFont(prt.display_settings.wx_font)
+            self.btn_load.Bind(wx.EVT_LEFT_UP, self._onClickLoadButton)
 
-            if not os.path.isfile(prt.productsFile):
-                self.btnLoad.Disable()
+            if not os.path.isfile(prt.products_file):
+                self.btn_load.Disable()
 
-            btnSave = wx.Button(panel, id=wx.ID_ANY, label="save", name="save",
-                                size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
-                                pos=(self._width - prt.displaySettings.btnWidth, 6 * prt.displaySettings.btnHeight))
-            btnSave.SetFont(prt.displaySettings.wxFont)
-            btnSave.Bind(wx.EVT_LEFT_UP, self._onClickSaveButton)
+            btn_save = wx.Button(panel, id=wx.ID_ANY, label="save", name="save",
+                                 size=wx.Size(prt.display_settings.btn_width, prt.display_settings.btn_height),
+                                 pos=(self._width - prt.display_settings.btn_width,
+                                      6 * prt.display_settings.btn_height))
+            btn_save.SetFont(prt.display_settings.wx_font)
+            btn_save.Bind(wx.EVT_LEFT_UP, self._onClickSaveButton)
 
-            self.prodList = wx.ListCtrl(panel,
-                                        size=(self._width - prt.displaySettings.btnWidth -
-                                              2 * prt.displaySettings.offSet,
-                                              self._height - 2 * prt.displaySettings.offSet),
-                                        pos=(prt.displaySettings.offSet, prt.displaySettings.offSet),
-                                        style=wx.LC_REPORT | wx.LC_HRULES)
-            self.prodList.SetFont(prt.displaySettings.wxFont)
+            self.prod_list = wx.ListCtrl(panel,
+                                         size=(self._width - prt.display_settings.btn_width -
+                                               2 * prt.display_settings.off_set,
+                                               self._height - 2 * prt.display_settings.off_set),
+                                         pos=(prt.display_settings.off_set, prt.display_settings.off_set),
+                                         style=wx.LC_REPORT | wx.LC_HRULES)
+            self.prod_list.SetFont(prt.display_settings.wx_font)
             for index, entry in enumerate(self.columns):
-                self.prodList.InsertColumn(index, entry['text'], width=entry['width'])
+                self.prod_list.InsertColumn(index, entry['text'], width=entry['width'])
 
             self.SetBackgroundColour("Gray")
             self.ShowFullScreen(True)
 
-    def update_prodList(self, products_df: pd.DataFrame):
-        """"""
-        self.prodList.DeleteAllItems()
-        for index, row in products_df.iterrows():
-            self.prodList.Append([value for value in row])
+    def update_prod_list(self, products_df: pd.DataFrame) -> None:
+        """
+        Update the ListCtrl showing the product list
 
-    def _onClickCloseButton(self, event):
+        :param products_df: dataframe of products
+        :return:
+        """
+        self.prod_list.DeleteAllItems()
+        for _, row in products_df.iterrows():
+            self.prod_list.Append(row.tolist())
+
+    def _onClickCloseButton(self, _) -> None:
         """"""
         self.parent.exit()
 
-    def _onClickAddButton(self, event):
+    def _onClickAddButton(self, _) -> None:
         """"""
         number = self.parent.get_new_number()
         self.parent.show_edit_frame(number=number)
 
-    def _onClickEditButton(self, event):
+    def _onClickEditButton(self, _) -> None:
         """"""
-        fi = self.prodList.GetFirstSelected()
-        if fi != -1:
-            number = int(self.prodList.GetItemText(fi, 0))
-            old_values = (self.prodList.GetItemText(fi, i) for i in range(1, self.prodList.GetColumnCount()))
+        first_selected = self.prod_list.GetFirstSelected()
+        if first_selected != -1:
+            number = int(self.prod_list.GetItemText(first_selected, 0))
+            old_values = (self.prod_list.GetItemText(first_selected, i)
+                          for i in range(1, self.prod_list.GetColumnCount()))
             self.parent.show_edit_frame(number=number, old_values=old_values)
 
-    def _onClickDelButton(self, event):
+    def _onClickDelButton(self, _) -> None:
         """"""
-        fi = self.prodList.GetFirstSelected()
-        if fi != -1:
-            product_nr = self.prodList.GetItemText(item=fi, col=0)
+        first_selected = self.prod_list.GetFirstSelected()
+        if first_selected != -1:
+            product_nr = self.prod_list.GetItemText(item=first_selected, col=0)
             if not self.parent.show_confirm_dialog(confirm_message=f'Are your sure to delete #{product_nr}?'):
                 return None
             self.parent.delete_item(number=int(product_nr))
             self.parent.update_product_listctrl()
+        return None
 
-    def _onClickLoadButton(self, event):
+    def _onClickLoadButton(self, _) -> None:
         """"""
-        if self.parent.show_confirm_dialog(confirm_message=f'Do you want to load {self.parent.productsFile}?'):
+        if self.parent.show_confirm_dialog(confirm_message=f'Do you want to load {self.parent.products_file}?'):
             self.parent.load_products()
             self.parent.update_product_listctrl()
 
-    def _onClickSaveButton(self, event):
+    def _onClickSaveButton(self, _) -> None:
         """"""
-        if self.parent.show_confirm_dialog(confirm_message=f'Do you want to save to {self.parent.productsFile}?'):
+        if self.parent.show_confirm_dialog(confirm_message=f'Do you want to save to {self.parent.products_file}?'):
             self.parent.save_products()
-            self.btnLoad.Enable()
+            self.btn_load.Enable()

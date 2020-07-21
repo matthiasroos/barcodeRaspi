@@ -3,7 +3,7 @@ import abc
 import dataclasses
 import os
 import sys
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
 import pandas as pd
 import wx
@@ -13,6 +13,9 @@ import functions
 
 @dataclasses.dataclass()
 class FileContents:
+    """
+    TODO:
+    """
     products: pd.DataFrame = None
     purchases: pd.DataFrame = None
     users: pd.DataFrame = None
@@ -20,30 +23,36 @@ class FileContents:
 
 @dataclasses.dataclass()
 class DisplaySettings:
-    btnHeight: int = None
-    btnWidth: int = None
-    fontSize: int = None
-    offSet: int = None
-    wxFont: wx.Font = None
+    """
+    TODO:
+    """
+    btn_height: int = None
+    btn_width: int = None
+    font_size: int = None
+    off_set: int = None
+    wx_font: wx.Font = None
     screen_width: int = None
     screen_height: int = None
 
 
 class App:
+    """
+    TODO:
+    """
 
     def __init__(self):
-        self.displaySettings = DisplaySettings()
-        self.fileContents = FileContents()
-        self._productsFile: Optional[str] = None
+        self.display_settings = DisplaySettings()
+        self.file_contents = FileContents()
+        self._products_file: Optional[str] = None
         self.product_columns = ['nr', 'code', 'desc', 'price', 'stock']
         self.product_columns_type = {'nr': int, 'code': str, 'desc': str, 'price': float, 'stock': int}
 
         self.app = wx.App(False)
         if 'BARCODE_DEV' in os.environ:
-            self.displaySettings.screen_width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X) / 2
+            self.display_settings.screen_width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X) / 2
         else:
-            self.displaySettings.screen_width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)
-        self.displaySettings.screen_height = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y)
+            self.display_settings.screen_width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)
+        self.display_settings.screen_height = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y)
 
     # The magic methods __enter__ and __exit__ are necessary for using the class in context managers
     def __enter__(self):
@@ -59,20 +68,35 @@ class App:
 
         :return:
         """
-        pass
 
     @staticmethod
     def exit() -> None:
+        """
+        Exit the app
+
+        :return:
+        """
         sys.exit()
 
     @staticmethod
     def restart() -> None:
+        """
+        Restart the app
+
+        :return:
+        """
         os.execl(sys.executable, sys.executable, *sys.argv)
         sys.exit()
 
     # dialogs
     @staticmethod
     def show_error_dialog(error_message: str) -> None:
+        """
+        Show an error dialog
+
+        :param error_message: error message for the user
+        :return:
+        """
         dlg = wx.MessageDialog(None, message=error_message, caption='ERROR',
                                style=wx.OK | wx.ICON_WARNING | wx.STAY_ON_TOP)
         # dlg.SetFont(self.displaySettings.wxFont)
@@ -80,6 +104,12 @@ class App:
 
     @staticmethod
     def show_info_dialog(info_message: str) -> None:
+        """
+        Show an info dialog
+
+        :param info_message: info message for the user
+        :return:
+        """
         dlg = wx.MessageDialog(None, message=info_message, caption='INFO',
                                style=wx.OK | wx.ICON_INFORMATION | wx.STAY_ON_TOP)
         # dlg.SetFont(self.displaySettings.wxFont)
@@ -87,42 +117,60 @@ class App:
 
     @staticmethod
     def show_confirm_dialog(confirm_message: str) -> bool:
+        """
+        Show an confirm dialog
+
+        :param confirm_message: confirm message for the user
+        :return: True if wx.OK was clicked, False if wx.CANCEL was clicked
+        """
         dlg = wx.MessageDialog(None, message=confirm_message, caption='CONFIRM',
                                style=wx.OK | wx.CANCEL | wx.ICON_QUESTION | wx.STAY_ON_TOP)
         # dlg.SetFont(self.displaySettings.wxFont)
         choice = dlg.ShowModal()
-        if choice == wx.ID_OK:
-            return True
-        else:
-            return False
+        return bool(choice == wx.ID_OK)
 
     @staticmethod
     def show_password_dialog(password_message: str) -> bool:
+        """
+        Prompt the user for a password and compare it with the environment variable 'ADMIN_PASSWORD'
+
+        :param password_message: password message for the user
+        :return: True if password
+        """
         dlg = wx.PasswordEntryDialog(parent=None, message=password_message,
                                      defaultValue='', style=wx.OK | wx.CANCEL)
         # dlg.SetFont(self.displaySettings.wxFont)
         dlg.ShowModal()
-        if dlg.GetValue() == os.getenv('ADMIN_PASSWORD'):
-            return True
-        return False
+        return bool(dlg.GetValue() == os.getenv('ADMIN_PASSWORD'))
 
     # handling of products
     @property
     @abc.abstractmethod
-    def productsFile(self) -> str:
+    def products_file(self) -> str:
         """
         Abstract property to return the products file
         """
         raise NotImplementedError
 
-    @productsFile.setter
-    def productsFile(self, value) -> None:
-        self._productsFile = value
+    @products_file.setter
+    def products_file(self, value) -> None:
+        """
+        Setter for the property products_file
+
+        :param value: value for the property products_file
+        :return:
+        """
+        self._products_file = value
 
     def load_products(self) -> None:
-        self.fileContents.products = functions.read_csv_file(file=self.productsFile,
-                                                             columns=self.product_columns,
-                                                             column_types=self.product_columns_type)
+        """
+        Load the products file into a dataframe
+
+        :return:
+        """
+        self.file_contents.products = functions.read_csv_file(file=self.products_file,
+                                                              columns=self.product_columns,
+                                                              column_types=self.product_columns_type)
 
     def create_new_product(self, values: Dict[str, str]) -> Optional[pd.DataFrame]:
         """
@@ -141,4 +189,4 @@ class App:
         return new_item_df
 
     def _save_products(self) -> None:
-        functions.write_csv_file(file=self.productsFile, df=self.fileContents.products)
+        functions.write_csv_file(file=self.products_file, df=self.file_contents.products)

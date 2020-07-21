@@ -10,8 +10,8 @@ class EditFrame(wx.Frame):
     def __init__(self, parent, number: int, old_values: Optional[Tuple[str, str, str]]):
         """Constructor"""
 
-        frameWidth = 500
-        frameHeight = 500
+        frame_width = 500
+        frame_height = 500
 
         self.parent = parent
         self.number = number
@@ -25,62 +25,62 @@ class EditFrame(wx.Frame):
             title = 'Edit entry'
             code, desc, price = old_values
 
-        wx.Frame.__init__(self, None, title=title, size=(frameWidth, frameHeight))
+        wx.Frame.__init__(self, None, title=title, size=(frame_width, frame_height))
 
         self.input_names = ['nr', 'code', 'desc', 'price']
         self.input_list = [self.number]
 
         with self.parent as prt:
 
-            self.NummerTxt = wx.StaticText(self, label=f'# {self.number}', pos=(40, 20), size=(20, 50))
-            self.NummerTxt.SetFont(prt.displaySettings.wxFont)
+            nummer_txt = wx.StaticText(self, label=f'# {self.number}', pos=(40, 20), size=(20, 50))
+            nummer_txt.SetFont(prt.display_settings.wx_font)
 
-            CodeTxt = wx.StaticText(self, label='code', pos=(40, 70), size=(20, 50))
-            CodeTxt.SetFont(prt.displaySettings.wxFont)
-            CodeInp = wx.TextCtrl(self, value=code, pos=(140, 60), size=(300, 50))
-            CodeInp.SetFont(prt.displaySettings.wxFont)
-            CodeInp.SetMaxLength(13)
-            CodeInp.SetFocus()
-            self.input_list.append(CodeInp)
+            code_txt = wx.StaticText(self, label='code', pos=(40, 70), size=(20, 50))
+            code_txt.SetFont(prt.display_settings.wx_font)
+            code_inp = wx.TextCtrl(self, value=code, pos=(140, 60), size=(300, 50))
+            code_inp.SetFont(prt.display_settings.wx_font)
+            code_inp.SetMaxLength(13)
+            code_inp.SetFocus()
+            self.input_list.append(code_inp)
 
-            DescTxt = wx.StaticText(self, label='descr.', pos=(40, 125), size=(20, 50))
-            DescTxt.SetFont(prt.displaySettings.wxFont)
-            DescInp = wx.TextCtrl(self, value=desc, pos=(140, 115), size=(300, 50))
-            DescInp.SetMaxLength(30)
-            DescInp.SetFont(prt.displaySettings.wxFont)
-            self.input_list.append(DescInp)
+            desc_txt = wx.StaticText(self, label='descr.', pos=(40, 125), size=(20, 50))
+            desc_txt.SetFont(prt.display_settings.wx_font)
+            desc_inp = wx.TextCtrl(self, value=desc, pos=(140, 115), size=(300, 50))
+            desc_inp.SetMaxLength(30)
+            desc_inp.SetFont(prt.display_settings.wx_font)
+            self.input_list.append(desc_inp)
 
-            PriceTxt = wx.StaticText(self, label='price', pos=(40, 180), size=(20, 50))
-            PriceTxt.SetFont(prt.displaySettings.wxFont)
-            PriceInp = wx.TextCtrl(self, value=price, pos=(140, 170), size=(300, 50))
-            PriceInp.SetMaxLength(6)
-            PriceInp.SetFont(prt.displaySettings.wxFont)
-            self.input_list.append(PriceInp)
+            price_txt = wx.StaticText(self, label='price', pos=(40, 180), size=(20, 50))
+            price_txt.SetFont(prt.display_settings.wx_font)
+            price_inp = wx.TextCtrl(self, value=price, pos=(140, 170), size=(300, 50))
+            price_inp.SetMaxLength(6)
+            price_inp.SetFont(prt.display_settings.wx_font)
+            self.input_list.append(price_inp)
 
-            btnBack = wx.Button(self, id=wx.ID_ANY, label="back", name="back",
-                                size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
-                                pos=(100, frameHeight - 2 * prt.displaySettings.btnHeight))
-            btnBack.SetFont(prt.displaySettings.wxFont)
-            btnBack.Bind(wx.EVT_LEFT_UP, self._onClickBackButton)
+            btn_back = wx.Button(self, id=wx.ID_ANY, label="back", name="back",
+                                 size=wx.Size(prt.display_settings.btn_width, prt.display_settings.btn_height),
+                                 pos=(100, frame_height - 2 * prt.display_settings.btn_height))
+            btn_back.SetFont(prt.display_settings.wx_font)
+            btn_back.Bind(wx.EVT_LEFT_UP, self._onClickBackButton)
 
-            btnConfirm = wx.Button(self, id=wx.ID_ANY, label="confirm", name="confirm",
-                                   size=wx.Size(prt.displaySettings.btnWidth, prt.displaySettings.btnHeight),
-                                   pos=(100 + prt.displaySettings.btnWidth + 5,
-                                        frameHeight - 2 * prt.displaySettings.btnHeight))
-            btnConfirm.SetFont(prt.displaySettings.wxFont)
-            btnConfirm.Bind(wx.EVT_LEFT_UP, self._onClickConfirmButton)
-            # btnConfirm.Disable()
+            btn_confirm = wx.Button(self, id=wx.ID_ANY, label="confirm", name="confirm",
+                                    size=wx.Size(prt.display_settings.btn_width, prt.display_settings.btn_height),
+                                    pos=(100 + prt.display_settings.btn_width + 5,
+                                         frame_height - 2 * prt.display_settings.btn_height))
+            btn_confirm.SetFont(prt.display_settings.wx_font)
+            btn_confirm.Bind(wx.EVT_LEFT_UP, self._onClickConfirmButton)
+            # btn_confirm.Disable()
 
         self.Show()
 
-    def _onClickBackButton(self, event):
+    def _onClickBackButton(self, _) -> None:
         """"""
         self.Close()
 
-    def _onClickConfirmButton(self, event):
+    def _onClickConfirmButton(self, _) -> None:
         """"""
-        values = {name: Input.GetValue() if isinstance(Input, wx.TextCtrl) else Input
-                  for name, Input in zip(self.input_names, self.input_list)}
+        values = {name: inp.GetValue() if isinstance(inp, wx.TextCtrl) else inp
+                  for name, inp in zip(self.input_names, self.input_list)}
 
         # check if code is unique
         if self.parent.check_item(number=self.number, code=values['code'], mode=self.mode):
@@ -97,5 +97,6 @@ class EditFrame(wx.Frame):
                 else:
                     return None
             self.Close()
-        else:
-            self.parent.show_error_dialog(error_message='Code already exists in product list')
+            return None
+        self.parent.show_error_dialog(error_message='Code already exists in product list')
+        return None
