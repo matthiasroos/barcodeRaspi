@@ -14,7 +14,7 @@ import functions
 @dataclasses.dataclass()
 class FileContents:
     """
-    TODO:
+    DataClass containing the contents of files
     """
     products: pd.DataFrame = None
     purchases: pd.DataFrame = None
@@ -24,7 +24,7 @@ class FileContents:
 @dataclasses.dataclass()
 class DisplaySettings:
     """
-    TODO:
+    DataClass containing all display related settings
     """
     btn_height: int = None
     btn_width: int = None
@@ -37,7 +37,7 @@ class DisplaySettings:
 
 class App:
     """
-    TODO:
+    Abstract class for a barcodeRaspi App
     """
 
     def __init__(self):

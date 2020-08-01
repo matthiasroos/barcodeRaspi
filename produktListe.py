@@ -1,5 +1,8 @@
 #!/usr/bin/python3
 
+"""
+Main executable for the produktListe
+"""
 
 import src.produktListe.listframe
 import src.produktListe.produktapp
