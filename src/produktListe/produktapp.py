@@ -1,5 +1,5 @@
 
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple, Union
 
 import pandas as pd
 import wx
@@ -116,11 +116,11 @@ class ProduktApp(src.app.App):
             return True
         return False
 
-    def add_item(self, values: Dict[str, str]) -> bool:
+    def add_item(self, values: Dict[str, Union[str, int]]) -> bool:
         """
         Add item to the products dataframe, input sanity is checked by create_new_product()
 
-        :param values: number, code, desc, price
+        :param values: dict with nr, code, desc, price
         :return: True: item successfully created, False: an exception occurred (error dialog by create_new_product())
         """
         new_item_df = self.create_new_product(values=values)
@@ -132,29 +132,33 @@ class ProduktApp(src.app.App):
             self.file_contents.products = pd.concat([self.file_contents.products, new_item_df])
         return True
 
-    def edit_item(self, values: Dict[str, str]) -> bool:
+    def edit_item(self, values: Dict[str, Union[str, int]]) -> bool:
         """
         Edit item in the products dataframe
 
-        :param values: number, code, desc, price
-        :return:
-        # TODO Bug: no input sanity check is done here
+        :param values: dict with nr, code, desc, price
+        :return: True: item successfully edited, False: an exception occurred (error dialog by create_new_product())
         """
-        for key, value in values.items():
-            if key != 'nr':
-                self.file_contents.products.loc[self.file_contents.products['nr'] == values['nr'], key] = value
+        new_item_df = self.create_new_product(values=values)
+        if new_item_df is None:
+            return False
+        self.file_contents.products = self.file_contents.products[self.file_contents.products['nr'] != values['nr']]
+
+        self.file_contents.products = pd.concat([self.file_contents.products, new_item_df])
+        self.file_contents.products = self.file_contents.products.sort_values(by='nr')
+        self.file_contents.products = self.file_contents.products.reset_index(drop=True)
         return True
 
-    def delete_item(self, number: int) -> None:
+    def delete_item(self, values: Dict[str, int]) -> None:
         """
         Delete item in the products dataframe
 
-        :param number: product number
+        :param values: dict with nr as product number
         :return:
         """
-        self.file_contents.products = self.file_contents.products[self.file_contents.products['nr'] != number]
+        self.file_contents.products = self.file_contents.products[self.file_contents.products['nr'] != values['nr']]
         self.file_contents.products = self.file_contents.products.reset_index(drop=True)
-        for index in range(number, len(self.file_contents.products) + 1):
+        for index in range(values['nr'], len(self.file_contents.products) + 1):
             self.file_contents.products.at[index - 1, 'nr'] = index
 
     def save_products(self) -> None:
