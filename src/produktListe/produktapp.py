@@ -114,6 +114,7 @@ class ProduktApp(src.app.App):
         if (not prd_code[prd_code['nr'] == number].empty) and mode == 'edit':
             # old code, edit mode
             return True
+        self.show_error_dialog(error_message='Code already exists in product list')
         return False
 
     def add_item(self, values: Dict[str, Union[str, int]]) -> bool:
@@ -134,7 +135,7 @@ class ProduktApp(src.app.App):
 
     def edit_item(self, values: Dict[str, Union[str, int]]) -> bool:
         """
-        Edit item in the products dataframe
+        Edit item in the products dataframe, input sanity is checked by create_new_product()
 
         :param values: dict with nr, code, desc, price
         :return: True: item successfully edited, False: an exception occurred (error dialog by create_new_product())

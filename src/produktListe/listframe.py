@@ -110,7 +110,7 @@ class ListFrame(wx.Frame):
         first_selected = self.prod_list.GetFirstSelected()
         if first_selected != -1:
             product_nr = self.prod_list.GetItemText(item=first_selected, col=0)
-            if not self.parent.show_confirm_dialog(confirm_message=f'Are your sure to delete #{product_nr}?'):
+            if not self.parent.show_confirm_dialog(confirm_message=f'Are you sure to delete #{product_nr}?'):
                 return None
             self.parent.delete_item(values={'nr': int(product_nr)})
             self.parent.update_product_listctrl()

@@ -98,5 +98,4 @@ class EditFrame(wx.Frame):
                     return None
             self.Close()
             return None
-        self.parent.show_error_dialog(error_message='Code already exists in product list')
         return None
