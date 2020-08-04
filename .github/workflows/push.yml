@@ -32,4 +32,4 @@ jobs:
         # pip install freezegun gitpython pandas wxpython
     - name: Test with pytest
       run: |
-        pytest -vv --cov=./ --cov-config=.coveragerc --cov-report=xml:coverage.xml ./tests/
+        python3 -m pytest -vv --cov=./ --cov-config=.coveragerc --cov-report=xml:coverage.xml ./tests/
