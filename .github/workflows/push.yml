@@ -25,7 +25,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update -y -qq
-        sudo apt-get install -y -qq python-wxgtk3.0
+        sudo apt-get install -y -qq python3-wxgtk4.0
         python -m pip install --upgrade pip
         pip install pytest pytest-cov freezegun gitpython pandas
     - name: Test with pytest
