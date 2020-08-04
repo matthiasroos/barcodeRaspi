@@ -27,7 +27,9 @@ jobs:
         sudo apt-get update -y -qq
         sudo apt-get install -y -qq python3-wxgtk4.0
         python -m pip install --upgrade pip
-        pip install pytest pytest-cov freezegun gitpython pandas
+        pip install wheel
+        pip install pytest pytest-cov
+        pip install freezegun gitpython pandas wxpython
     - name: Test with pytest
       run: |
         pytest -vv --cov=./ --cov-config=.coveragerc --cov-report=xml:coverage.xml ./tests/
