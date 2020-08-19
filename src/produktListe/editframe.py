@@ -80,7 +80,7 @@ class EditFrame(wx.Frame):
 
     def _onClickBackButton(self, _) -> None:
         """"""
-        self.Close()
+        self.Destroy()
 
     def _onClickConfirmButton(self, _) -> None:
         """"""
@@ -101,6 +101,6 @@ class EditFrame(wx.Frame):
                     self.parent.update_product_listctrl()
                 else:
                     return None
-            self.Close()
+            self.Destroy()
             return None
         return None
