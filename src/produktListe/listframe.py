@@ -1,4 +1,6 @@
-
+"""
+ListFrame of produktListe app
+"""
 import os.path
 from typing import Dict, List
 
@@ -8,6 +10,9 @@ import wx.grid
 
 
 class ListFrame(wx.Frame):
+    """
+    Frame to list the products
+    """
 
     def __init__(self, parent, columns: List[Dict[str, int]]):
         """Constructor"""

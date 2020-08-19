@@ -1,3 +1,6 @@
+"""
+Main module for the produktList app
+"""
 
 from typing import Dict, Optional, Tuple, Union
 

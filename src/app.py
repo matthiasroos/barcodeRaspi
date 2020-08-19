@@ -1,4 +1,6 @@
-
+"""
+Module containing the abstract base class for an app
+"""
 import abc
 import dataclasses
 import os

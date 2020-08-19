@@ -1,4 +1,6 @@
-
+"""
+EditFrame of produktListe app
+"""
 from typing import Optional, Tuple
 
 import wx
@@ -6,6 +8,9 @@ import wx.grid
 
 
 class EditFrame(wx.Frame):
+    """
+    Frame to edit the products
+    """
 
     def __init__(self, parent, number: int, old_values: Optional[Tuple[str, str, str]]):
         """Constructor"""

@@ -1,4 +1,9 @@
 
+"""
+Collection of low-level functions used in different apps,
+which enables separation of GUI and logic for better testability.
+"""
+
 import datetime
 import hashlib
 import os
