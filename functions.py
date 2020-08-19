@@ -10,40 +10,61 @@ import os
 import socket
 import struct
 import time
-from typing import List
+from typing import Callable, List, Tuple
 
 import git
 import pandas as pd
 
 
-def check_environment_ONLY_PROD(func):
-    def wrapper(*args, **kwargs):
+def check_environment_ONLY_PROD(func) -> Callable:
+    """
+    Decorator function executing the handed function only in PROD environment
+
+    :param func: function (returning a bool)
+    :return:
+    """
+    def wrapper(*args, **kwargs) -> bool:
         if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
             return func(*args, **kwargs)
-        else:
-            return True
+        return True
     return wrapper
 
 
-def check_environment_TEST_PROD(func):
-    def wrapper(*args, **kwargs):
+def check_environment_TEST_PROD(func) -> Callable:
+    """
+    Decorator function executing the handed function only in TEST and PROD environment
+
+    :param func: function (returning a bool)
+    :return:
+    """
+    def wrapper(*args, **kwargs) -> bool:
         if 'BARCODE_DEV' not in os.environ:
             return func(*args, **kwargs)
-        else:
-            return True
+        return True
     return wrapper
 
 
-def check_environment_ONLY_DEV(func):
-    def wrapper(*args, **kwargs):
+def check_environment_ONLY_DEV(func) -> Callable:
+    """
+    Decorator function executing the handed function only in DEV environment
+
+    :param func: function (returning a bool)
+    :return:
+    """
+    def wrapper(*args, **kwargs) -> bool:
         if 'BARCODE_DEV' in os.environ:
             return func(*args, **kwargs)
-        else:
-            return True
+        return True
     return wrapper
 
 
 def getMD5Hash(filename: str) -> hashlib:
+    """
+    Get MD5 hash for a file
+
+    :param filename:
+    :return:
+    """
     hash_obj = hashlib.md5()
     with open(filename, 'rb') as file:
         buf = file.read()
