@@ -81,6 +81,7 @@ class EditFrame(wx.Frame):
     def _onClickBackButton(self, _) -> None:
         """"""
         self.Destroy()
+        return None
 
     def _onClickConfirmButton(self, _) -> None:
         """"""
