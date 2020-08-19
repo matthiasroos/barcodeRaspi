@@ -16,7 +16,7 @@ class EditFrame(wx.Frame):
         """Constructor"""
 
         frame_width = 500
-        frame_height = 500
+        frame_height = 350
 
         self.parent = parent
         self.number = number
