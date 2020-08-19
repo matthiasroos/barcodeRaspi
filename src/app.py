@@ -28,18 +28,18 @@ class DisplaySettings:
     """
     DataClass containing all display related settings
     """
-    btn_height: int = None
-    btn_width: int = None
-    font_size: int = None
-    off_set: int = None
+    btn_height: int = 0
+    btn_width: int = 0
+    font_size: int = 0
+    off_set: int = 0
     wx_font: wx.Font = None
-    screen_width: int = None
-    screen_height: int = None
+    screen_width: int = 0
+    screen_height: int = 0
 
 
-class App:
+class App(metaclass=abc.ABCMeta):
     """
-    Abstract class for a barcodeRaspi App
+    Abstract base class for a barcodeRaspi App
     """
 
     def __init__(self):

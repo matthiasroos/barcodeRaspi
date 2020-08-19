@@ -37,8 +37,8 @@ class EditFrame(wx.Frame):
 
         with self.parent as prt:
 
-            nummer_txt = wx.StaticText(self, label=f'# {self.number}', pos=(40, 20), size=(20, 50))
-            nummer_txt.SetFont(prt.display_settings.wx_font)
+            number_txt = wx.StaticText(self, label=f'# {self.number}', pos=(40, 20), size=(20, 50))
+            number_txt.SetFont(prt.display_settings.wx_font)
 
             code_txt = wx.StaticText(self, label='code', pos=(40, 70), size=(20, 50))
             code_txt.SetFont(prt.display_settings.wx_font)
