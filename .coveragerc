@@ -1,4 +1,4 @@
 [report]
 include =
             functions.py
-            getraenkeapp.py
+            src/getraenkeKasse/getraenkeapp.py

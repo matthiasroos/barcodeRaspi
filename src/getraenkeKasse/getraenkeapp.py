@@ -158,7 +158,7 @@ class GetraenkeApp:
     def get_products(self):
         self.fileContents.products = functions.read_csv_file(file=PRODUCTS_FILE,
                                                              columns=['nr', 'code', 'desc', 'price', 'stock'],
-                                                             column_type={'code': str, 'price': float})
+                                                             column_types={'code': str, 'price': float})
 
     def _save_products(self):
         functions.write_csv_file(file=PRODUCTS_FILE, df=self.fileContents.products)
@@ -185,7 +185,7 @@ class GetraenkeApp:
     def get_purchases(self):
         self.fileContents.purchases = functions.read_csv_file(file=PURCHASES_FILE,
                                                               columns=['timestamp', 'user', 'code', 'paid'],
-                                                              column_type={'code': str, 'paid': bool})
+                                                              column_types={'code': str, 'paid': bool})
 
     def _save_purchases(self):
         functions.write_csv_file(file=PURCHASES_FILE, df=self.fileContents.purchases)

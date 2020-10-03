@@ -3,6 +3,7 @@ import io
 import unittest.mock
 
 import freezegun
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -41,11 +42,24 @@ def test_read_users1():
     assert users_list == expected_users_list
 
 
-def test_csv_file0_file_not_found():
+def test_format_dataframe():
+    file_content = """1,1111111111111,xxxx,0.60,20"""
+    data_df = pd.read_csv(io.StringIO(file_content), header=None)
+    data_df.columns = ['nr', 'code', 'desc', 'price', 'stock']
+    types = {'nr': int, 'code': str, 'desc': str, 'price': float, 'stock': int}
+
+    data_df = functions.format_dataframe(data_df=data_df, types=types)
+
+    assert data_df['nr'].dtype == np.int64
+    assert data_df['code'].dtype == np.object
+    assert data_df['price'].dtype == np.float64
+
+
+def test_read_csv_file0_file_not_found():
     with unittest.mock.patch('os.path.isfile', return_value=False) as mocked_os:
         with pytest.raises(Exception) as exc:
             functions.read_csv_file(file='test_file', columns=[],
-                                    column_type={})
+                                    column_types={})
     mocked_os.assert_called_once_with('test_file')
     assert 'test_file not found!' in str(exc.value)
 
@@ -61,7 +75,7 @@ def test_read_csv_file1():
         with unittest.mock.patch('pandas.read_csv', return_value=df_from_file):
             prod_df = functions.read_csv_file(file='test_file',
                                               columns=columns,
-                                              column_type={'code': str, 'price': float})
+                                              column_types={'code': str, 'price': float})
     mocked_os.assert_called_once_with('test_file')
     pd.testing.assert_frame_equal(prod_df, expected_df)
 
@@ -77,8 +91,6 @@ def test_csv_file2_empty_file():
 def test_calc_length_code(input_df, expected_set):
     output_set = functions.calc_length_code(input_df)
     assert output_set == expected_set
-
-
 
 
 def test_merge_purchases_products():
