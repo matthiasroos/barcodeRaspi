@@ -76,7 +76,7 @@ class EditFrame(wx.Frame):
             btn_confirm.Bind(wx.EVT_LEFT_UP, self._onClickConfirmButton)
             # btn_confirm.Disable()
 
-        self.Show()
+        self.ShowFullScreen(True)
 
     def _onClickBackButton(self, _) -> None:
         """"""
