@@ -9,6 +9,7 @@ import wx
 
 import functions
 import getraenkeKasse
+import src.app
 import src.getraenkeKasse.adminframe
 import src.getraenkeKasse.listframe
 import src.getraenkeKasse.mainframe
@@ -24,49 +25,30 @@ FONT_SIZE = 18
 OFFSET = 5
 
 
-@dataclasses.dataclass()
-class FileContents:
-    products: pd.DataFrame = None
-    purchases: pd.DataFrame = None
-    users: pd.DataFrame = None
-
-
-@dataclasses.dataclass()
-class DisplaySettings:
-    btnHeight = BUTTON_HEIGHT
-    btnWidth = BUTTON_WIDTH
-    fontSize = FONT_SIZE
-    offSet = OFFSET
-    wxFont = None
-    screen_width: int = None
-    screen_height: int = None
-
-
-class GetraenkeApp:
+class GetraenkeApp(src.app.App):
+    """
+    App ...
+    """
 
     def __init__(self):
+        super().__init__()
+
+        self.display_settings.btn_height = BUTTON_HEIGHT
+        self.display_settings.btn_width = BUTTON_WIDTH
+        self.display_settings.font_size = FONT_SIZE
+        self.display_settings.wx_font = wx.Font(self.display_settings.font_size, wx.SWISS, wx.NORMAL, wx.BOLD)
+        self.display_settings.off_set = OFFSET
+        self._products_file = PRODUCTS_FILE
+
         self.version = getraenkeKasse.VERSION
-        self.displaySettings = DisplaySettings()
-        self.fileContents = FileContents()
         self._clicked_user = None
 
-        self.app = wx.App(False)
-        if 'BARCODE_DEV' in os.environ:
-            self.displaySettings.screen_width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)/2
-        else:
-            self.displaySettings.screen_width = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X)
-        self.displaySettings.screen_height = wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y)
-
-        self.displaySettings.wxFont = wx.Font(self.displaySettings.fontSize, wx.SWISS, wx.NORMAL, wx.BOLD)
-
-    # The magic methods __enter__ and __exit__ are necessary for using the class in context managers
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_value, exc_traceback):
-        pass
-
     def run(self):
+        """
+
+
+        :return:
+        """
         self.get_users()
 
         # code for adding the paid column to PURCHASES_FILE
@@ -83,63 +65,43 @@ class GetraenkeApp:
             functions.git_push(path_repo='./.',
                                files=[PRODUCTS_FILE],
                                commit_message='update PRODUCTS_FILE via getraenkeKasse.py')
-        self.get_products()
+        self.load_products()
 
         src.getraenkeKasse.mainframe.MainFrame(self)
         self.app.MainLoop()
 
-    @staticmethod
-    def exit():
-        sys.exit()
+    @property
+    def products_file(self) -> str:
+        """
+        Implementation of the abstract property to return the products file
 
-    @staticmethod
-    def restart():
-        os.execl(sys.executable, sys.executable, *sys.argv)
-        sys.exit()
+        :return:
+        """
+        return self._products_file
 
     def show_admin_frame(self):
+        """
+
+
+        :return:
+        """
         src.getraenkeKasse.adminframe.AdminFrame(self)
 
     def show_list_frame(self):
+        """
+
+
+        :return:
+        """
         src.getraenkeKasse.listframe.ListFrame(self)
 
     def show_scan_frame(self):
+        """
+
+
+        :return:
+        """
         src.getraenkeKasse.scanframe.ScanFrame(self)
-
-    @staticmethod
-    def show_error_dialog(error_message: str):
-        dlg = wx.MessageDialog(None, message=error_message, caption='ERROR',
-                               style=wx.OK | wx.ICON_WARNING | wx.STAY_ON_TOP)
-        # dlg.SetFont(self.displaySettings.wxFont)
-        dlg.ShowModal()
-
-    @staticmethod
-    def show_info_dialog(info_message: str):
-        dlg = wx.MessageDialog(None, message=info_message, caption='INFO',
-                               style=wx.OK | wx.ICON_INFORMATION | wx.STAY_ON_TOP)
-        # dlg.SetFont(self.displaySettings.wxFont)
-        dlg.ShowModal()
-
-    @staticmethod
-    def show_confirm_dialog(confirm_message: str) -> bool:
-        dlg = wx.MessageDialog(None, message=confirm_message, caption='CONFIRM',
-                               style=wx.OK | wx.CANCEL | wx.ICON_QUESTION | wx.STAY_ON_TOP)
-        # dlg.SetFont(self.displaySettings.wxFont)
-        choice = dlg.ShowModal()
-        if choice == wx.ID_OK:
-            return True
-        else:
-            return False
-
-    @staticmethod
-    def show_password_dialog(password_message: str) -> bool:
-        dlg = wx.PasswordEntryDialog(parent=None, message=password_message,
-                                     defaultValue='', style=wx.OK | wx.CANCEL)
-        # dlg.SetFont(self.displaySettings.wxFont)
-        dlg.ShowModal()
-        if dlg.GetValue() == os.getenv('ADMIN_PASSWORD'):
-            return True
-        return False
 
     def bring_git_repo_up_to_date(self, path_repo: str, error_message: str, should_exit: bool = False) -> None:
         if not functions.git_pull(path_repo=path_repo):
@@ -153,18 +115,10 @@ class GetraenkeApp:
             self.show_error_dialog(error_message=error_message)
 
     def get_users(self):
-        self.fileContents.users = functions.read_users(users_file=USERS_FILE)
-
-    def get_products(self):
-        self.fileContents.products = functions.read_csv_file(file=PRODUCTS_FILE,
-                                                             columns=['nr', 'code', 'desc', 'price', 'stock'],
-                                                             column_types={'code': str, 'price': float})
-
-    def _save_products(self):
-        functions.write_csv_file(file=PRODUCTS_FILE, df=self.fileContents.products)
+        self.file_contents.users = functions.read_users(users_file=USERS_FILE)
 
     def _set_stock_for_product(self, nr: int, stock: int):
-        self.fileContents.products.loc[self.fileContents.products['nr'] == nr, 'stock'] = stock
+        self.file_contents.products.loc[self.file_contents.products['nr'] == nr, 'stock'] = stock
 
     def replenish_stock(self, changed_stock: List[List[int]]):
         self.bring_git_repo_up_to_date(path_repo='./.', error_message='Problem with git (local repo).')
@@ -177,21 +131,21 @@ class GetraenkeApp:
                                        commit_message='replenish stock via getraenkeKasse.py')
 
     def _decrease_stock_for_product(self, code: str) -> bool:
-        if self.fileContents.products.loc[self.fileContents.products['code'] == code, 'stock'].values > 0:
-            self.fileContents.products.loc[self.fileContents.products['code'] == code, 'stock'] -= 1
+        if self.file_contents.products.loc[self.file_contents.products['code'] == code, 'stock'].values > 0:
+            self.file_contents.products.loc[self.file_contents.products['code'] == code, 'stock'] -= 1
             return True
         return False
 
     def get_purchases(self):
-        self.fileContents.purchases = functions.read_csv_file(file=PURCHASES_FILE,
-                                                              columns=['timestamp', 'user', 'code', 'paid'],
-                                                              column_types={'code': str, 'paid': bool})
+        self.file_contents.purchases = functions.read_csv_file(file=PURCHASES_FILE,
+                                                               columns=['timestamp', 'user', 'code', 'paid'],
+                                                               column_types={'code': str, 'paid': bool})
 
     def _save_purchases(self):
-        functions.write_csv_file(file=PURCHASES_FILE, df=self.fileContents.purchases)
+        functions.write_csv_file(file=PURCHASES_FILE, df=self.file_contents.purchases)
 
     def _set_paid_for_user(self, user: str):
-        self.fileContents.purchases.loc[self.fileContents.purchases['user'] == user, 'paid'] = True
+        self.file_contents.purchases.loc[self.file_contents.purchases['user'] == user, 'paid'] = True
 
     def pay_for_user(self, user: str):
         self.bring_git_repo_up_to_date(path_repo='./.', error_message='Problem with git (local repo).')
@@ -202,8 +156,8 @@ class GetraenkeApp:
 
     def make_purchase(self, user: str, code: str):
         self.bring_git_repo_up_to_date(path_repo='./.', error_message='Problem with git (local repo).')
-        self.fileContents.purchases = functions.add_purchase(purchases=self.fileContents.purchases,
-                                                             user=user, code=code)
+        self.file_contents.purchases = functions.add_purchase(purchases=self.file_contents.purchases,
+                                                              user=user, code=code)
         self._save_purchases()
         files = [PURCHASES_FILE]
         result = self._decrease_stock_for_product(code=code)

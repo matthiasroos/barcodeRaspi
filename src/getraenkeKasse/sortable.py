@@ -19,14 +19,14 @@ class SortableListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
         wx.Panel.__init__(self, parent, -1, style=wx.WANTS_CHARS)
 
         with self.super_parent as sprt:
-            offset = sprt.displaySettings.offSet
+            offset = sprt.display_settings.off_set
             self.sortable_list_ctrl = SortableListCtrl(parent=self,
-                                                       size=((sprt.displaySettings.screen_width -
-                                                              sprt.displaySettings.btnWidth - 2*offset),
-                                                             sprt.displaySettings.screen_height - 2*offset),
+                                                       size=((sprt.display_settings.screen_width -
+                                                              sprt.display_settings.btn_width - 2 * offset),
+                                                             sprt.display_settings.screen_height - 2 * offset),
                                                        pos=(offset, offset),
                                                        style=wx.LC_REPORT | wx.LC_HRULES | wx.LC_SORT_DESCENDING)
-            self.sortable_list_ctrl.SetFont(sprt.displaySettings.wxFont)
+            self.sortable_list_ctrl.SetFont(sprt.display_settings.wx_font)
             for i, (name, width) in enumerate(zip(columns.get('names'), columns.get('width'))):
                 self.sortable_list_ctrl.InsertColumn(i, name, width=width)
             values_dict = {}
