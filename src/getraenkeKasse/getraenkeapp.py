@@ -1,4 +1,7 @@
 
+
+from __future__ import annotations
+
 import dataclasses
 import os
 import sys
@@ -38,7 +41,7 @@ class GetraenkeApp(src.app.App):
         self.display_settings.font_size = FONT_SIZE
         self.display_settings.wx_font = wx.Font(self.display_settings.font_size, wx.SWISS, wx.NORMAL, wx.BOLD)
         self.display_settings.off_set = OFFSET
-        self._products_file = PRODUCTS_FILE
+        self.products_file = PRODUCTS_FILE
 
         self.version = getraenkeKasse.VERSION
         self._clicked_user = None
@@ -69,15 +72,6 @@ class GetraenkeApp(src.app.App):
 
         src.getraenkeKasse.mainframe.MainFrame(self)
         self.app.MainLoop()
-
-    @property
-    def products_file(self) -> str:
-        """
-        Implementation of the abstract property to return the products file
-
-        :return:
-        """
-        return self._products_file
 
     def show_admin_frame(self):
         """

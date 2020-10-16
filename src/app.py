@@ -45,7 +45,7 @@ class App(metaclass=abc.ABCMeta):
     def __init__(self):
         self.display_settings = DisplaySettings()
         self.file_contents = FileContents()
-        self._products_file: Optional[str] = None
+        self.products_file: Optional[str] = None
         self.product_columns = ['nr', 'code', 'desc', 'price', 'stock']
         self.product_columns_type = {'nr': int, 'code': str, 'desc': str, 'price': float, 'stock': int}
 
@@ -146,12 +146,11 @@ class App(metaclass=abc.ABCMeta):
 
     # handling of products
     @property
-    @abc.abstractmethod
     def products_file(self) -> str:
         """
         Abstract property to return the products file
         """
-        raise NotImplementedError
+        return self._products_file
 
     @products_file.setter
     def products_file(self, value) -> None:
