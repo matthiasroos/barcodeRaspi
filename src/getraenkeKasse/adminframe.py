@@ -48,7 +48,7 @@ class AdminFrame(wx.Frame):
 
             # Back button
             self.btn_back = wx.Button(self.panel, id=wx.ID_ANY, label='back', name='back',
-                                      size=wx.Size(prt.display_settings.btn_width, prt.display_settings.btn_height),
+                                      size=prt.display_settings.wx_button_size,
                                       pos=(prt.display_settings.screen_width - 1 * prt.display_settings.btn_width,
                                            prt.display_settings.screen_height - prt.display_settings.btn_height))
             self.btn_back.SetFont(prt.display_settings.wx_font)
@@ -56,7 +56,7 @@ class AdminFrame(wx.Frame):
 
             # Save button
             self.btn_save = wx.Button(self.panel, id=wx.ID_ANY, label='save', name='save',
-                                      size=wx.Size(prt.display_settings.btn_width, prt.display_settings.btn_height),
+                                      size=prt.display_settings.wx_button_size,
                                       pos=(prt.display_settings.screen_width - 1 * prt.display_settings.btn_width,
                                            prt.display_settings.screen_height - 2 * prt.display_settings.btn_height))
             self.btn_save.SetFont(prt.display_settings.wx_font)
@@ -64,7 +64,7 @@ class AdminFrame(wx.Frame):
 
             # Reset button
             self.btn_reset = wx.Button(self.panel, id=wx.ID_ANY, label='reset stock', name='reset',
-                                       size=wx.Size(prt.display_settings.btn_width, prt.display_settings.btn_height),
+                                       size=prt.display_settings.wx_button_size,
                                        pos=(prt.display_settings.screen_width - 1 * prt.display_settings.btn_width,
                                             prt.display_settings.screen_height - 3 * prt.display_settings.btn_height))
             self.btn_reset.SetFont(prt.display_settings.wx_font)
@@ -106,7 +106,7 @@ class AdminFrame(wx.Frame):
 
             # Pay button
             self.btn_pay = wx.Button(self.panel, id=wx.ID_ANY, label='pay for user', name='pay',
-                                     size=wx.Size(prt.display_settings.btn_width, prt.display_settings.btn_height),
+                                     size=prt.display_settings.wx_button_size,
                                      pos=(prt.display_settings.screen_width - 1 * prt.display_settings.btn_width,
                                           prt.display_settings.screen_height - 6 * prt.display_settings.btn_height))
             self.btn_pay.SetFont(prt.display_settings.wx_font)

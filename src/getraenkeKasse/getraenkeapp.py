@@ -39,6 +39,8 @@ class GetraenkeApp(src.app.App):
         self.display_settings.btn_height = BUTTON_HEIGHT
         self.display_settings.btn_width = BUTTON_WIDTH
         self.display_settings.font_size = FONT_SIZE
+        self.display_settings.wx_button_size = wx.Size(self.display_settings.btn_width,
+                                                       self.display_settings.btn_height)
         self.display_settings.wx_font = wx.Font(self.display_settings.font_size, wx.SWISS, wx.NORMAL, wx.BOLD)
         self.display_settings.off_set = OFFSET
         self.products_file = PRODUCTS_FILE

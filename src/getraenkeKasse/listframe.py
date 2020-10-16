@@ -38,15 +38,14 @@ class ListFrame(wx.Frame):
             self.notebook.AddPage(tab2, 'STOCK')
 
             self.btn_statistics = wx.Button(self.panel, id=wx.ID_ANY, label='statistics', name='statistics',
-                                            size=wx.Size(prt.display_settings.btn_width,
-                                                         prt.display_settings.btn_height),
+                                            size=prt.display_settings.wx_button_size,
                                             pos=(prt.display_settings.screen_width - prt.display_settings.btn_width,
                                                  3 * prt.display_settings.btn_height))
             self.btn_statistics.SetFont(prt.display_settings.wx_font)
             self.btn_statistics.Bind(wx.EVT_LEFT_UP, self._onClickStatisticsButton)
 
             self.btn_back = wx.Button(self.panel, id=wx.ID_ANY, label='back', name='back',
-                                      size=wx.Size(prt.display_settings.btn_width, prt.display_settings.btn_height),
+                                      size=prt.display_settings.wx_button_size,
                                       pos=(prt.display_settings.screen_width - 1 * prt.display_settings.btn_width,
                                            prt.display_settings.screen_height - prt.display_settings.btn_height))
             self.btn_back.SetFont(prt.display_settings.wx_font)
