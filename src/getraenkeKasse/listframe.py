@@ -6,6 +6,9 @@ import src.getraenkeKasse.statistics
 
 
 class ListFrame(wx.Frame):
+    """
+    Frame to list the purchases per user and the stock
+    """
 
     def __init__(self, parent):
         """Constructor"""
@@ -53,11 +56,11 @@ class ListFrame(wx.Frame):
 
         self.ShowFullScreen(True)
 
-    def _onClickBackButton(self, event):
+    def _onClickBackButton(self, _) -> None:
         """"""
         self.Close()
 
-    def _onClickStatisticsButton(self, event):
+    def _onClickStatisticsButton(self, _) -> None:
         """"""
         number_page = self.notebook.GetSelection()
         current_page = self.notebook.GetCurrentPage()

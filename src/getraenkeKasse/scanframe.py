@@ -7,6 +7,9 @@ import functions
 
 
 class ScanFrame(wx.Frame):
+    """
+    Frame to scan the products
+    """
 
     def __init__(self, parent):
         """Constructor"""
@@ -57,7 +60,7 @@ class ScanFrame(wx.Frame):
 
         self.ShowFullScreen(True)
 
-    def _onClickNoCodeButton(self, event):
+    def _onClickNoCodeButton(self, _) -> None:
         """"""
         self.btnNoCode.Disable()
         self.Code.Hide()
@@ -67,11 +70,11 @@ class ScanFrame(wx.Frame):
                                        size=(320, 50))
         nrProducts = len(self.parent.products)
 
-    def _onClickBackButton(self, event):
+    def _onClickBackButton(self, _) -> None:
         """"""
         self.Close()
 
-    def _onClickConfirmButton(self, event):
+    def _onClickConfirmButton(self, _) -> None:
         """"""
         self.Disable()
         self.Update()
@@ -79,7 +82,7 @@ class ScanFrame(wx.Frame):
         self.parent.make_purchase(user=self.parent.clicked_user, code=self.Code.GetValue())
         self.Close()
 
-    def _onChangeCode(self, event):
+    def _onChangeCode(self, _) -> None:
         """"""
         code = self.Code.GetValue()
         prod_df = self.parent.fileContents.products

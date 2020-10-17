@@ -42,11 +42,14 @@ class SortableListCtrlPanel(wx.Panel, listmix.ColumnSorterMixin):
             self.sortable_list_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self._OnItemClick)
 
     # used by ColumnSorterMixin
-    def GetListCtrl(self):
+    def GetListCtrl(self) -> SortableListCtrl:
+        """"""
         return self.sortable_list_ctrl
 
-    def _OnColumnClick(self, event):
+    def _OnColumnClick(self, event) -> None:
+        """"""
         event.Skip()
 
-    def _OnItemClick(self, event):
+    def _OnItemClick(self, event) -> None:
+        """"""
         pass

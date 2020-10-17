@@ -5,8 +5,11 @@ import src.getraenkeKasse.sortable
 
 
 class AdminFrame(wx.Frame):
+    """
+    Frame to admin stock and purchases
+    """
 
-    def __init__(self, parent):
+    def __init__(self, parent) -> None:
         """Constructor"""
         self.parent = parent
         self.changed = False
@@ -114,13 +117,15 @@ class AdminFrame(wx.Frame):
 
         self.ShowFullScreen(True)
 
-    def _onClickBackButton(self, event):
+    def _onClickBackButton(self, _) -> None:
+        """"""
         if self.changed:
             if not self.parent.show_confirm_dialog(confirm_message='Do you want to discard?'):
                 return None
         self.Close()
 
-    def _onClickSaveButton(self, event):
+    def _onClickSaveButton(self, _) -> None:
+        """"""
         if self.changed:
             user_paid = []
             count = self.tab1.sortable_list_ctrl.GetItemCount()
@@ -145,7 +150,8 @@ class AdminFrame(wx.Frame):
                 self.parent.replenish_stock(changed_stock=changed_stock)
                 self.changed = False
 
-    def _onClickResetButton(self, event):
+    def _onClickResetButton(self, _) -> None:
+        """"""
         focus = self.tab2.sortable_list_ctrl.GetFocusedItem()
         product = self.tab2.sortable_list_ctrl.GetItem(focus, 0).GetText()
         stock_old = self.tab2.sortable_list_ctrl.GetItem(focus, 2).GetText()
@@ -153,7 +159,8 @@ class AdminFrame(wx.Frame):
         if result:
             self.tab2.sortable_list_ctrl.SetItem(focus, 3, stock_old)
 
-    def _onClickAddButton(self, event):
+    def _onClickAddButton(self, event) -> None:
+        """"""
         btn_id = event.GetEventObject().GetId()
         addition_to_stock = (btn_id - 6000)
         focus = self.tab2.sortable_list_ctrl.GetFocusedItem()
@@ -162,7 +169,8 @@ class AdminFrame(wx.Frame):
         self.tab2.sortable_list_ctrl.SetItem(focus, 3, str(stock_new))
         self.changed = True
 
-    def _onClickPayButton(self, event):
+    def _onClickPayButton(self, _) -> None:
+        """"""
         focus = self.tab1.sortable_list_ctrl.GetFocusedItem()
         user = self.tab1.sortable_list_ctrl.GetItem(focus, 0).GetText()
         result = self.parent.show_confirm_dialog(f'Do you want to set all purchases of user {user} as paid?')

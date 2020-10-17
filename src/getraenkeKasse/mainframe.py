@@ -70,27 +70,27 @@ class MainFrame(wx.Frame):
 
         self.ShowFullScreen(True)
 
-    def _onClickNameButton(self, event):
+    def _onClickNameButton(self, event) -> None:
         """"""
         button_id = event.GetId()
         button_by_id = self.FindWindowById(button_id)
         self.parent.clicked_user = button_by_id.GetLabel()
         self.parent.show_scan_frame()
 
-    def _onClickListButton(self, event):
+    def _onClickListButton(self, _) -> None:
         """"""
         self.parent.show_list_frame()
 
-    def _onClickAdminButton(self, event):
+    def _onClickAdminButton(self, _) -> None:
         """"""
         self.parent.show_admin_frame()
 
-    def _onClickCloseButton(self, event):
+    def _onClickCloseButton(self, _) -> None:
         """"""
         if self.parent.show_confirm_dialog(confirm_message='Do you want to exit?'):
             self.parent.exit()
 
-    def _onClickRestartButton(self, event):
+    def _onClickRestartButton(self, _) -> None:
         """"""
         if self.parent.show_confirm_dialog(confirm_message='Do you want to restart?'):
             self.parent.restart()
