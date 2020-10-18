@@ -46,11 +46,11 @@ class GetraenkeApp(src.app.App):
         self.products_file = PRODUCTS_FILE
 
         self.version = getraenkeKasse.VERSION
-        self._clicked_user = None
+        self.clicked_user = None
 
     def run(self):
         """
-
+        Implementation of the abstract run method
 
         :return:
         """
@@ -77,7 +77,7 @@ class GetraenkeApp(src.app.App):
 
     def show_admin_frame(self):
         """
-
+        Show the admin frame
 
         :return:
         """
@@ -85,7 +85,7 @@ class GetraenkeApp(src.app.App):
 
     def show_list_frame(self):
         """
-
+        Show the list frame
 
         :return:
         """
@@ -93,7 +93,7 @@ class GetraenkeApp(src.app.App):
 
     def show_scan_frame(self):
         """
-
+        Show the scan frame
 
         :return:
         """

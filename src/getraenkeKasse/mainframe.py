@@ -3,6 +3,9 @@ import wx
 
 
 class MainFrame(wx.Frame):
+    """
+    Frame to choose the user and navigate to other frames
+    """
 
     def __init__(self, parent):
         """Constructor"""
@@ -60,11 +63,12 @@ class MainFrame(wx.Frame):
             self.btn_restart.SetFont(prt.display_settings.wx_font)
             self.btn_restart.Bind(wx.EVT_LEFT_UP, self._onClickRestartButton)
 
-            self.text_version = wx.StaticText(self.panel, label='ver. ' + prt.version,
-                                              size=prt.display_settings.wx_button_size,
-                                              pos=(
-                                                  prt.display_settings.screen_width - 0.9 * prt.display_settings.btn_width,
-                                                  prt.display_settings.screen_height - 2.7 * prt.display_settings.btn_height))
+            self.text_version = wx.StaticText(
+                self.panel,
+                label='ver. ' + prt.version,
+                size=prt.display_settings.wx_button_size,
+                pos=(prt.display_settings.screen_width - 0.9 * prt.display_settings.btn_width,
+                     prt.display_settings.screen_height - 2.7 * prt.display_settings.btn_height))
             self.text_version.SetFont(prt.display_settings.wx_font)
             self.SetBackgroundColour("Gray")
 
