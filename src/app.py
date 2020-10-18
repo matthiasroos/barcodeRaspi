@@ -100,7 +100,7 @@ class App(metaclass=abc.ABCMeta):
         """
         dlg = wx.MessageDialog(None, message=error_message, caption='ERROR',
                                style=wx.OK | wx.ICON_WARNING | wx.STAY_ON_TOP)
-        # dlg.SetFont(self.displaySettings.wxFont)
+        # dlg.SetFont(self.display_settings.wxFont)
         dlg.ShowModal()
 
     @staticmethod
@@ -113,7 +113,7 @@ class App(metaclass=abc.ABCMeta):
         """
         dlg = wx.MessageDialog(None, message=info_message, caption='INFO',
                                style=wx.OK | wx.ICON_INFORMATION | wx.STAY_ON_TOP)
-        # dlg.SetFont(self.displaySettings.wxFont)
+        # dlg.SetFont(self.display_settings.wxFont)
         dlg.ShowModal()
 
     @staticmethod
@@ -126,7 +126,7 @@ class App(metaclass=abc.ABCMeta):
         """
         dlg = wx.MessageDialog(None, message=confirm_message, caption='CONFIRM',
                                style=wx.OK | wx.CANCEL | wx.ICON_QUESTION | wx.STAY_ON_TOP)
-        # dlg.SetFont(self.displaySettings.wxFont)
+        # dlg.SetFont(self.display_settings.wxFont)
         choice = dlg.ShowModal()
         return bool(choice == wx.ID_OK)
 
@@ -140,7 +140,7 @@ class App(metaclass=abc.ABCMeta):
         """
         dlg = wx.PasswordEntryDialog(parent=None, message=password_message,
                                      defaultValue='', style=wx.OK | wx.CANCEL)
-        # dlg.SetFont(self.displaySettings.wxFont)
+        # dlg.SetFont(self.display_settings.wxFont)
         dlg.ShowModal()
         return bool(dlg.GetValue() == os.getenv('ADMIN_PASSWORD'))
 
