@@ -8,10 +8,25 @@ import functions
 
 VERSION = '0.1.2'
 
+PRODUCTS_FILE = 'produkt.txt'
+PURCHASES_FILE = 'purchase.txt'
+USERS_FILE = 'user.txt'
+
+BUTTON_HEIGHT = 70
+BUTTON_WIDTH = 180
+FONT_SIZE = 18
+OFFSET = 5
+
 
 if __name__ == "__main__":
 
-    gk = src.getraenkeKasse.getraenkeapp.GetraenkeApp()
+    gk = src.getraenkeKasse.getraenkeapp.GetraenkeApp(button_height=BUTTON_HEIGHT,
+                                                      button_width=BUTTON_WIDTH,
+                                                      font_size=FONT_SIZE,
+                                                      offset=OFFSET,
+                                                      file_names={'products': PRODUCTS_FILE,
+                                                                  'purchases': PURCHASES_FILE,
+                                                                  'users': USERS_FILE})
 
     # check network
     if not functions.checkNetwork():

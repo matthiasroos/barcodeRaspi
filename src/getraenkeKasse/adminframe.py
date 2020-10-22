@@ -16,7 +16,7 @@ class AdminFrame(wx.Frame):
         wx.Frame.__init__(self, None, title='AdminFrame', style=wx.DEFAULT_FRAME_STYLE)
         with self.parent as prt:
             self.panel = wx.Panel(self)
-            prt.get_purchases()
+            prt.load_purchases()
             prt.load_products()
 
             if not prt.show_password_dialog(password_message='Please enter administrator PIN'):

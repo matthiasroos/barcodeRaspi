@@ -15,7 +15,7 @@ class ListFrame(wx.Frame):
         self.parent = parent
         wx.Frame.__init__(self, None, title='ListFrame', style=wx.DEFAULT_FRAME_STYLE)
         with self.parent as prt:
-            prt.get_purchases()
+            prt.load_purchases()
             prt.load_products()
             self.panel = wx.Panel(self)
             self.notebook = wx.Notebook(self.panel, pos=(0, 0),
