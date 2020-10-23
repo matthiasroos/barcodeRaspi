@@ -109,8 +109,6 @@ class GetraenkeApp(src.app.App):
         if not functions.git_push(path_repo=path_repo, files=files, commit_message=commit_message):
             self.show_error_dialog(error_message=error_message)
 
-    def load_users(self):
-        self.file_contents.users = functions.read_users(users_file=self.users_file)
 
     def _set_stock_for_product(self, nr: int, stock: int):
         self.file_contents.products.loc[self.file_contents.products['nr'] == nr, 'stock'] = stock
@@ -131,13 +129,7 @@ class GetraenkeApp(src.app.App):
             return True
         return False
 
-    def load_purchases(self):
-        self.file_contents.purchases = functions.read_csv_file(file=self.purchases_file,
-                                                               columns=['timestamp', 'user', 'code', 'paid'],
-                                                               column_types={'code': str, 'paid': bool})
 
-    def _save_purchases(self):
-        functions.write_csv_file(file=self.purchases_file, df=self.file_contents.purchases)
 
     def _set_paid_for_user(self, user: str):
         self.file_contents.purchases.loc[self.file_contents.purchases['user'] == user, 'paid'] = True
