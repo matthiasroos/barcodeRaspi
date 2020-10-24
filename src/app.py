@@ -5,7 +5,7 @@ import abc
 import dataclasses
 import os
 import sys
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 import pandas as pd
 import wx
@@ -20,7 +20,7 @@ class FileContents:
     """
     products: pd.DataFrame = None
     purchases: pd.DataFrame = None
-    users: pd.DataFrame = None
+    users: List[str] = None
 
 
 @dataclasses.dataclass()
@@ -45,7 +45,9 @@ class App(metaclass=abc.ABCMeta):
     def __init__(self):
         self.display_settings = DisplaySettings()
         self.file_contents = FileContents()
-        self._products_file: Optional[str] = None
+        self.products_file: Optional[str] = None
+        self.purchases_file: Optional[str] = None
+        self.users_file: Optional[str] = None
         self.product_columns = ['nr', 'code', 'desc', 'price', 'stock']
         self.product_columns_type = {'nr': int, 'code': str, 'desc': str, 'price': float, 'stock': int}
 
@@ -100,7 +102,7 @@ class App(metaclass=abc.ABCMeta):
         """
         dlg = wx.MessageDialog(None, message=error_message, caption='ERROR',
                                style=wx.OK | wx.ICON_WARNING | wx.STAY_ON_TOP)
-        # dlg.SetFont(self.displaySettings.wxFont)
+        # dlg.SetFont(self.display_settings.wxFont)
         dlg.ShowModal()
 
     @staticmethod
@@ -113,7 +115,7 @@ class App(metaclass=abc.ABCMeta):
         """
         dlg = wx.MessageDialog(None, message=info_message, caption='INFO',
                                style=wx.OK | wx.ICON_INFORMATION | wx.STAY_ON_TOP)
-        # dlg.SetFont(self.displaySettings.wxFont)
+        # dlg.SetFont(self.display_settings.wxFont)
         dlg.ShowModal()
 
     @staticmethod
@@ -126,7 +128,7 @@ class App(metaclass=abc.ABCMeta):
         """
         dlg = wx.MessageDialog(None, message=confirm_message, caption='CONFIRM',
                                style=wx.OK | wx.CANCEL | wx.ICON_QUESTION | wx.STAY_ON_TOP)
-        # dlg.SetFont(self.displaySettings.wxFont)
+        # dlg.SetFont(self.display_settings.wxFont)
         choice = dlg.ShowModal()
         return bool(choice == wx.ID_OK)
 
@@ -140,28 +142,27 @@ class App(metaclass=abc.ABCMeta):
         """
         dlg = wx.PasswordEntryDialog(parent=None, message=password_message,
                                      defaultValue='', style=wx.OK | wx.CANCEL)
-        # dlg.SetFont(self.displaySettings.wxFont)
+        # dlg.SetFont(self.display_settings.wxFont)
         dlg.ShowModal()
         return bool(dlg.GetValue() == os.getenv('ADMIN_PASSWORD'))
 
     # handling of products
     @property
-    @abc.abstractmethod
     def products_file(self) -> str:
         """
         Abstract property to return the products file
         """
-        raise NotImplementedError
+        return self._products_file
 
     @products_file.setter
-    def products_file(self, value) -> None:
+    def products_file(self, filename) -> None:
         """
         Setter for the property products_file
 
-        :param value: value for the property products_file
+        :param filename: value for the property products_file
         :return:
         """
-        self._products_file = value
+        self._products_file = filename
 
     def load_products(self) -> None:
         """
@@ -190,4 +191,57 @@ class App(metaclass=abc.ABCMeta):
         return new_item_df
 
     def _save_products(self) -> None:
+        """
+        Save the products dataframe to file
+
+        :return:
+        """
         functions.write_csv_file(file=self.products_file, df=self.file_contents.products)
+
+    # basics purchases
+    def load_purchases(self) -> None:
+        """
+        Load the purchases file into a dataframe
+
+        :return:
+        """
+        self.file_contents.purchases = functions.read_csv_file(file=self.purchases_file,
+                                                               columns=['timestamp', 'user', 'code', 'paid'],
+                                                               column_types={'code': str, 'paid': bool})
+
+    def _save_purchases(self) -> None:
+        """
+        Save the purchases dataframe into a file
+
+        :return:
+        """
+        functions.write_csv_file(file=self.purchases_file, df=self.file_contents.purchases)
+
+    # basics of users
+    @property
+    def users_file(self) -> str:
+        """
+        Abstract property to return the users file
+        """
+        return self._users_file
+
+    @users_file.setter
+    def users_file(self, filename) -> None:
+        """
+        Setter for the property users_file
+
+        :param filename: value for the property users_file
+        :return:
+        """
+        self._users_file = filename
+
+    def load_users(self) -> None:
+        """
+        Load the users file into a list
+
+        :return:
+        """
+        self.file_contents.users = functions.read_users(users_file=self.users_file)
+
+    def _save_users(self) -> None:
+        pass

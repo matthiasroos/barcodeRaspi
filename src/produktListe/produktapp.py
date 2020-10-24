@@ -31,7 +31,7 @@ class ProduktApp(src.app.App):
         self.display_settings.font_size = FONT_SIZE
         self.display_settings.wx_font = wx.Font(self.display_settings.font_size, wx.SWISS, wx.NORMAL, wx.BOLD)
         self.display_settings.off_set = OFFSET
-        self._products_file = PRODUCTS_FILE
+        self.products_file = PRODUCTS_FILE
 
         self.shown_columns = [{'column': 'nr', 'text': '#', 'width': 50},
                               {'column': 'code', 'text': 'code', 'width': 250},
@@ -48,15 +48,6 @@ class ProduktApp(src.app.App):
         """
         self.show_list_frame()
         self.app.MainLoop()
-
-    @property
-    def products_file(self) -> str:
-        """
-        Implementation of the abstract property to return the products file
-
-        :return:
-        """
-        return self._products_file
 
     def show_edit_frame(self, number: int, old_values: Optional[Tuple[str, str, str]] = None) -> None:
         """
