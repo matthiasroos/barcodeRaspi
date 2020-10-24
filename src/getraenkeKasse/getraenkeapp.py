@@ -30,7 +30,7 @@ class GetraenkeApp(src.app.App):
                  font_size: int,
                  offset: int,
                  file_names: Dict[str, str]
-                 ):
+                 ) -> None:
         super().__init__()
 
         self.display_settings.btn_height = button_height
@@ -47,7 +47,7 @@ class GetraenkeApp(src.app.App):
         self.version = getraenkeKasse.VERSION
         self.clicked_user = None
 
-    def run(self):
+    def run(self) -> None:
         """
         Implementation of the abstract run method
 
@@ -74,7 +74,7 @@ class GetraenkeApp(src.app.App):
         src.getraenkeKasse.mainframe.MainFrame(self)
         self.app.MainLoop()
 
-    def show_admin_frame(self):
+    def show_admin_frame(self) -> None:
         """
         Show the admin frame
 
@@ -82,7 +82,7 @@ class GetraenkeApp(src.app.App):
         """
         src.getraenkeKasse.adminframe.AdminFrame(self)
 
-    def show_list_frame(self):
+    def show_list_frame(self) -> None:
         """
         Show the list frame
 
@@ -90,7 +90,7 @@ class GetraenkeApp(src.app.App):
         """
         src.getraenkeKasse.listframe.ListFrame(self)
 
-    def show_scan_frame(self):
+    def show_scan_frame(self) -> None:
         """
         Show the scan frame
 
@@ -98,22 +98,59 @@ class GetraenkeApp(src.app.App):
         """
         src.getraenkeKasse.scanframe.ScanFrame(self)
 
-    def bring_git_repo_up_to_date(self, path_repo: str, error_message: str, should_exit: bool = False) -> None:
+    def bring_git_repo_up_to_date(self,
+                                  path_repo: str,
+                                  error_message: str,
+                                  should_exit: bool = False) -> None:
+        """
+        Pull all remote changes into the repository.
+
+        :param path_repo: absolute or relative path to git repository
+        :param error_message: text of the error message in case of error
+        :param should_exit: flag if function should exit in case of error
+        :return:
+        """
         if not functions.git_pull(path_repo=path_repo):
             self.show_error_dialog(error_message=error_message)
             if should_exit:
                 self.exit()
 
-    def check_in_changes_into_git(self, path_repo: str, files: List[str], commit_message: str,
+    def check_in_changes_into_git(self,
+                                  path_repo: str,
+                                  files: List[str],
+                                  commit_message: str,
                                   error_message: str = 'Problem with git (local repo).') -> None:
+        """
+        Commit all changes in a list of files to git.
+
+        :param path_repo: absolute or relative path to git repository
+        :param files: list of filenames to
+        :param commit_message: commit message
+        :param error_message: message in case of error
+        :return:
+        """
         if not functions.git_push(path_repo=path_repo, files=files, commit_message=commit_message):
             self.show_error_dialog(error_message=error_message)
 
+    def _set_stock_for_product(self,
+                               nr: int,
+                               stock: int) -> None:
+        """
+        Set the stock for a product to a new value.
 
-    def _set_stock_for_product(self, nr: int, stock: int):
+        :param nr: number of the product
+        :param stock: new stock for the product
+        :return:
+        """
         self.file_contents.products.loc[self.file_contents.products['nr'] == nr, 'stock'] = stock
 
-    def replenish_stock(self, changed_stock: List[List[int]]):
+    def replenish_stock(self, changed_stock: List[List[int]]) -> None:
+        """
+        Fill the stock of a product and commit the new stock.
+
+        :param changed_stock:
+        :return:
+        """
         self.bring_git_repo_up_to_date(path_repo='./.', error_message='Problem with git (local repo).')
         for product in changed_stock:
             nr, stock_old, stock_new = product
@@ -124,24 +161,49 @@ class GetraenkeApp(src.app.App):
                                        commit_message='replenish stock via getraenkeKasse.py')
 
     def _decrease_stock_for_product(self, code: str) -> bool:
+        """
+        Decrease the stock for a product by one.
+
+        :param code: code of the product
+        :return: True if there was stock to sell, False if not
+        """
         if self.file_contents.products.loc[self.file_contents.products['code'] == code, 'stock'].values > 0:
             self.file_contents.products.loc[self.file_contents.products['code'] == code, 'stock'] -= 1
             return True
         return False
 
+    def _set_paid_for_user(self, user: str) -> None:
+        """
+        Set all purchases for a user to True.
 
-
-    def _set_paid_for_user(self, user: str):
+        :param user: paying user
+        :return:
+        """
         self.file_contents.purchases.loc[self.file_contents.purchases['user'] == user, 'paid'] = True
 
-    def pay_for_user(self, user: str):
+    def pay_for_user(self, user: str) -> None:
+        """
+        Pay all purchases for a user and commit the payment.
+
+        :param user: paying user
+        :return:
+        """
         self.bring_git_repo_up_to_date(path_repo='./.', error_message='Problem with git (local repo).')
         self._set_paid_for_user(user=user)
         self._save_purchases()
         self.check_in_changes_into_git(path_repo='./.', files=[self.purchases_file],
                                        commit_message=f'pay for user {user} via getraenkeKasse.py')
 
-    def make_purchase(self, user: str, code: str):
+    def make_purchase(self,
+                      user: str,
+                      code: str) -> None:
+        """
+        Make purchases for user.
+
+        :param user: buying user
+        :param code: product code of bought item
+        :return:
+        """
         self.bring_git_repo_up_to_date(path_repo='./.', error_message='Problem with git (local repo).')
         self.file_contents.purchases = functions.add_purchase(purchases=self.file_contents.purchases,
                                                               user=user, code=code)
@@ -161,5 +223,5 @@ class GetraenkeApp(src.app.App):
         return self._clicked_user
 
     @clicked_user.setter
-    def clicked_user(self, user: str):
+    def clicked_user(self, user: str) -> None:
         self._clicked_user = user
