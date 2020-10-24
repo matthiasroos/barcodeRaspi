@@ -88,7 +88,7 @@ class ScanFrame(wx.Frame):
     def _onChangeCode(self, _) -> None:
         """"""
         code = self.Code.GetValue()
-        prod_df = self.parent.fileContents.products
+        prod_df = self.parent.file_contents.products
         if len(code) in functions.calc_length_code(products_df=prod_df):
             select_df = prod_df[prod_df['code'] == code]
             if not select_df.empty:
