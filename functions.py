@@ -10,7 +10,7 @@ import os
 import socket
 import struct
 import time
-from typing import Callable, List, Tuple
+from typing import Callable, Iterable, List, Optional, Tuple
 
 import git
 import pandas as pd
@@ -137,9 +137,22 @@ def git_push(path_repo: str, files: List[str], commit_message: str) -> bool:
         return False
 
 
-def check_for_file(file) -> None:
+def check_for_file(file, raise_exec=True) -> Optional[bool]:
+    """
+    Check if the file exists.
+
+    Return True if it exists, False if not.
+    An exception is raised in the latter case, if raise_exec is True.
+
+    :param file: name of the file
+    :param raise_exec: flag if
+    :return:
+    """
     if not os.path.isfile(file):
-        raise Exception(f'{file} not found!')
+        if raise_exec is True:
+            raise Exception(f'{file} not found!')
+        return False
+    return True
 
 
 def read_users(users_file: str):
