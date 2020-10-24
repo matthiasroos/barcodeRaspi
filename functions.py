@@ -155,9 +155,12 @@ def check_for_file(file, raise_exec=True) -> Optional[bool]:
     return True
 
 
-def read_users(users_file: str):
+def read_users(users_file: str) -> Iterable[str]:
     """"
-    Read users from usersFile
+    Read users from file.
+
+    :param users_file: file containing user names
+    :return:
     """
     check_for_file(users_file)
     with open(users_file, "r") as file_users:
