@@ -192,24 +192,30 @@ class GetraenkeApp(src.app.App):
 
     def make_purchase(self,
                       user: str,
-                      code: str) -> None:
+                      code: str,
+                      count: int) -> None:
         """
         Make purchases for user.
 
         :param user: buying user
         :param code: product code of bought item
+        :param count: number of item to be bought
         :return:
         """
         self.bring_git_repo_up_to_date(path_repo='./.', error_message='Problem with git (local repo).')
-        self.file_contents.purchases = functions.add_purchase(purchases=self.file_contents.purchases,
-                                                              user=user, code=code)
+        for _ in range(0, count):
+            self.file_contents.purchases = functions.add_purchase(purchases=self.file_contents.purchases,
+                                                                  user=user, code=code)
         self._save_purchases()
         files = [self.purchases_file]
-        result = self._decrease_stock_for_product(code=code)
-        if result:
+        result_list = []
+        for _ in range(0, count):
+            result = self._decrease_stock_for_product(code=code)
+            result_list.append(result)
+        if any(result_list):
             self._save_products()
             files.append(self.products_file)
-        else:
+        if not any(result_list):
             # TODO issue warning for selling without stock
             pass
         self.check_in_changes_into_git(path_repo='./.', files=files, commit_message='purchase via getraenkeKasse.py')
