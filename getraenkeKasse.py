@@ -6,7 +6,7 @@ import time
 import src.getraenkeKasse.getraenkeapp
 import functions
 
-VERSION = '0.1.2'
+VERSION = '0.1.3'
 
 PRODUCTS_FILE = 'produkt.txt'
 PURCHASES_FILE = 'purchase.txt'
