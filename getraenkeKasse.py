@@ -41,17 +41,16 @@ if __name__ == "__main__":
             gk.exit()
 
     # check for new commits in local repository
-    gk.bring_git_repo_up_to_date(path_repo='./.', error_message='Problem with git (local repo).', should_exit=True)
-
-    # check for new version of getraenkeKasse.py script on github
-    hash_old = functions.getMD5Hash('barcodeRaspi/getraenkeKasse.py')
-    gk.bring_git_repo_up_to_date(path_repo='barcodeRaspi', error_message='Problem with git (GitHub). Exiting...',
+    gk.bring_git_repo_up_to_date(path_repo='./.',
+                                 error_message='Problem with git (local repo)',
                                  should_exit=True)
 
-    hash_new = functions.getMD5Hash('barcodeRaspi/getraenkeKasse.py')
-    if hash_new.hexdigest() != hash_old.hexdigest():
-        # getraenkeKasse.py has changed, script is restarted
-        print("new version from gitHub, script is restarting...")
-        gk.restart()
+    # check for new version of getraenkeKasse.py script on github
+    gk.bring_git_repo_up_to_date(path_repo='barcodeRaspi',
+                                 error_message='Problem with git (GitHub)',
+                                 should_exit=True,
+                                 restart_message='new version from gitHub, script is restarting...',
+                                 should_restart=True
+                                 )
 
     gk.run()

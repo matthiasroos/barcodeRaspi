@@ -97,19 +97,28 @@ class GetraenkeApp(src.app.App):
     def bring_git_repo_up_to_date(self,
                                   path_repo: str,
                                   error_message: str,
-                                  should_exit: bool = False) -> None:
+                                  should_exit: bool = False,
+                                  restart_message: str = '',
+                                  should_restart: bool = False) -> None:
         """
         Pull all remote changes into the repository.
 
         :param path_repo: absolute or relative path to git repository
         :param error_message: text of the error message in case of error
         :param should_exit: flag if function should exit in case of error
+        :param restart_message: text of the info message in case of restart
+        :param should_restart: flag if function should restart if changes were
         :return:
         """
-        if not functions.git_pull(path_repo=path_repo):
-            self.show_error_dialog(error_message=error_message)
+        error, changed = functions.git_pull(path_repo=path_repo)
+        if error:
+            self.show_error_dialog(error_message=f'{error_message}:\n{error}\n{"Exiting now." if should_exit else ""}')
             if should_exit:
                 self.exit()
+        if changed:
+            if should_restart:
+                self.show_info_dialog(info_message=restart_message)
+                self.restart()
 
     def check_in_changes_into_git(self,
                                   path_repo: str,

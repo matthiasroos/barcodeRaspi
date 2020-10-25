@@ -103,23 +103,27 @@ def getTimefromNTP():
 
 
 @check_environment_ONLY_PROD
-def git_pull(path_repo: str) -> bool:
+def git_pull(path_repo: str) -> Tuple[Optional[str], Optional[bool]]:
+    """
+    Do a git pull on a repository.
+
+    :param path_repo: relative path of the repository
+    :return: error message: error message which will be displayed, None if an exception occurred,
+             changed: True if changes were received, False if there were no changes, None in case of an exception
+    """
     try:
         repo = git.Repo(path_repo)
+        current = repo.head.commit
         repo.remotes.origin.pull()
-        return True
-    except git.GitCommandError as exception:
-        print(exception)
-        if exception.stdout:
-            print("!! stdout was:")
-            print(exception.stdout)
-        if exception.stderr:
-            print("!! stderr was:")
-            print(exception.stderr)
-        return False
-    except git.InvalidGitRepositoryError:
-        print('Invalid Git Repository')
-        return False
+        if current == repo.head.commit:
+            return None, False
+        return None, True
+    except git.GitCommandError as exc:
+        error_message = \
+            f'{exc}; stdout: {exc.stdout if exc.stdout else None}; stderr: {exc.stderr if exc.stderr else None}'
+        return error_message, None
+    except git.InvalidGitRepositoryError as exc:
+        return f'Invalid Git Repository: {exc}', None
 
 
 @check_environment_ONLY_PROD
