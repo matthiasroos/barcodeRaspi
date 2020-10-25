@@ -23,6 +23,7 @@ def check_environment_ONLY_PROD(func) -> Callable:
     :param func: function (returning a bool)
     :return:
     """
+    # FIXME: return value of wrapper does not match use case for: git_pull()
     def wrapper(*args, **kwargs) -> bool:
         if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
             return func(*args, **kwargs)
@@ -56,20 +57,6 @@ def check_environment_ONLY_DEV(func) -> Callable:
             return func(*args, **kwargs)
         return True
     return wrapper
-
-
-def getMD5Hash(filename: str) -> hashlib:
-    """
-    Get MD5 hash for a file
-
-    :param filename:
-    :return:
-    """
-    hash_obj = hashlib.md5()
-    with open(filename, 'rb') as file:
-        buf = file.read()
-        hash_obj.update(buf)
-    return hash_obj
 
 
 @check_environment_TEST_PROD
