@@ -141,7 +141,8 @@ class AdminFrame(wx.Frame):
                 nr = int(self.tab2.sortable_list_ctrl.GetItem(row, col=0).GetText())
                 stock_old = int(self.tab2.sortable_list_ctrl.GetItem(row, col=2).GetText())
                 stock_new = int(self.tab2.sortable_list_ctrl.GetItem(row, col=3).GetText())
-                changed_stock.append([nr, stock_old, stock_new])
+                if stock_old != stock_new:
+                    changed_stock.append([nr, stock_old, stock_new])
 
             result = self.parent.show_confirm_dialog('Do you want to save purchases/products?')
             if result:
