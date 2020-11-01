@@ -51,20 +51,20 @@ class GetraenkeApp(src.app.App):
         """
         self.load_users()
 
-        # code for adding the paid column to PURCHASES_FILE
-        if functions.check_column_nr_in_file(self.purchases_file) == 3:
-            functions.transform_purchases(purchases_file=self.purchases_file)
-            functions.git_push(path_repo='./.',
-                               files=[self.purchases_file],
-                               commit_message='update PURCHASES_FILE via getraenkeKasse.py')
+        # # code for adding the paid column to PURCHASES_FILE
+        # if functions.check_column_nr_in_file(self.purchases_file) == 3:
+        #     functions.transform_purchases(purchases_file=self.purchases_file)
+        #     functions.git_push(path_repo='./.',
+        #                        files=[self.purchases_file],
+        #                        commit_message='update PURCHASES_FILE via getraenkeKasse.py')
         self.load_purchases()
-
-        # code for adding the stock column to PRODUCTS_FILE
-        if functions.check_column_nr_in_file(self.products_file) == 4:
-            functions.transform_products(products_file=self.products_file)
-            functions.git_push(path_repo='./.',
-                               files=[self.products_file],
-                               commit_message='update PRODUCTS_FILE via getraenkeKasse.py')
+        #
+        # # code for adding the stock column to PRODUCTS_FILE
+        # if functions.check_column_nr_in_file(self.products_file) == 4:
+        #     functions.transform_products(products_file=self.products_file)
+        #     functions.git_push(path_repo='./.',
+        #                        files=[self.products_file],
+        #                        commit_message='update PRODUCTS_FILE via getraenkeKasse.py')
         self.load_products()
 
         src.getraenkeKasse.mainframe.MainFrame(self)
