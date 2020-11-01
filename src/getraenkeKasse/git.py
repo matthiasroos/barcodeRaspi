@@ -41,7 +41,7 @@ class GitRepository:
         try:
             current = self.repo.head.commit
             self.repo.remotes.origin.pull()
-            if current == self.repo.head.commit:
+            if current != self.repo.head.commit:
                 self.is_changed = True
             else:
                 self.is_changed = False
