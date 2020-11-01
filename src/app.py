@@ -89,7 +89,7 @@ class App(metaclass=abc.ABCMeta):
 
         :return:
         """
-        os.execl(sys.executable, sys.executable)
+        os.execl(sys.executable, sys.executable, *sys.argv)
 
     # dialogs
     @staticmethod
