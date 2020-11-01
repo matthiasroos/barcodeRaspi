@@ -191,13 +191,14 @@ class GetraenkeApp(src.app.App):
         :return:
         """
         self.bring_git_repo_up_to_date(repo=self.repo_kasse, error_message='Problem with git (local repo).')
-        for product in changed_stock:
-            nr, stock_old, stock_new = product
-            if stock_old != stock_new:
-                self._set_stock_for_product(nr=nr, stock=stock_new)
-        self._save_products()
-        self.check_in_changes_into_git(path_repo='./.', files=[self.products_file],
-                                       commit_message='replenish stock via getraenkeKasse.py')
+        if changed_stock:
+            for product in changed_stock:
+                nr, stock_old, stock_new = product
+                if stock_old != stock_new:
+                    self._set_stock_for_product(nr=nr, stock=stock_new)
+            self._save_products()
+            self.check_in_changes_into_git(path_repo='./.', files=[self.products_file],
+                                           commit_message='replenish stock via getraenkeKasse.py')
 
     def _decrease_stock_for_product(self, code: str) -> bool:
         """
