@@ -246,7 +246,7 @@ class GetraenkeApp(src.app.App):
         :param count: number of item to be bought
         :return:
         """
-        self.bring_git_repo_up_to_date(path_repo='./.', error_message='Problem with git (local repo).')
+        self.bring_git_repo_up_to_date(repo=self.repo_kasse, error_message='Problem with git (local repo).')
         for _ in range(0, count):
             self.file_contents.purchases = functions.add_purchase(purchases=self.file_contents.purchases,
                                                                   user=user, code=code)
