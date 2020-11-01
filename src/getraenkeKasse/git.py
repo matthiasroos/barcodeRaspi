@@ -17,7 +17,6 @@ class GitRepository:
         self.path_repo: str = path_repo
 
         self.repo = git.Repo(self.path_repo)
-        # except git.InvalidGitRepositoryError:
 
         self.is_changed: bool = None # noqa
         self.error_message: Optional[str] = None

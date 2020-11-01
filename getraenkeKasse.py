@@ -26,7 +26,9 @@ if __name__ == "__main__":
                                                       offset=OFFSET,
                                                       file_names={'products': PRODUCTS_FILE,
                                                                   'purchases': PURCHASES_FILE,
-                                                                  'users': USERS_FILE})
+                                                                  'users': USERS_FILE},
+                                                      repositories={'kasse': './.',
+                                                                    'code': 'barcodeRaspi'})
 
     # check network
     if not functions.checkNetwork():
@@ -39,18 +41,5 @@ if __name__ == "__main__":
         if timeT[0] != time.ctime():
             gk.show_error_dialog(error_message='Date/time not synchronized with NTP. Exiting...')
             gk.exit()
-
-    # check for new commits in local repository
-    gk.bring_git_repo_up_to_date(path_repo='./.',
-                                 error_message='Problem with git (local repo)',
-                                 should_exit=True)
-
-    # check for new version of getraenkeKasse.py script on github
-    gk.bring_git_repo_up_to_date(path_repo='barcodeRaspi',
-                                 error_message='Problem with git (GitHub)',
-                                 should_exit=True,
-                                 restart_message='new version from gitHub, script is restarting...',
-                                 should_restart=True
-                                 )
 
     gk.run()

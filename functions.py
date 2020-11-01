@@ -87,6 +87,7 @@ def getTimefromNTP():
         t -= REFERENCE_TIME_1970
     return time.ctime(t), t
 
+
 def check_for_file(file, raise_exec=True) -> Optional[bool]:
     """
     Check if the file exists.
