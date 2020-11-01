@@ -23,7 +23,6 @@ def check_environment_ONLY_PROD(func) -> Callable:
     :param func: function (returning a bool)
     :return:
     """
-    # FIXME: return value of wrapper does not match use case for: git_pull()
     def wrapper(*args, **kwargs) -> bool:
         if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
             return func(*args, **kwargs)
@@ -87,46 +86,6 @@ def getTimefromNTP():
         t = struct.unpack('!12I', data)[10]
         t -= REFERENCE_TIME_1970
     return time.ctime(t), t
-
-
-@check_environment_ONLY_PROD
-def git_pull(path_repo: str) -> Tuple[Optional[str], Optional[bool]]:
-    """
-    Do a git pull on a repository.
-
-    :param path_repo: relative path of the repository
-    :return: error message: error message which will be displayed, None if an exception occurred,
-             changed: True if changes were received, False if there were no changes, None in case of an exception
-    """
-    try:
-        repo = git.Repo(path_repo)
-        current = repo.head.commit
-        repo.remotes.origin.pull()
-        if current == repo.head.commit:
-            return None, False
-        return None, True
-    except git.GitCommandError as exc:
-        error_message = \
-            f'{exc}; stdout: {exc.stdout if exc.stdout else None}; stderr: {exc.stderr if exc.stderr else None}'
-        return error_message, None
-    except git.InvalidGitRepositoryError as exc:
-        return f'Invalid Git Repository: {exc}', None
-
-
-@check_environment_ONLY_PROD
-def git_push(path_repo: str, files: List[str], commit_message: str) -> bool:
-    try:
-        repo_local = git.Repo(path_repo)
-        for file in files:
-            repo_local.git.add(file)
-        repo_local.index.commit(commit_message)
-        origin = repo_local.remote(name='origin')
-        origin.push()
-        return True
-    except git.GitCommandError as exception:
-        print(exception)
-        return False
-
 
 def check_for_file(file, raise_exec=True) -> Optional[bool]:
     """
