@@ -3,6 +3,7 @@ Module containing the abstract base class for an app
 """
 import abc
 import dataclasses
+import logging
 import os
 import sys
 from typing import Dict, List, Optional
@@ -50,6 +51,13 @@ class App(metaclass=abc.ABCMeta):
         self.users_file: Optional[str] = None
         self.product_columns = ['nr', 'code', 'desc', 'price', 'stock']
         self.product_columns_type = {'nr': int, 'code': str, 'desc': str, 'price': float, 'stock': int}
+
+        logging.basicConfig(filename='getraenke.log',
+                            filemode='a',
+                            format='%(asctime)s.%(msecs)03d %(levelname)s - %(name)s - %(funcName)s - %(message)s',
+                            datefmt='%Y-%m-%d %H:%M:%S',
+                            level=logging.DEBUG)
+        self.logger = logging.getLogger(self.__class__.__name__)
 
         self.app = wx.App(False)
         if 'BARCODE_DEV' in os.environ:
@@ -170,9 +178,11 @@ class App(metaclass=abc.ABCMeta):
 
         :return:
         """
+        self.logger.info('loading products')
         self.file_contents.products = functions.read_csv_file(file=self.products_file,
                                                               columns=self.product_columns,
                                                               column_types=self.product_columns_type)
+        self.logger.info('loading of %s products successful', len(self.file_contents.products))
 
     def create_new_product(self, values: Dict[str, str]) -> Optional[pd.DataFrame]:
         """
@@ -205,9 +215,11 @@ class App(metaclass=abc.ABCMeta):
 
         :return:
         """
+        self.logger.info('loading purchases')
         self.file_contents.purchases = functions.read_csv_file(file=self.purchases_file,
                                                                columns=['timestamp', 'user', 'code', 'paid'],
                                                                column_types={'code': str, 'paid': bool})
+        self.logger.info('loading of %s purchases successful', len(self.file_contents.purchases))
 
     def _save_purchases(self) -> None:
         """
@@ -241,7 +253,9 @@ class App(metaclass=abc.ABCMeta):
 
         :return:
         """
+        self.logger.info('loading users')
         self.file_contents.users = functions.read_users(users_file=self.users_file)
+        self.logger.info('loading of %s users successful', len(self.file_contents.users))
 
     def _save_users(self) -> None:
         pass
