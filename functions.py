@@ -106,17 +106,19 @@ def check_for_file(file, raise_exec=True) -> Optional[bool]:
     return True
 
 
-def read_users(users_file: str) -> Iterable[str]:
+def read_users(users_file: str) -> List[str]:
     """"
     Read users from file.
 
     :param users_file: file containing user names
-    :return:
+    :return: list containing the users
     """
     check_for_file(users_file)
+    users_list = []
     with open(users_file, "r") as file_users:
         for line in file_users:
-            yield line.rstrip()
+            users_list.append(line.rstrip())
+    return users_list
 
 
 def format_dataframe(data_df: pd.DataFrame, types: dict) -> pd.DataFrame:
