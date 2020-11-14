@@ -81,22 +81,22 @@ class App(metaclass=abc.ABCMeta):
         :return:
         """
 
-    @staticmethod
-    def exit() -> None:
+    def exit(self) -> None:
         """
         Exit the app
 
         :return:
         """
+        self.logger.info('app is closed')
         sys.exit()
 
-    @staticmethod
-    def restart() -> None:
+    def restart(self) -> None:
         """
         Restart the app
 
         :return:
         """
+        self.logger.info('app is restarting')
         os.execl(sys.executable, sys.executable, *sys.argv)
 
     # dialogs

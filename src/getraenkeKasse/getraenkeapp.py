@@ -69,6 +69,7 @@ class GetraenkeApp(src.app.App):
 
         :return:
         """
+        self.logger.info('starting up app')
         # check for new commits in local repository
         self.bring_git_repo_up_to_date(repo=self.repo_kasse,
                                        error_message='Problem with git (local repo)',
