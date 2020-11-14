@@ -15,6 +15,7 @@ import src.getraenkeKasse.git
 import src.getraenkeKasse.listframe
 import src.getraenkeKasse.mainframe
 import src.getraenkeKasse.scanframe
+import src.getraenkeKasse.timer
 
 
 class GetraenkeApp(src.app.App):
@@ -48,6 +49,10 @@ class GetraenkeApp(src.app.App):
 
         self.version = getraenkeKasse.VERSION
         self.clicked_user = None
+
+        # 30 minutes = 30 * 60 * 1000 milliseconds
+        self.remote_update_timer = src.getraenkeKasse.timer.UpdateTimer(interval=30 * 60 * 1000,
+                                                                        func=self.update_from_remote)
 
     def init_repo(self, path_repo: str) -> src.getraenkeKasse.git.GitRepository:
         """
@@ -100,6 +105,7 @@ class GetraenkeApp(src.app.App):
         self.load_products()
 
         src.getraenkeKasse.mainframe.MainFrame(self)
+        self.remote_update_timer.Start(milliseconds=self.remote_update_timer.time_interval)
         self.app.MainLoop()
 
     def show_admin_frame(self) -> None:
@@ -126,6 +132,19 @@ class GetraenkeApp(src.app.App):
         """
         self.logger.info('scanframe shown')
         src.getraenkeKasse.scanframe.ScanFrame(self)
+
+    def update_from_remote(self):
+        """
+
+        :return:
+        """
+        self.bring_git_repo_up_to_date(repo=self.repo_kasse)
+        if self.repo_kasse.is_changed:
+            self.logger.info('changes were fetched')
+            self.load_products()
+            self.load_purchases()
+        else:
+            self.logger.info('already up to date')
 
     def bring_git_repo_up_to_date(self,
                                   repo: src.getraenkeKasse.git.GitRepository,
