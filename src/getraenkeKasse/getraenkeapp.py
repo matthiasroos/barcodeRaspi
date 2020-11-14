@@ -72,11 +72,11 @@ class GetraenkeApp(src.app.App):
         self.logger.info('starting up app')
         # check for new commits in local repository
         self.bring_git_repo_up_to_date(repo=self.repo_kasse,
-                                       error_message='Problem with git (local repo)',
+                                       error_message='Problem with local git repo.',
                                        should_exit=True)
         # check for new version of getraenkeKasse.py script on github
         self.bring_git_repo_up_to_date(repo=self.repo_code,
-                                       error_message='Problem with git (GitHub)',
+                                       error_message='Problem with GitHub repository.',
                                        should_exit=True,
                                        restart_message='new version from gitHub, script is restarting...',
                                        should_restart=True)
@@ -129,7 +129,7 @@ class GetraenkeApp(src.app.App):
 
     def bring_git_repo_up_to_date(self,
                                   repo: src.getraenkeKasse.git.GitRepository,
-                                  error_message: str,
+                                  error_message: str = 'Problem with local git repo.',
                                   should_exit: bool = False,
                                   restart_message: str = '',
                                   should_restart: bool = False) -> None:
@@ -194,7 +194,7 @@ class GetraenkeApp(src.app.App):
         :param changed_stock:
         :return:
         """
-        self.bring_git_repo_up_to_date(repo=self.repo_kasse, error_message='Problem with git (local repo).')
+        self.bring_git_repo_up_to_date(repo=self.repo_kasse)
         if changed_stock:
             for product in changed_stock:
                 nr, stock_old, stock_new = product
@@ -232,7 +232,7 @@ class GetraenkeApp(src.app.App):
         :param user: paying user
         :return:
         """
-        self.bring_git_repo_up_to_date(repo=self.repo_kasse, error_message='Problem with git (local repo).')
+        self.bring_git_repo_up_to_date(repo=self.repo_kasse)
         self._set_paid_for_user(user=user)
         self._save_purchases()
         self.check_in_changes_into_git(path_repo='./.', files=[self.purchases_file],
