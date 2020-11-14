@@ -20,7 +20,7 @@ class ScanFrame(wx.Frame):
         self.counter = 1
 
         with self.parent as prt:
-            prt.load_products()
+            # prt.load_products()
             self.btn_nocode = wx.Button(self.panel, id=wx.ID_ANY, label="no barcode", name="no barcode",
                                         size=prt.display_settings.wx_button_size,
                                         pos=(prt.display_settings.screen_width - 3 * prt.display_settings.btn_width,
