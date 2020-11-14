@@ -157,23 +157,26 @@ class GetraenkeApp(src.app.App):
         self.logger.info('finished git pull, repository path %s', repo.path_repo)
 
     def check_in_changes_into_git(self,
-                                  path_repo: str,
+                                  repo: src.getraenkeKasse.git.GitRepository,
                                   files: List[str],
                                   commit_message: str,
-                                  error_message: str = 'Problem with git (local repo).') -> None:
+                                  error_message: str = 'Problem with local git repo.') -> None:
         """
         Commit all changes in a list of files to git.
 
-        :param path_repo: absolute or relative path to git repository
+        :param repo:
         :param files: list of filenames to
         :param commit_message: commit message
         :param error_message: message in case of error
         :return:
         """
-        if not self.repo_kasse.commit(files=files, commit_message=commit_message):
-            self.show_error_dialog(error_message=error_message)
-        if not self.repo_kasse.push():
-            self.show_error_dialog(error_message=error_message)
+        self.logger.info('commit changes to git')
+        if not repo.commit(files=files, commit_message=commit_message):
+            self.show_error_dialog(error_message=f'{error_message}\n{repo.error_message}')
+        self.logger.info('push commits to origin')
+        if not repo.push():
+            self.show_error_dialog(error_message=f'{error_message}\n{repo.error_message}')
+        self.logger.info('push finished')
 
     def _set_stock_for_product(self,
                                nr: int,
@@ -201,7 +204,7 @@ class GetraenkeApp(src.app.App):
                 if stock_old != stock_new:
                     self._set_stock_for_product(nr=nr, stock=stock_new)
             self._save_products()
-            self.check_in_changes_into_git(path_repo='./.', files=[self.products_file],
+            self.check_in_changes_into_git(repo=self.repo_kasse, files=[self.products_file],
                                            commit_message='replenish stock via getraenkeKasse.py')
 
     def _decrease_stock_for_product(self, code: str) -> bool:
@@ -235,7 +238,7 @@ class GetraenkeApp(src.app.App):
         self.bring_git_repo_up_to_date(repo=self.repo_kasse)
         self._set_paid_for_user(user=user)
         self._save_purchases()
-        self.check_in_changes_into_git(path_repo='./.', files=[self.purchases_file],
+        self.check_in_changes_into_git(repo=self.repo_kasse, files=[self.purchases_file],
                                        commit_message=f'pay for user {user} via getraenkeKasse.py')
 
     def make_purchase(self,
