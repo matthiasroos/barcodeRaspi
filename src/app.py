@@ -5,6 +5,7 @@ import abc
 import dataclasses
 import logging
 import os
+import queue
 import sys
 from typing import Dict, List, Optional
 
@@ -58,6 +59,8 @@ class App(metaclass=abc.ABCMeta):
                             datefmt='%Y-%m-%d %H:%M:%S',
                             level=logging.DEBUG)
         self.logger = logging.getLogger(self.__class__.__name__)
+
+        self.queue = queue.Queue(maxsize=1)
 
         self.app = wx.App(False)
         if 'BARCODE_DEV' in os.environ:

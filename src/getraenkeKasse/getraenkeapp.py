@@ -144,7 +144,9 @@ class GetraenkeApp(src.app.App):
         :return:
         """
         self.logger.info('starting git pull, repository path %s', repo.path_repo)
+        self.queue.put(True)
         status = repo.pull()
+        self.queue.get()
         if not status:
             self.show_error_dialog(
                 error_message=f'{error_message}:\n{repo.error_message}\n{"Exiting now." if should_exit else ""}')
