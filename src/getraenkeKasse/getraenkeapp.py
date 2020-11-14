@@ -124,6 +124,7 @@ class GetraenkeApp(src.app.App):
 
         :return:
         """
+        self.logger.info('scanframe shown')
         src.getraenkeKasse.scanframe.ScanFrame(self)
 
     def bring_git_repo_up_to_date(self,
@@ -142,6 +143,7 @@ class GetraenkeApp(src.app.App):
         :param should_restart: flag if function should restart if changes were
         :return:
         """
+        self.logger.info('starting git pull, repository path %s', repo.path_repo)
         status = repo.pull()
         if not status:
             self.show_error_dialog(
@@ -152,6 +154,7 @@ class GetraenkeApp(src.app.App):
             if should_restart:
                 self.show_info_dialog(info_message=restart_message)
                 self.restart()
+        self.logger.info('finished git pull, repository path %s', repo.path_repo)
 
     def check_in_changes_into_git(self,
                                   path_repo: str,
@@ -247,7 +250,7 @@ class GetraenkeApp(src.app.App):
         :param count: number of item to be bought
         :return:
         """
-        self.bring_git_repo_up_to_date(repo=self.repo_kasse, error_message='Problem with git (local repo).')
+        self.logger.info('user %s, code %s, count %s', user, code, count)
         for _ in range(0, count):
             self.file_contents.purchases = functions.add_purchase(purchases=self.file_contents.purchases,
                                                                   user=user, code=code)

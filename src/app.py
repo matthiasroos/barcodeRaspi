@@ -100,14 +100,14 @@ class App(metaclass=abc.ABCMeta):
         os.execl(sys.executable, sys.executable, *sys.argv)
 
     # dialogs
-    @staticmethod
-    def show_error_dialog(error_message: str) -> None:
+    def show_error_dialog(self, error_message: str) -> None:
         """
         Show an error dialog
 
         :param error_message: error message for the user
         :return:
         """
+        self.logger.error('error message: %s', error_message)
         dlg = wx.MessageDialog(None, message=error_message, caption='ERROR',
                                style=wx.OK | wx.ICON_WARNING | wx.STAY_ON_TOP)
         # dlg.SetFont(self.display_settings.wxFont)
