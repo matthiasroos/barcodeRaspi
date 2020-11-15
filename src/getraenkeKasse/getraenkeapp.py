@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import threading
 from typing import Dict, List
 
 import git
@@ -192,11 +193,13 @@ class GetraenkeApp(src.app.App):
         :return:
         """
         self.logger.info('commit changes to git')
+        self.queue.put(True)
         if not repo.commit(files=files, commit_message=commit_message):
             self.show_error_dialog(error_message=f'{error_message}\n{repo.error_message}')
         self.logger.info('push commits to origin')
         if not repo.push():
             self.show_error_dialog(error_message=f'{error_message}\n{repo.error_message}')
+        self.queue.get()
         self.logger.info('push finished')
 
     def _set_stock_for_product(self,
@@ -290,7 +293,11 @@ class GetraenkeApp(src.app.App):
         if not any(result_list):
             # TODO issue warning for selling without stock
             pass
-        self.check_in_changes_into_git(path_repo='./.', files=files, commit_message='purchase via getraenkeKasse.py')
+        thread = threading.Thread(target=self.check_in_changes_into_git,
+                                  kwargs={'repo': self.repo_kasse,
+                                          'files': files,
+                                          'commit_message': 'purchase via getraenkeKasse.py'})
+        thread.start()
 
     @property
     def clicked_user(self) -> str:
