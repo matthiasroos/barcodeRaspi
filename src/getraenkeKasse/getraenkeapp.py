@@ -281,14 +281,14 @@ class GetraenkeApp(src.app.App):
         for _ in range(0, count):
             self.file_contents.purchases = functions.add_purchase(purchases=self.file_contents.purchases,
                                                                   user=user, code=code)
-        # self._save_purchases()
+        self._save_purchases()
         files = [self.purchases_file]
         result_list = []
         for _ in range(0, count):
             result = self._decrease_stock_for_product(code=code)
             result_list.append(result)
         if any(result_list):
-            # self._save_products()
+            self._save_products()
             files.append(self.products_file)
         if not any(result_list):
             # TODO issue warning for selling without stock
