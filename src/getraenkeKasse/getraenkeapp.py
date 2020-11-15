@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import threading
+import time
 from typing import Dict, List
 
 import git
@@ -193,6 +194,7 @@ class GetraenkeApp(src.app.App):
         :return:
         """
         self.logger.info('commit changes to git')
+        time.sleep(20)
         self.queue.put(True)
         if not repo.commit(files=files, commit_message=commit_message):
             self.show_error_dialog(error_message=f'{error_message}\n{repo.error_message}')
