@@ -265,6 +265,7 @@ class GetraenkeApp(src.app.App):
         self.check_in_changes_into_git(repo=self.repo_kasse, files=[self.purchases_file],
                                        commit_message=f'pay for user {user} via getraenkeKasse.py')
 
+    @functions.runtime_profile
     def make_purchase(self,
                       user: str,
                       code: str,

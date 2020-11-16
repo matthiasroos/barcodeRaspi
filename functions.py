@@ -4,10 +4,12 @@ Collection of low-level functions used in different apps,
 which enables separation of GUI and logic for better testability.
 """
 
+import cProfile
 import datetime
 import functools
 import logging
 import os
+import pstats
 import socket
 import struct
 import time
@@ -91,6 +93,32 @@ def check_environment_ONLY_DEV(func) -> Callable:
             return result
         logger.info('TEST: function %s not executed', func.__name__)
         return True
+    return wrapper
+
+
+@check_environment_DEV_TEST
+def runtime_profile(func):
+    """
+
+    :param func: decorated function
+    :return:
+    """
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        profile_ = cProfile.Profile()
+        profile_.enable()
+        result = func(*args, **kwargs)
+        profile_.disable()
+
+        timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+        output_file = f'{func.__name__}.profile-{timestamp}'
+        with open(output_file, 'w') as file_handle:
+            ps = pstats.Stats(profile_, stream=file_handle)
+            ps.strip_dirs()
+            ps.sort_stats(pstats.SortKey.CUMULATIVE)
+            ps.print_stats()
+        return result
+
     return wrapper
 
 
