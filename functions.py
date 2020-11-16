@@ -6,6 +6,7 @@ which enables separation of GUI and logic for better testability.
 
 import datetime
 import functools
+import logging
 import os
 import socket
 import struct
@@ -13,6 +14,8 @@ import time
 from typing import Callable, Iterable, List, Optional, Tuple
 
 import pandas as pd
+
+logger = logging.getLogger()
 
 
 def check_environment_ONLY_PROD(func) -> Callable:
@@ -29,6 +32,7 @@ def check_environment_ONLY_PROD(func) -> Callable:
             result = func(*args, **kwargs)
 
             return result
+        logger.info('DEV or TEST: function %s not executed', func.__name__)
         return True
     return wrapper
 
@@ -47,6 +51,7 @@ def check_environment_TEST_PROD(func) -> Callable:
             result = func(*args, **kwargs)
 
             return result
+        logger.info('DEV: function %s not executed', func.__name__)
         return True
     return wrapper
 
@@ -84,6 +89,7 @@ def check_environment_ONLY_DEV(func) -> Callable:
             result = func(*args, **kwargs)
 
             return result
+        logger.info('TEST: function %s not executed', func.__name__)
         return True
     return wrapper
 
