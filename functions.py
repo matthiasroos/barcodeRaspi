@@ -5,14 +5,13 @@ which enables separation of GUI and logic for better testability.
 """
 
 import datetime
-import hashlib
+import functools
 import os
 import socket
 import struct
 import time
 from typing import Callable, Iterable, List, Optional, Tuple
 
-import git
 import pandas as pd
 
 
@@ -23,9 +22,13 @@ def check_environment_ONLY_PROD(func) -> Callable:
     :param func: function (returning a bool)
     :return:
     """
+    @functools.wraps(func)
     def wrapper(*args, **kwargs) -> bool:
         if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
-            return func(*args, **kwargs)
+
+            result = func(*args, **kwargs)
+
+            return result
         return True
     return wrapper
 
@@ -37,10 +40,33 @@ def check_environment_TEST_PROD(func) -> Callable:
     :param func: function (returning a bool)
     :return:
     """
+    @functools.wraps(func)
     def wrapper(*args, **kwargs) -> bool:
         if 'BARCODE_DEV' not in os.environ:
-            return func(*args, **kwargs)
+
+            result = func(*args, **kwargs)
+
+            return result
         return True
+    return wrapper
+
+
+def check_environment_DEV_TEST(func) -> Callable:
+    """
+
+
+    :param func:
+    :return:
+    """
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs) -> bool:
+        if ('BARCODE_DEV' in os.environ) or ('BARCODE_TEST' in os.environ):
+
+            result = func(*args, **kwargs)
+
+            return result
+        return True
+
     return wrapper
 
 
@@ -51,9 +77,13 @@ def check_environment_ONLY_DEV(func) -> Callable:
     :param func: function (returning a bool)
     :return:
     """
+    @functools.wraps(func)
     def wrapper(*args, **kwargs) -> bool:
         if 'BARCODE_DEV' in os.environ:
-            return func(*args, **kwargs)
+
+            result = func(*args, **kwargs)
+
+            return result
         return True
     return wrapper
 
