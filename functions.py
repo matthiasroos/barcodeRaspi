@@ -96,30 +96,39 @@ def check_environment_ONLY_DEV(func) -> Callable:
     return wrapper
 
 
-@check_environment_DEV_TEST
-def runtime_profile(func):
+def runtime_profile(active: bool = False) -> Callable:
     """
 
-    :param func: decorated function
+    :param active: flag if decorator is active
     :return:
     """
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        profile_ = cProfile.Profile()
-        profile_.enable()
-        result = func(*args, **kwargs)
-        profile_.disable()
+    def factory(func) -> Callable:
+        """
 
-        timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-        output_file = f'{func.__name__}.profile-{timestamp}'
-        with open(output_file, 'w') as file_handle:
-            ps = pstats.Stats(profile_, stream=file_handle)
-            ps.strip_dirs()
-            ps.sort_stats(pstats.SortKey.CUMULATIVE)
-            ps.print_stats()
-        return result
+        :param func: decorated function
+        :return:
+        """
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            if active is False:
+                return func(*args, **kwargs)
 
-    return wrapper
+            profile_ = cProfile.Profile()
+            profile_.enable()
+            result = func(*args, **kwargs)
+            profile_.disable()
+
+            timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+            output_file = f'{func.__name__}.profile-{timestamp}'
+            with open(output_file, 'w') as file_handle:
+                ps = pstats.Stats(profile_, stream=file_handle)
+                ps.strip_dirs()
+                ps.sort_stats(pstats.SortKey.CUMULATIVE)
+                ps.print_stats()
+            return result
+
+        return wrapper
+    return factory
 
 
 @check_environment_TEST_PROD
