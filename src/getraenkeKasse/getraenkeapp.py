@@ -294,11 +294,14 @@ class GetraenkeApp(src.app.App):
         if not any(result_list):
             # TODO issue warning for selling without stock
             pass
-        thread = threading.Thread(target=self.check_in_changes_into_git,
-                                  kwargs={'repo': self.repo_kasse,
-                                          'files': files,
-                                          'commit_message': 'purchase via getraenkeKasse.py'})
-        thread.start()
+        self.check_in_changes_into_git(repo=self.repo_kasse,
+                                       files=files,
+                                       commit_message='purchase via getraenkeKasse.py')
+        # thread = threading.Thread(target=self.check_in_changes_into_git,
+        #                           kwargs={'repo': self.repo_kasse,
+        #                                   'files': files,
+        #                                   'commit_message': 'purchase via getraenkeKasse.py'})
+        # thread.start()
 
     @property
     def clicked_user(self) -> str:
