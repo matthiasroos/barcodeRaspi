@@ -102,7 +102,7 @@ def runtime_profile(active: bool = False) -> Callable:
     :param active: flag if decorator is active
     :return:
     """
-    def factory(func) -> Callable:
+    def decorator(func) -> Callable:
         """
 
         :param func: decorated function
@@ -128,7 +128,7 @@ def runtime_profile(active: bool = False) -> Callable:
             return result
 
         return wrapper
-    return factory
+    return decorator
 
 
 @check_environment_TEST_PROD
