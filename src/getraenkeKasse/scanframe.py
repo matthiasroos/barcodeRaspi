@@ -1,4 +1,5 @@
 
+import logging
 import time
 
 import wx
@@ -101,10 +102,11 @@ class ScanFrame(wx.Frame):
         """"""
         self.Disable()
         self.Update()
-        functions.check_environment_ONLY_DEV(time.sleep(7))
         self.parent.make_purchase(user=self.parent.clicked_user,
                                   code=self.txt_code.GetValue(),
                                   count=self.counter)
+        logger = logging.getLogger()
+        logger.info('closing scanframe')
         self.Close()
 
     def _onChangeCode(self, _) -> None:
