@@ -278,30 +278,31 @@ class GetraenkeApp(src.app.App):
         :param count: number of item to be bought
         :return:
         """
+        def thread_function() -> None:
+            for _ in range(0, count):
+                self.file_contents.purchases = functions.add_purchase(purchases=self.file_contents.purchases,
+                                                                      user=user, code=code)
+            self._save_purchases()
+            files = [self.purchases_file]
+            result_list = []
+            for _ in range(0, count):
+                result = self._decrease_stock_for_product(code=code)
+                result_list.append(result)
+            if any(result_list):
+                self._save_products()
+                files.append(self.products_file)
+            if not any(result_list):
+                # TODO issue warning for selling without stock
+                pass
+            self.check_in_changes_into_git(repo=self.repo_kasse,
+                                           files=files,
+                                           commit_message='purchase via getraenkeKasse.py')
+            return None
+
         self.logger.info('user %s, code %s, count %s', user, code, count)
-        for _ in range(0, count):
-            self.file_contents.purchases = functions.add_purchase(purchases=self.file_contents.purchases,
-                                                                  user=user, code=code)
-        self._save_purchases()
-        files = [self.purchases_file]
-        result_list = []
-        for _ in range(0, count):
-            result = self._decrease_stock_for_product(code=code)
-            result_list.append(result)
-        if any(result_list):
-            self._save_products()
-            files.append(self.products_file)
-        if not any(result_list):
-            # TODO issue warning for selling without stock
-            pass
-        self.check_in_changes_into_git(repo=self.repo_kasse,
-                                       files=files,
-                                       commit_message='purchase via getraenkeKasse.py')
-        # thread = threading.Thread(target=self.check_in_changes_into_git,
-        #                           kwargs={'repo': self.repo_kasse,
-        #                                   'files': files,
-        #                                   'commit_message': 'purchase via getraenkeKasse.py'})
-        # thread.start()
+
+        thread = threading.Thread(target=thread_function)
+        thread.start()
 
     @property
     def clicked_user(self) -> str:
