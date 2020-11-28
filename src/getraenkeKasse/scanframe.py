@@ -112,18 +112,19 @@ class ScanFrame(wx.Frame):
     def _onChangeCode(self, _) -> None:
         """"""
         code = self.txt_code.GetValue()
-        prod_df = self.parent.file_contents.products
-        if len(code) in functions.calc_length_code(products_df=prod_df):
-            select_df = prod_df[prod_df['code'] == code]
-            if not select_df.empty:
-                ind = select_df.first_valid_index()
-                price = select_df.at[ind, 'price']
-                label = f"{select_df.at[ind, 'desc']}\t Price: {self.counter}x{price:.2f} = {self.counter * price:.2f}"
-                self.Product.SetLabel(label=label)
-                self.btn_confirm.Enable()
-                return None
-        self.Product.SetLabel("")
-        self.btn_confirm.Disable()
+        price, desc = self.parent.get_product_for_code(code=code)
+        if (price is None) and (desc is None):
+            self.Product.SetLabel('')
+            self.btn_confirm.Disable()
+            return None
+        if (price is None) and (desc is not None):
+            label = f'{desc}'
+            self.Product.SetLabel(label=label)
+            self.btn_confirm.Disable()
+            return None
+        label = f'{desc}\t Price: {self.counter}x{price:.2f} = {self.counter * price:.2f}'
+        self.Product.SetLabel(label=label)
+        self.btn_confirm.Enable()
 
     def _onClickPlusMinusButton(self, event) -> None:
         """"""

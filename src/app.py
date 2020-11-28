@@ -7,7 +7,7 @@ import logging
 import os
 import queue
 import sys
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 import wx
@@ -202,6 +202,24 @@ class App(metaclass=abc.ABCMeta):
             self.show_error_dialog(error_message=f'Error: {str(exc)}')
             return None
         return new_item_df
+
+    def get_product_for_code(self, code: str) -> Tuple[Optional[str], Optional[str]]:
+        """
+
+        Prerequisite: code is unique
+
+        :param code:
+        :return:
+        """
+        if len(code) in functions.calc_length_code(products_df=self.file_contents.products):
+            select_df = self.file_contents.products[self.file_contents.products['code'] == code]
+            if select_df.empty:
+                return None, 'invalid code'
+            ind = select_df.first_valid_index()
+            price = select_df.at[ind, 'price']
+            desc = select_df.at[ind, 'desc']
+            return price, desc
+        return None, None
 
     def _save_products(self) -> None:
         """
