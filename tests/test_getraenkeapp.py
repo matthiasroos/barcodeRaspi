@@ -1,4 +1,5 @@
 
+import logging
 import time
 import unittest.mock
 
@@ -57,6 +58,149 @@ def mock_getraenkekasse():
         gk.file_contents.purchases = pd.DataFrame(purchases, columns=columns_purchases)
         gk.file_contents.users = None
     return gk
+
+
+def test_bring_git_repo_up_to_date_success_no_changes(mock_getraenkekasse, caplog):
+    mock_getraenkekasse.repo_kasse.pull.return_value = True
+    mock_getraenkekasse.repo_kasse.path_repo = 'test_repo'
+    mock_getraenkekasse.repo_kasse.is_changed = False
+
+    caplog.set_level(level=logging.INFO)
+
+    mock_getraenkekasse.bring_git_repo_up_to_date(repo=mock_getraenkekasse.repo_kasse)
+
+    assert caplog.record_tuples == [('GetraenkeApp', logging.INFO, 'starting git pull, repository path test_repo'),
+                                    ('GetraenkeApp', logging.INFO, 'finished git pull, repository path test_repo')]
+
+
+def test_bring_git_repo_up_to_date_success_changes_no_restart(mock_getraenkekasse, caplog):
+    mock_getraenkekasse.repo_kasse.pull.return_value = True
+    mock_getraenkekasse.repo_kasse.path_repo = 'test_repo'
+    mock_getraenkekasse.repo_kasse.is_changed = True
+
+    caplog.set_level(level=logging.INFO)
+
+    mock_getraenkekasse.bring_git_repo_up_to_date(repo=mock_getraenkekasse.repo_kasse)
+
+    assert caplog.record_tuples == [('GetraenkeApp', logging.INFO, 'starting git pull, repository path test_repo'),
+                                    ('GetraenkeApp', logging.INFO, 'finished git pull, repository path test_repo')]
+
+
+def test_bring_git_repo_up_to_date_success_changes_restart(mock_getraenkekasse, caplog):
+    mock_getraenkekasse.repo_kasse.pull.return_value = True
+    mock_getraenkekasse.repo_kasse.path_repo = 'test_repo'
+    mock_getraenkekasse.repo_kasse.is_changed = True
+
+    caplog.set_level(level=logging.INFO)
+
+    with unittest.mock.patch('wx.MessageDialog', autospec=True), \
+         unittest.mock.patch('os.execl', autospec=True) as mock_os_execl:
+        mock_getraenkekasse.bring_git_repo_up_to_date(repo=mock_getraenkekasse.repo_kasse,
+                                                      should_restart=True)
+
+    assert caplog.record_tuples == [('GetraenkeApp', logging.INFO, 'starting git pull, repository path test_repo'),
+                                    ('GetraenkeApp', logging.INFO, 'app is restarting'),
+                                    ('GetraenkeApp', logging.INFO, 'finished git pull, repository path test_repo')]
+    assert mock_os_execl.call_count == 1
+
+
+def test_bring_git_repo_up_to_date_error_no_exit(mock_getraenkekasse, caplog):
+    mock_getraenkekasse.repo_kasse.pull.return_value = False
+    mock_getraenkekasse.repo_kasse.path_repo = 'test_repo'
+    mock_getraenkekasse.repo_kasse.is_changed = False
+    mock_getraenkekasse.repo_kasse.error_message = 'test_error'
+
+    caplog.set_level(level=logging.INFO)
+
+    with unittest.mock.patch('wx.MessageDialog', autospec=True):
+        mock_getraenkekasse.bring_git_repo_up_to_date(repo=mock_getraenkekasse.repo_kasse,
+                                                      error_message='Problem occurred')
+
+    assert caplog.record_tuples == [
+        ('GetraenkeApp', logging.INFO, 'starting git pull, repository path test_repo'),
+        ('GetraenkeApp', logging.ERROR, 'error message: Problem occurred:\ntest_error\n'),
+        ('GetraenkeApp', logging.INFO, 'finished git pull, repository path test_repo')]
+
+
+def test_bring_git_repo_up_to_date_error_exit(mock_getraenkekasse, caplog):
+    mock_getraenkekasse.repo_kasse.pull.return_value = False
+    mock_getraenkekasse.repo_kasse.path_repo = 'test_repo'
+    mock_getraenkekasse.repo_kasse.is_changed = False
+    mock_getraenkekasse.repo_kasse.error_message = 'test_error'
+
+    caplog.set_level(level=logging.INFO)
+
+    with unittest.mock.patch('wx.MessageDialog', autospec=True), \
+            pytest.raises(SystemExit) as pytest_raise:
+        mock_getraenkekasse.bring_git_repo_up_to_date(repo=mock_getraenkekasse.repo_kasse,
+                                                      error_message='Problem occurred',
+                                                      should_exit=True)
+
+    assert caplog.record_tuples == [
+        ('GetraenkeApp', logging.INFO, 'starting git pull, repository path test_repo'),
+        ('GetraenkeApp', logging.ERROR, 'error message: Problem occurred:\ntest_error\nExiting now.'),
+        ('GetraenkeApp', logging.INFO, 'app is closed')]
+    assert pytest_raise.type == SystemExit
+    assert pytest_raise.value.code is None
+
+
+def test_commit_success(mock_getraenkekasse, caplog):
+    mock_getraenkekasse.repo_kasse.commit.return_value = True
+
+    caplog.set_level(level=logging.INFO)
+
+    mock_getraenkekasse._commit(repo=mock_getraenkekasse.repo_kasse,
+                                files=mock_getraenkekasse.purchases_file,
+                                commit_message='test_commit')
+
+    assert caplog.record_tuples == [
+        ('GetraenkeApp', logging.INFO, 'start'),
+        ('GetraenkeApp', logging.INFO, 'finish')]
+
+
+def test_commit_error(mock_getraenkekasse, caplog):
+    with unittest.mock.patch('wx.MessageDialog', autospec=True):
+        mock_getraenkekasse.repo_kasse.commit.return_value = False
+        mock_getraenkekasse.repo_kasse.error_message = 'test_error'
+
+        caplog.set_level(level=logging.INFO)
+
+        mock_getraenkekasse._commit(repo=mock_getraenkekasse.repo_kasse,
+                                    files=mock_getraenkekasse.purchases_file,
+                                    commit_message='test_commit',
+                                    error_message='Problem occurred')
+
+    assert caplog.record_tuples == [
+        ('GetraenkeApp', logging.INFO, 'start'),
+        ('GetraenkeApp', logging.ERROR, 'error message: Problem occurred\ntest_error'),
+        ('GetraenkeApp', logging.INFO, 'finish')]
+
+
+def test_push_success(mock_getraenkekasse, caplog):
+    mock_getraenkekasse.repo_kasse.push.return_value = True
+
+    caplog.set_level(level=logging.INFO)
+
+    mock_getraenkekasse._push(repo=mock_getraenkekasse.repo_kasse,
+                              error_message='Problem occurred')
+
+    assert caplog.record_tuples == [('GetraenkeApp', logging.INFO, 'start'),
+                                    ('GetraenkeApp', logging.INFO, 'finish')]
+
+
+def test_push_error(mock_getraenkekasse, caplog):
+    with unittest.mock.patch('wx.MessageDialog', autospec=True):
+        mock_getraenkekasse.repo_kasse.push.return_value = False
+        mock_getraenkekasse.repo_kasse.error_message = 'test_error'
+
+        caplog.set_level(level=logging.INFO)
+
+        mock_getraenkekasse._push(repo=mock_getraenkekasse.repo_kasse,
+                                  error_message='Problem occurred')
+
+    assert caplog.record_tuples == [('GetraenkeApp', logging.INFO, 'start'),
+                                    ('GetraenkeApp', logging.ERROR, 'error message: Problem occurred\ntest_error'),
+                                    ('GetraenkeApp', logging.INFO, 'finish')]
 
 
 def test_set_stock_for_product(mock_getraenkekasse):
