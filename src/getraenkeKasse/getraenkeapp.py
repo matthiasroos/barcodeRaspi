@@ -178,29 +178,39 @@ class GetraenkeApp(src.app.App):
                 self.restart()
         self.logger.info('finished git pull, repository path %s', repo.path_repo)
 
-    def check_in_changes_into_git(self,
-                                  repo: src.getraenkeKasse.git.GitRepository,
-                                  files: List[str],
-                                  commit_message: str,
-                                  error_message: str = 'Problem with local git repo.') -> None:
+    def _commit(self,
+                repo: src.getraenkeKasse.git.GitRepository,
+                files: List[str],
+                commit_message: str,
+                error_message: str = 'Problem with local git repo.') -> None:
         """
-        Commit all changes in a list of files to git.
+        Wrapper for repo.commit containing logging and an error dialog.
 
         :param repo:
-        :param files: list of filenames to
+        :param files: list of filenames to commit
         :param commit_message: commit message
         :param error_message: message in case of error
         :return:
         """
-        self.logger.info('commit changes to git')
-        self.queue.put(True)
+        self.logger.info('start')
         if not repo.commit(files=files, commit_message=commit_message):
             self.show_error_dialog(error_message=f'{error_message}\n{repo.error_message}')
-        self.logger.info('push commits to origin')
+        self.logger.info('finish')
+
+    def _push(self,
+              repo: src.getraenkeKasse.git.GitRepository,
+              error_message: str = 'Problem with local git repo.') -> None:
+        """
+        Wrapper for repo.push with containing logging and an error dialog.
+
+        :param repo:
+        :param error_message: message in case of error
+        :return:
+        """
+        self.logger.info('start')
         if not repo.push():
             self.show_error_dialog(error_message=f'{error_message}\n{repo.error_message}')
-        self.queue.get()
-        self.logger.info('push finished')
+        self.logger.info('finish')
 
     def _set_stock_for_product(self,
                                nr: int,
