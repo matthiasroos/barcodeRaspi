@@ -296,6 +296,7 @@ class GetraenkeApp(src.app.App):
         :return:
         """
         def thread_function() -> None:
+            self.queue.put(True)
             for _ in range(0, count):
                 self.file_contents.purchases = functions.add_purchase(purchases=self.file_contents.purchases,
                                                                       user=user, code=code)
@@ -311,15 +312,19 @@ class GetraenkeApp(src.app.App):
             if not any(result_list):
                 # TODO issue warning for selling without stock
                 pass
-            self.check_in_changes_into_git(repo=self.repo_kasse,
-                                           files=files,
-                                           commit_message='purchase via getraenkeKasse.py')
+            self._commit(repo=self.repo_kasse,
+                         files=files,
+                         commit_message='purchase via getraenkeKasse.py')
+            self._push(repo=self.repo_kasse)
+            self.queue.get()
             return None
 
         self.logger.info('user %s, code %s, count %s', user, code, count)
 
+        self.logger.info('start')
         thread = threading.Thread(target=thread_function)
         thread.start()
+        self.logger.info('finish')
 
     @property
     def clicked_user(self) -> str:
