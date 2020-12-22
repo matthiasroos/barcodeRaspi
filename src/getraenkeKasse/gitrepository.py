@@ -1,3 +1,4 @@
+
 from __future__ import annotations
 
 import datetime
@@ -21,16 +22,6 @@ class GitRepository:
         self.is_changed: bool = None # noqa
         self.error_message: Optional[str] = None
 
-    @staticmethod
-    def _create_error_message(exc: git.GitCommandError) -> str:
-        """
-        Create a error message from a GitCommandError.
-
-        :param exc: exception
-        :return: error message
-        """
-        return f'{exc}; stdout: {exc.stdout if exc.stdout else None}; stderr: {exc.stderr if exc.stderr else None}'
-
     @functions.check_environment_TEST_PROD
     def pull(self) -> bool:
         """
@@ -47,8 +38,8 @@ class GitRepository:
                 self.is_changed = False
             self.error_message = None
             return True
-        except git.GitCommandError as exc:
-            self.error_message = self._create_error_message(exc=exc)
+        except git.GitError as exc:
+            self.error_message = f'{exc}'
             return False
 
     @functions.check_environment_TEST_PROD
@@ -76,8 +67,8 @@ class GitRepository:
                 self.repo.index.commit(message=commit_message)
                 return True
             return False
-        except git.GitCommandError as exc:
-            self.error_message = self._create_error_message(exc=exc)
+        except git.GitError as exc:
+            self.error_message = f'{exc}'
             return False
 
     @functions.check_environment_TEST_PROD
@@ -91,8 +82,8 @@ class GitRepository:
             # TODO: check if it is necessary to push
             self.repo.remotes.origin.push()
             return True
-        except git.GitCommandError as exc:
-            self.error_message = self._create_error_message(exc=exc)
+        except git.GitError as exc:
+            self.error_message = f'{exc}'
             return False
 
     @property
