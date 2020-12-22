@@ -60,6 +60,7 @@ class GitRepository:
         """
         pass
 
+    @functions.check_environment_TEST_PROD
     def commit(self, files: list[str], commit_message: str) -> bool:
         """
         Add and commit files to the repository.
