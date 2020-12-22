@@ -37,7 +37,7 @@ def mock_getraenkekasse():
     with unittest.mock.patch('wx.App', autospec=True), \
          unittest.mock.patch('wx.SystemSettings', autospec=True), \
          unittest.mock.patch('wx.Font', autospec=True), \
-         unittest.mock.patch('src.getraenkeKasse.git.GitRepository', autospec=True), \
+         unittest.mock.patch('src.getraenkeKasse.gitrepository.GitRepository', autospec=True), \
          unittest.mock.patch('src.getraenkeKasse.timer.UpdateTimer', autospec=True):
         gk = src.getraenkeKasse.getraenkeapp.GetraenkeApp(button_height=1,
                                                           button_width=1,

@@ -12,7 +12,7 @@ import functions
 import getraenkeKasse
 import src.app
 import src.getraenkeKasse.adminframe
-import src.getraenkeKasse.git
+import src.getraenkeKasse.gitrepository
 import src.getraenkeKasse.listframe
 import src.getraenkeKasse.mainframe
 import src.getraenkeKasse.scanframe
@@ -55,7 +55,7 @@ class GetraenkeApp(src.app.App):
         self.remote_update_timer = src.getraenkeKasse.timer.UpdateTimer(interval=30 * 60 * 1000,
                                                                         func=self.update_from_remote)
 
-    def init_repo(self, path_repo: str) -> src.getraenkeKasse.git.GitRepository:
+    def init_repo(self, path_repo: str) -> src.getraenkeKasse.gitrepository.GitRepository:
         """
 
 
@@ -63,7 +63,7 @@ class GetraenkeApp(src.app.App):
         :return:
         """
         try:
-            repo = src.getraenkeKasse.git.GitRepository(path_repo=path_repo)
+            repo = src.getraenkeKasse.gitrepository.GitRepository(path_repo=path_repo)
             return repo
         except git.InvalidGitRepositoryError as exc:
             self.show_error_dialog(error_message=f'Invalid Git Repository: {path_repo}')
@@ -148,7 +148,7 @@ class GetraenkeApp(src.app.App):
             self.logger.info('already up to date')
 
     def bring_git_repo_up_to_date(self,
-                                  repo: src.getraenkeKasse.git.GitRepository,
+                                  repo: src.getraenkeKasse.gitrepository.GitRepository,
                                   error_message: str = 'Problem with local git repo.',
                                   should_exit: bool = False,
                                   restart_message: str = '',
@@ -179,7 +179,7 @@ class GetraenkeApp(src.app.App):
         self.logger.info('finished git pull, repository path %s', repo.path_repo)
 
     def _commit(self,
-                repo: src.getraenkeKasse.git.GitRepository,
+                repo: src.getraenkeKasse.gitrepository.GitRepository,
                 files: List[str],
                 commit_message: str,
                 error_message: str = 'Problem with local git repo.') -> None:
@@ -198,7 +198,7 @@ class GetraenkeApp(src.app.App):
         self.logger.info('finish')
 
     def _push(self,
-              repo: src.getraenkeKasse.git.GitRepository,
+              repo: src.getraenkeKasse.gitrepository.GitRepository,
               error_message: str = 'Problem with local git repo.') -> None:
         """
         Wrapper for repo.push with containing logging and an error dialog.
