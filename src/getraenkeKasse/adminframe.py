@@ -144,11 +144,9 @@ class AdminFrame(wx.Frame):
                 if stock_old != stock_new:
                     changed_stock.append([nr, stock_old, stock_new])
 
-            result = self.parent.show_confirm_dialog('Do you want to save purchases/products?')
-            if result:
-                for user in user_paid:
-                    self.parent.pay_for_user(user=user)
-                self.parent.replenish_stock(changed_stock=changed_stock)
+            if self.parent.show_confirm_dialog('Do you want to save purchases/products?'):
+                self.parent.save_admin_changes(user_paid=user_paid,
+                                               changed_stock=changed_stock)
                 self.changed = False
 
     def _onClickResetButton(self, _) -> None:

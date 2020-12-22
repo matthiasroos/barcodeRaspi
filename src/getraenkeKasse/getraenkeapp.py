@@ -224,23 +224,6 @@ class GetraenkeApp(src.app.App):
         """
         self.file_contents.products.loc[self.file_contents.products['nr'] == nr, 'stock'] = stock
 
-    def replenish_stock(self, changed_stock: List[List[int]]) -> None:
-        """
-        Fill the stock of a product and commit the new stock.
-
-        :param changed_stock:
-        :return:
-        """
-        self.bring_git_repo_up_to_date(repo=self.repo_kasse)
-        if changed_stock:
-            for product in changed_stock:
-                nr, stock_old, stock_new = product
-                if stock_old != stock_new:
-                    self._set_stock_for_product(nr=nr, stock=stock_new)
-            self._save_products()
-            self.check_in_changes_into_git(repo=self.repo_kasse, files=[self.products_file],
-                                           commit_message='replenish stock via getraenkeKasse.py')
-
     def _decrease_stock_for_product(self, code: str) -> bool:
         """
         Decrease the stock for a product by one.
@@ -262,18 +245,42 @@ class GetraenkeApp(src.app.App):
         """
         self.file_contents.purchases.loc[self.file_contents.purchases['user'] == user, 'paid'] = True
 
-    def pay_for_user(self, user: str) -> None:
+    @functions.runtime_profile(active=True)
+    def save_admin_changes(self,
+                           user_paid: List[str],
+                           changed_stock: List[List[int, int, int]]) -> None:
         """
-        Pay all purchases for a user and commit the payment.
 
-        :param user: paying user
+
+        :param user_paid: list of paying users
+        :param changed_stock:
         :return:
         """
-        self.bring_git_repo_up_to_date(repo=self.repo_kasse)
-        self._set_paid_for_user(user=user)
-        self._save_purchases()
-        self.check_in_changes_into_git(repo=self.repo_kasse, files=[self.purchases_file],
-                                       commit_message=f'pay for user {user} via getraenkeKasse.py')
+        def thread_function() -> None:
+            self.queue.put(True)
+            if user_paid:
+                for user in user_paid:
+                    self._set_paid_for_user(user=user)
+                    self._save_purchases()
+                    self._commit(repo=self.repo_kasse,
+                                 files=[self.purchases_file],
+                                 commit_message=f'pay for user {user} via getraenkeKasse.py')
+            if changed_stock:
+                for product in changed_stock:
+                    nr, stock_old, stock_new = product
+                    if stock_old != stock_new:
+                        self._set_stock_for_product(nr=nr, stock=stock_new)
+            self._save_products()
+            self._commit(repo=self.repo_kasse,
+                         files=[self.products_file],
+                         commit_message='replenish stock via getraenkeKasse.py')
+            self._push(repo=self.repo_kasse)
+            self.queue.get()
+
+        self.logger.info('start')
+        thread = threading.Thread(target=thread_function)
+        thread.start()
+        self.logger.info('finish')
 
     @functions.runtime_profile(active=True)
     def make_purchase(self,
