@@ -1,4 +1,5 @@
 
+import time
 import unittest.mock
 
 import freezegun
@@ -25,29 +26,30 @@ def get_purchases_for_user(gk: src.getraenkeKasse.getraenkeapp.GetraenkeApp, use
 
 
 @pytest.fixture(autouse=False)
-def mock_functions(request, monkeypatch):
-    mock_git_pull = unittest.mock.Mock(return_value=request.param['status_git_pull'])
-    monkeypatch.setattr(target=functions, name='git_pull', value=mock_git_pull)
-    mock_git_push = unittest.mock.Mock(return_value=True)
-    monkeypatch.setattr(target=functions, name='git_push', value=mock_git_push)
+def mock_functions(monkeypatch):
     mock_write_csv = unittest.mock.Mock(return_value=None)
     monkeypatch.setattr(target=functions, name='write_csv_file', value=mock_write_csv)
-    return mock_git_pull, mock_git_push, mock_write_csv
+    return mock_write_csv
 
 
 @pytest.fixture(autouse=False)
 def mock_getraenkekasse():
     with unittest.mock.patch('wx.App', autospec=True), \
          unittest.mock.patch('wx.SystemSettings', autospec=True), \
-         unittest.mock.patch('wx.Font', autospec=True):
+         unittest.mock.patch('wx.Font', autospec=True), \
+         unittest.mock.patch('src.getraenkeKasse.git.GitRepository', autospec=True), \
+         unittest.mock.patch('src.getraenkeKasse.timer.UpdateTimer', autospec=True):
         gk = src.getraenkeKasse.getraenkeapp.GetraenkeApp(button_height=1,
                                                           button_width=1,
                                                           font_size=1,
                                                           offset=1,
                                                           file_names={'products': TEST_PRODUCTS_FILE,
                                                                       'purchases': TEST_PURCHASES_FILE,
-                                                                      'users': TEST_USERS_FILE})
-        products = [[1, '1111111111111', 'xxxx', 0.60, 20], [2, '2222222222222', 'yyyy', 0.80, 0]]
+                                                                      'users': TEST_USERS_FILE},
+                                                          repositories={'kasse': 'test1',
+                                                                        'code': 'test2'})
+        products = [[1, '1111111111111', 'xxxx', 0.60, 20],
+                    [2, '2222222222222', 'yyyy', 0.80, 0]]
         gk.file_contents.products = pd.DataFrame(products, columns=columns_products)
         purchases = [['2019-12-10T12:20:00', 'aaa', '1111111111111', False],
                      ['2019-12-10T16:30:00', 'bbb', '2222222222222', False],
@@ -60,18 +62,6 @@ def mock_getraenkekasse():
 def test_set_stock_for_product(mock_getraenkekasse):
     mock_getraenkekasse._set_stock_for_product(nr=1, stock=23)
     assert get_stock_for_product(mock_getraenkekasse, '1111111111111') == 23
-
-
-@pytest.mark.parametrize('mock_functions', [dict(status_git_pull=True)], indirect=True)
-def test_replenish_stock(mock_getraenkekasse, mock_functions):
-    mock_git_pull, mock_git_push, mock_write_csv = mock_functions
-    mock_getraenkekasse.replenish_stock([[1, 20, 23], [2, 0, 0]])
-    assert get_stock_for_product(mock_getraenkekasse, '1111111111111') == 23
-    assert get_stock_for_product(mock_getraenkekasse, '2222222222222') == 0
-    mock_git_pull.assert_called_once()
-    mock_git_push.assert_called_once()
-    mock_write_csv.assert_called_once_with(file=TEST_PRODUCTS_FILE,
-                                           df=mock_getraenkekasse.file_contents.products)
 
 
 def test_decrease_stock_for_product0(mock_getraenkekasse):
@@ -91,50 +81,123 @@ def test_set_paid_for_user(mock_getraenkekasse):
     assert mock_getraenkekasse.file_contents.purchases['paid'].tolist() == [False, True, True]
 
 
-@pytest.mark.parametrize('mock_functions', [dict(status_git_pull=True)], indirect=True)
-def test_pay_for_user(mock_getraenkekasse, mock_functions):
-    mock_git_pull, mock_git_push, mock_write_csv = mock_functions
-    mock_getraenkekasse.pay_for_user('aaa')
-    assert mock_getraenkekasse.file_contents.purchases['paid'].tolist() == [True, False, False]
-    mock_git_pull.assert_called_once_with(path_repo='./.')
-    mock_git_push.assert_called_once_with(path_repo='./.', files=[TEST_PURCHASES_FILE],
-                                          commit_message='pay for user aaa via getraenkeKasse.py')
-    mock_write_csv.assert_called_once_with(file=TEST_PURCHASES_FILE,
-                                           df=mock_getraenkekasse.file_contents.purchases)
+def test_save_admin_changes_one_user_paid(mock_getraenkekasse, mock_functions):
+    mock_write_csv = mock_functions
+    mock_getraenkekasse.repo_kasse.commit.return_value = True
+    mock_getraenkekasse.repo_kasse.pull.return_value = True
 
+    mock_getraenkekasse.save_admin_changes(user_paid=['bbb'],
+                                           changed_stock=[])
 
-@freezegun.freeze_time('2019-12-10 17:00:00')
-@pytest.mark.parametrize('mock_functions', [dict(status_git_pull=True)], indirect=True)
-def test_make_purchase_stock_available(mock_getraenkekasse, mock_functions):
-    mock_git_pull, mock_git_push, mock_write_csv = mock_functions
-    expected_df = pd.DataFrame([['2019-12-10T12:20:00', 'aaa', '1111111111111', False],
-                                ['2019-12-10T17:00:00', 'aaa', '1111111111111', False]],
-                               columns=columns_purchases, index=[0, 3])
-    mock_getraenkekasse.make_purchase(user='aaa', code='1111111111111')
-    pd.testing.assert_frame_equal(get_purchases_for_user(gk=mock_getraenkekasse, user='aaa'), expected_df)
-    assert get_stock_for_product(mock_getraenkekasse, '1111111111111') == 19
-    mock_git_pull.assert_called_once_with(path_repo='./.')
-    mock_git_push.assert_called_once_with(path_repo='./.', files=[TEST_PURCHASES_FILE,
-                                                                  TEST_PRODUCTS_FILE],
-                                          commit_message='purchase via getraenkeKasse.py')
+    time.sleep(2)
+
+    pd.testing.assert_frame_equal(get_purchases_for_user(gk=mock_getraenkekasse, user='bbb'),
+                                  pd.DataFrame([
+                                      ['2019-12-10T16:30:00', 'bbb', '2222222222222', True],
+                                      ['2019-12-10T16:35:00', 'bbb', '2222222222222', True]],
+                                      columns=columns_purchases, index=[1, 2]))
+    mock_getraenkekasse.repo_kasse.commit.assert_called_once_with(
+        files=[TEST_PURCHASES_FILE],
+        commit_message='pay for user bbb via getraenkeKasse.py')
+    mock_getraenkekasse.repo_kasse.push.assert_called_once_with()
     mock_write_csv.assert_has_calls([unittest.mock.call(file=TEST_PURCHASES_FILE,
-                                                        df=mock_getraenkekasse.file_contents.purchases),
-                                     unittest.mock.call(file=TEST_PRODUCTS_FILE,
+                                                        df=mock_getraenkekasse.file_contents.purchases)])
+
+
+def test_save_admin_changes_stock_replenished(mock_getraenkekasse, mock_functions):
+    mock_write_csv = mock_functions
+    mock_getraenkekasse.repo_kasse.commit.return_value = True
+    mock_getraenkekasse.repo_kasse.pull.return_value = True
+
+    mock_getraenkekasse.save_admin_changes(user_paid=[],
+                                           changed_stock=[[2, 0, 30]])
+
+    time.sleep(2)
+
+    assert get_stock_for_product(gk=mock_getraenkekasse, code='2222222222222') == 30
+    mock_getraenkekasse.repo_kasse.commit.assert_called_once_with(
+        files=[TEST_PRODUCTS_FILE],
+        commit_message='replenish stock via getraenkeKasse.py')
+    mock_getraenkekasse.repo_kasse.push.assert_called_once_with()
+    mock_write_csv.assert_has_calls([unittest.mock.call(file=TEST_PRODUCTS_FILE,
                                                         df=mock_getraenkekasse.file_contents.products)])
 
 
+def test_save_admin_changes_user_paid_and_stock_replenished(mock_getraenkekasse, mock_functions):
+    mock_write_csv = mock_functions
+    mock_getraenkekasse.repo_kasse.commit.return_value = True
+    mock_getraenkekasse.repo_kasse.pull.return_value = True
+
+    mock_getraenkekasse.save_admin_changes(user_paid=['bbb'],
+                                           changed_stock=[[2, 0, 30]])
+
+    time.sleep(2)
+
+    pd.testing.assert_frame_equal(get_purchases_for_user(gk=mock_getraenkekasse, user='bbb'),
+                                  pd.DataFrame([
+                                      ['2019-12-10T16:30:00', 'bbb', '2222222222222', True],
+                                      ['2019-12-10T16:35:00', 'bbb', '2222222222222', True]],
+                                      columns=columns_purchases, index=[1, 2]))
+    assert get_stock_for_product(gk=mock_getraenkekasse, code='2222222222222') == 30
+    mock_getraenkekasse.repo_kasse.commit.assert_has_calls([
+        unittest.mock.call(files=[TEST_PURCHASES_FILE],
+                           commit_message='pay for user bbb via getraenkeKasse.py'),
+        unittest.mock.call(files=[TEST_PRODUCTS_FILE],
+                           commit_message='replenish stock via getraenkeKasse.py')
+    ])
+    mock_getraenkekasse.repo_kasse.push.assert_called_once_with()
+    mock_write_csv.assert_has_calls([
+        unittest.mock.call(file=TEST_PURCHASES_FILE,
+                           df=mock_getraenkekasse.file_contents.purchases),
+        unittest.mock.call(file=TEST_PRODUCTS_FILE,
+                           df=mock_getraenkekasse.file_contents.products)
+    ])
+
+
+@freezegun.freeze_time('2019-12-10 17:00:00')
+def test_make_purchase_stock_available(mock_getraenkekasse, mock_functions):
+    mock_write_csv = mock_functions
+    mock_getraenkekasse.repo_kasse.commit.return_value = True
+    mock_getraenkekasse.repo_kasse.pull.return_value = True
+
+    expected_df = pd.DataFrame([['2019-12-10T12:20:00', 'aaa', '1111111111111', False],
+                                ['2019-12-10T17:00:00', 'aaa', '1111111111111', False]],
+                               columns=columns_purchases, index=[0, 3])
+
+    mock_getraenkekasse.make_purchase(user='aaa', code='1111111111111', count=1)
+
+    time.sleep(2)
+
+    pd.testing.assert_frame_equal(get_purchases_for_user(gk=mock_getraenkekasse, user='aaa'), expected_df)
+    assert get_stock_for_product(mock_getraenkekasse, '1111111111111') == 19
+    mock_getraenkekasse.repo_kasse.commit.assert_called_once_with(files=[TEST_PURCHASES_FILE,
+                                                                         TEST_PRODUCTS_FILE],
+                                                                  commit_message='purchase via getraenkeKasse.py')
+    mock_getraenkekasse.repo_kasse.push.assert_called_once_with()
+    mock_write_csv.assert_has_calls([
+        unittest.mock.call(file=TEST_PURCHASES_FILE,
+                           df=mock_getraenkekasse.file_contents.purchases),
+        unittest.mock.call(file=TEST_PRODUCTS_FILE,
+                           df=mock_getraenkekasse.file_contents.products)
+    ])
+
+
 @freezegun.freeze_time('2019-12-10 18:00:00')
-@pytest.mark.parametrize('mock_functions', [dict(status_git_pull=True)], indirect=True)
 def test_make_purchase_stock_empty(mock_getraenkekasse, mock_functions):
-    mock_git_pull, mock_git_push, mock_write_csv = mock_functions
+    mock_write_csv = mock_functions
+    mock_getraenkekasse.repo_kasse.commit.return_value = True
+    mock_getraenkekasse.repo_kasse.pull.return_value = True
+
     expected_df = pd.DataFrame([['2019-12-10T12:20:00', 'aaa', '1111111111111', False],
                                 ['2019-12-10T18:00:00', 'aaa', '2222222222222', False]],
                                columns=columns_purchases, index=[0, 3])
-    mock_getraenkekasse.make_purchase(user='aaa', code='2222222222222')
+
+    mock_getraenkekasse.make_purchase(user='aaa', code='2222222222222', count=1)
+
     pd.testing.assert_frame_equal(get_purchases_for_user(gk=mock_getraenkekasse, user='aaa'), expected_df)
     assert get_stock_for_product(mock_getraenkekasse, '2222222222222') == 0
-    mock_git_pull.assert_called_once_with(path_repo='./.')
-    mock_git_push.assert_called_once_with(path_repo='./.', files=[TEST_PURCHASES_FILE],
-                                          commit_message='purchase via getraenkeKasse.py')
+    mock_getraenkekasse.repo_kasse.commit.assert_called_once_with(files=[TEST_PURCHASES_FILE],
+                                                                  commit_message='purchase via getraenkeKasse.py')
+    mock_getraenkekasse.repo_kasse.push.assert_called_once_with()
     mock_write_csv.assert_called_once_with(file=TEST_PURCHASES_FILE,
                                            df=mock_getraenkekasse.file_contents.purchases)

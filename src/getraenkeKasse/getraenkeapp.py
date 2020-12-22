@@ -270,10 +270,10 @@ class GetraenkeApp(src.app.App):
                     nr, stock_old, stock_new = product
                     if stock_old != stock_new:
                         self._set_stock_for_product(nr=nr, stock=stock_new)
-            self._save_products()
-            self._commit(repo=self.repo_kasse,
-                         files=[self.products_file],
-                         commit_message='replenish stock via getraenkeKasse.py')
+                self._save_products()
+                self._commit(repo=self.repo_kasse,
+                             files=[self.products_file],
+                             commit_message='replenish stock via getraenkeKasse.py')
             self._push(repo=self.repo_kasse)
             self.queue.get()
 
