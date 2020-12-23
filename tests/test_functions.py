@@ -10,18 +10,6 @@ import pytest
 import functions
 
 
-def test_git_pull0():
-    with unittest.mock.patch('git.Repo') as mock_git_repo:
-        status = functions.git_pull('./.')
-    mock_git_repo.assert_called_once_with('./.')
-    assert status is True
-
-
-def test_git_pull1():
-    status = functions.git_pull('./.')
-    assert status is False
-
-
 def test_read_users0_file_not_found():
     with unittest.mock.patch('os.path.isfile', return_value=False) as mocked_os:
         with pytest.raises(Exception) as exc:
