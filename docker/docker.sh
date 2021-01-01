@@ -1,3 +1,5 @@
 #!/usr/bin/bash
 
-docker run --net=host --env="DISPLAY" --volume="$HOME/.Xauthority:/root/.Xauthority:rw" getraenkekasse
+export KASSE=...
+
+sudo docker run --network host --env="DISPLAY" --volume="$KASSE:/app/kasse" --volume="$HOME/.Xauthority:/root/.Xauthority:rw"  getraenkekasse
