@@ -191,7 +191,7 @@ class App(metaclass=abc.ABCMeta):
         """
         Create dataframe for new item, if possible (input sanity check)
 
-        :param values: code, desc, price, stock
+        :param values: nr, code, desc, price, stock
         :return: dataframe containing the new product
         """
         new_item_list = [values[column] if values.get(column) else 0 for column in self.product_columns]
@@ -205,7 +205,7 @@ class App(metaclass=abc.ABCMeta):
 
     def get_product_for_code(self, code: str) -> Tuple[Optional[str], Optional[str]]:
         """
-
+        TODO: add docstring
         Prerequisite: code is unique
 
         :param code:
