@@ -1,44 +1,70 @@
 
+"""
+Collection of low-level functions used in different apps,
+which enables separation of GUI and logic for better testability.
+"""
+
 import datetime
 import hashlib
 import os
 import socket
 import struct
 import time
-from typing import List
+from typing import Callable, Iterable, List, Optional, Tuple
 
 import git
 import pandas as pd
 
 
-def check_environment_ONLY_PROD(func):
-    def wrapper(*args, **kwargs):
+def check_environment_ONLY_PROD(func) -> Callable:
+    """
+    Decorator function executing the handed function only in PROD environment
+
+    :param func: function (returning a bool)
+    :return:
+    """
+    def wrapper(*args, **kwargs) -> bool:
         if not ('BARCODE_DEV' in os.environ or 'BARCODE_TEST' in os.environ):
             return func(*args, **kwargs)
-        else:
-            return True
+        return True
     return wrapper
 
 
-def check_environment_TEST_PROD(func):
-    def wrapper(*args, **kwargs):
+def check_environment_TEST_PROD(func) -> Callable:
+    """
+    Decorator function executing the handed function only in TEST and PROD environment
+
+    :param func: function (returning a bool)
+    :return:
+    """
+    def wrapper(*args, **kwargs) -> bool:
         if 'BARCODE_DEV' not in os.environ:
             return func(*args, **kwargs)
-        else:
-            return True
+        return True
     return wrapper
 
 
-def check_environment_ONLY_DEV(func):
-    def wrapper(*args, **kwargs):
+def check_environment_ONLY_DEV(func) -> Callable:
+    """
+    Decorator function executing the handed function only in DEV environment
+
+    :param func: function (returning a bool)
+    :return:
+    """
+    def wrapper(*args, **kwargs) -> bool:
         if 'BARCODE_DEV' in os.environ:
             return func(*args, **kwargs)
-        else:
-            return True
+        return True
     return wrapper
 
 
 def getMD5Hash(filename: str) -> hashlib:
+    """
+    Get MD5 hash for a file
+
+    :param filename:
+    :return:
+    """
     hash_obj = hashlib.md5()
     with open(filename, 'rb') as file:
         buf = file.read()
@@ -111,14 +137,30 @@ def git_push(path_repo: str, files: List[str], commit_message: str) -> bool:
         return False
 
 
-def check_for_file(file) -> None:
+def check_for_file(file, raise_exec=True) -> Optional[bool]:
+    """
+    Check if the file exists.
+
+    Return True if it exists, False if not.
+    An exception is raised in the latter case, if raise_exec is True.
+
+    :param file: name of the file
+    :param raise_exec: flag if
+    :return:
+    """
     if not os.path.isfile(file):
-        raise Exception(f'{file} not found!')
+        if raise_exec is True:
+            raise Exception(f'{file} not found!')
+        return False
+    return True
 
 
-def read_users(users_file: str):
+def read_users(users_file: str) -> Iterable[str]:
     """"
-    Read users from usersFile
+    Read users from file.
+
+    :param users_file: file containing user names
+    :return:
     """
     check_for_file(users_file)
     with open(users_file, "r") as file_users:
@@ -126,13 +168,18 @@ def read_users(users_file: str):
             yield line.rstrip()
 
 
-def read_csv_file(file: str, columns: List[str], column_type: dict) -> pd.DataFrame:
+def format_dataframe(data_df: pd.DataFrame, types: dict) -> pd.DataFrame:
+    for key, value in types.items():
+        data_df[key] = data_df[key].astype(value)
+    return data_df
+
+
+def read_csv_file(file: str, columns: List[str], column_types: dict) -> pd.DataFrame:
     check_for_file(file)
     try:
         data_df = pd.read_csv(file, header=None)
         data_df.columns = columns
-        for key, value in column_type.items():
-            data_df[key] = data_df[key].astype(value)
+        data_df = format_dataframe(data_df=data_df, types=column_types)
     except pd.errors.EmptyDataError:
         data_df = pd.DataFrame([], columns=columns)
     return data_df
